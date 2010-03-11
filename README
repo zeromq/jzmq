@@ -1,0 +1,7 @@
+This is the Java language binding for 0MQ.
+
+To build, set JAVA_HOME to the location of your JDK and run:
+
+./configure; make
+
+For more information, refer to the 0MQ website at http://www.zeromq.org/.
