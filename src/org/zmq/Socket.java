@@ -25,7 +25,6 @@ public class Socket {
     }
 
     public static final int NOBLOCK = 1;
-    public static final int NOFLUSH = 2;
 
     public static final int P2P = 0;
     public static final int PUB = 1;
@@ -98,11 +97,6 @@ public class Socket {
      * @return true if send was successful, false otherwise.
      */
     public native boolean send (byte [] msg, long flags);
-
-    /**
-     * Flush the messages down the stream.
-     */
-    public native void flush ();
 
     /**
      * Receive a message.

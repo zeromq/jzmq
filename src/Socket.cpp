@@ -296,22 +296,6 @@ JNIEXPORT jboolean JNICALL Java_org_zmq_Socket_send (JNIEnv *env,
 }
 
 /**
- * Called by Java's Socket::flush().
- */
-JNIEXPORT void JNICALL Java_org_zmq_Socket_flush (JNIEnv *env, jobject obj)
-{
-    void *s = get_socket (env, obj);
-    assert (s);
-
-    int rc = zmq_flush (s);
-
-    if (rc == -1) {
-        raise_exception (env, errno);
-        return ;
-    }
-}
-
-/**
  * Called by Java's Socket::recv(long flags).
  */
 JNIEXPORT jbyteArray JNICALL Java_org_zmq_Socket_recv (JNIEnv *env,
