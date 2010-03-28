@@ -85,7 +85,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Creating JAR archive"
-				CommandLine="jar -cfv ..\..\..\lib\zmq.jar ..\..\..\src\org\zmq\Context.class ..\..\..\src\org\zmq\Socket.class ..\..\..\src\org\zmq\Poller.class"
+				CommandLine="cd ..\..\..\src\&#x0D;&#x0A;jar -cvf ..\lib\zmq.jar org\zmq\Context.class org\zmq\Socket.class org\zmq\Poller.class"
 			/>
 		</Configuration>
 		<Configuration
@@ -161,7 +161,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Creating JAR archive"
-				CommandLine="jar -cfv ..\..\..\lib\zmq.jar ..\..\..\src\org\zmq\Context.class ..\..\..\src\org\zmq\Socket.class ..\..\..\src\org\zmq\Poller.class"
+				CommandLine="cd ..\..\..\src\&#x0D;&#x0A;jar -cvf ..\lib\zmq.jar org\zmq\Context.class org\zmq\Socket.class org\zmq\Poller.class"
 			/>
 		</Configuration>
 	</Configurations>

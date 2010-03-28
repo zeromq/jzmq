@@ -36,6 +36,14 @@ public class Context {
         construct (appThreads, ioThreads, flags);
     }
 
+    /**
+     * This is an explicit "destructor".  It can be called to ensure
+     * the corresponding 0MQ Context has been disposed of.
+     */
+    public void destroy () {
+        finalize ();
+    }
+
     /** Initialize the JNI interface */
     protected native void construct (int appThreads, int ioThreads, int flags);
 

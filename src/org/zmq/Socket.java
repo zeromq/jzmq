@@ -60,6 +60,14 @@ public class Socket {
     }
 
     /**
+     * This is an explicit "destructor".  It can be called to ensure
+     * the corresponding 0MQ Socket has been disposed of.
+     */
+    public void destroy () {
+        finalize ();
+    }
+
+    /**
      * Set the socket option value, given as a long.
      *
      * @param option ID of the option to set.
