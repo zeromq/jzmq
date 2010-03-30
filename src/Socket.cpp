@@ -132,10 +132,12 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_finalize (JNIEnv *env,
     jobject obj)
 {
     void *s = get_socket (env, obj);
-    assert (s);
+    if (! s)
+        return;
 
     int rc = zmq_close (s);
-    put_socket (env, obj, NULL);
+    s = NULL;
+    put_socket (env, obj, s);
     assert (rc == 0);
 }
 
