@@ -92,7 +92,7 @@ else
 fi
 CPPFLAGS="$CPPFLAGS -I${JAVA_HOME}/include"
 
-# Need host-specific path for jni_md.h, this is braindead
+# Need host-specific path for jni_md.h on some systems, this is braindead
 AC_CANONICAL_HOST
 case "${host_os}" in
     *solaris*)
@@ -103,6 +103,9 @@ case "${host_os}" in
     ;;
     *linux*)
         CPPFLAGS="$CPPFLAGS -I${JAVA_HOME}/include/linux"
+    ;;
+    *darwin*)
+        # Darwin does not need an extra -I path
     ;;
     *)
         AC_MSG_ERROR([don't know how to find jni_md.h on this platform])
