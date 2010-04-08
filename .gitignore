@@ -16,7 +16,7 @@ stamp-*
 *~
 src/Zmq.jar
 src/config.hpp*
-src/org_zmq_*.h
+src/org_zeromq_*.h
 lib/
 builds/msvc/msvc.ncb
 builds/msvc/msvc.suo

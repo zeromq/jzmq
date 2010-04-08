@@ -1,23 +1,23 @@
 /*
-    Copyright (c) 2007-2010 iMatix Corporation
+  Copyright (c) 2007-2010 iMatix Corporation
 
-    This file is part of 0MQ.
+  This file is part of 0MQ.
 
-    0MQ is free software; you can redistribute it and/or modify it under
-    the terms of the Lesser GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+  0MQ is free software; you can redistribute it and/or modify it under
+  the terms of the Lesser GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    Lesser GNU General Public License for more details.
+  0MQ is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  Lesser GNU General Public License for more details.
 
-    You should have received a copy of the Lesser GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the Lesser GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import org.zmq.*;
+import org.zeromq.ZMQ;
 
 class remote_thr
 {
@@ -25,7 +25,7 @@ class remote_thr
     {
         if (args.length != 3) {
             System.out.println ("usage: remote_thr <connect-to> " +
-                "<message-size> <message-count>");
+                                "<message-size> <message-count>");
             return;
         }
 
@@ -34,12 +34,11 @@ class remote_thr
         int messageSize = Integer.parseInt (args [1]);
         int messageCount = Integer.parseInt (args [2]);
 
-        org.zmq.Context ctx = new org.zmq.Context (1, 1, 0);
+        ZMQ.Context ctx = ZMQ.context (1, 1, 0);
+        ZMQ.Socket s = ctx.socket (ZMQ.PUB);
 
-        org.zmq.Socket s = new org.zmq.Socket (ctx, org.zmq.Socket.PUB);
-
-       //  Add your socket options here.
-       //  For example ZMQ_RATE, ZMQ_RECOVERY_IVL and ZMQ_MCAST_LOOP for PGM.
+        //  Add your socket options here.
+        //  For example ZMQ_RATE, ZMQ_RECOVERY_IVL and ZMQ_MCAST_LOOP for PGM.
 
         s.connect (connectTo);
 

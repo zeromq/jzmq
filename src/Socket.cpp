@@ -17,85 +17,39 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include <assert.h>
 #include <errno.h>
+#include <string.h>
 
 #include <zmq.h>
 
 #include "jzmq.hpp"
 #include "util.hpp"
-#include "org_zmq_Socket.h"
+#include "org_zeromq_ZMQ_Socket.h"
 
 /** Handle to Java's Socket::socketHandle. */
 static jfieldID socket_handle_fid = NULL;
 
-/**
- * Make sure we have a valid pointer to Java's Socket::socketHandle.
- */
-static void ensure_socket (JNIEnv *env, jobject obj)
-{
-    if (socket_handle_fid == NULL) {
-        jclass cls = env->GetObjectClass (obj);
-        assert (cls);
-        socket_handle_fid = env->GetFieldID (cls, "socketHandle", "J");
-        assert (socket_handle_fid);
-        env->DeleteLocalRef (cls);
-    }
-}
 
-/**
- * Get the value of Java's Socket::socketHandle.
- */
-static void *get_socket (JNIEnv *env, jobject obj, int do_assert)
-{
-    ensure_socket (env, obj);
-    void *s = (void*) env->GetLongField (obj, socket_handle_fid);
+static void ensure_socket (JNIEnv *env,
+                           jobject obj);
+static void *get_socket (JNIEnv *env,
+                         jobject obj,
+                         int do_assert);
+static void put_socket (JNIEnv *env,
+                        jobject obj,
+                        void *s);
+static void *fetch_context (JNIEnv *env,
+                            jobject context);
 
-    if (do_assert)
-        assert (s);
-
-    return s;
-}
-
-/**
- * Set the value of Java's Socket::socketHandle.
- */
-static void put_socket (JNIEnv *env, jobject obj, void *s)
-{
-    ensure_socket (env, obj);
-    env->SetLongField (obj, socket_handle_fid, (jlong) s);
-}
-
-/**
- * Get the value of contextHandle for the specified Java Context.
- */
-static void *fetch_context (JNIEnv *env, jobject context)
-{
-    static jmethodID get_context_handle_mid = NULL;
-
-    if (get_context_handle_mid == NULL) {
-        jclass cls = env->GetObjectClass (context);
-        assert (cls);
-        get_context_handle_mid = env->GetMethodID (cls,
-            "getContextHandle", "()J");
-        env->DeleteLocalRef (cls);
-        assert (get_context_handle_mid);
-    }
-
-    void *c = (void*) env->CallLongMethod (context, get_context_handle_mid);
-    if (env->ExceptionCheck ()) {
-        c = NULL;
-    }
-
-    return c;
-}
 
 /**
  * Called to construct a Java Socket object.
  */
-JNIEXPORT void JNICALL Java_org_zmq_Socket_construct (JNIEnv *env,
-    jobject obj, jobject context, jint type)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_construct (JNIEnv *env,
+                                                                  jobject obj,
+                                                                  jobject context,
+                                                                  jint type)
 {
     void *s = get_socket (env, obj, 0);
     if (s)
@@ -120,8 +74,8 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_construct (JNIEnv *env,
 /**
  * Called to destroy a Java Socket object.
  */
-JNIEXPORT void JNICALL Java_org_zmq_Socket_finalize (JNIEnv *env,
-    jobject obj)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_finalize (JNIEnv *env,
+                                                                 jobject obj)
 {
     void *s = get_socket (env, obj, 0);
     if (! s)
@@ -141,8 +95,10 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_finalize (JNIEnv *env,
 /**
  * Called by Java's Socket::setsockopt(int option, long optval).
  */
-JNIEXPORT void JNICALL Java_org_zmq_Socket_setsockopt__IJ (JNIEnv *env,
-    jobject obj, jint option, jlong optval)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setsockopt__IJ (JNIEnv *env,
+                                                                       jobject obj,
+                                                                       jint option,
+                                                                       jlong optval)
 {
     switch (option) {
     case ZMQ_HWM:
@@ -174,8 +130,10 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_setsockopt__IJ (JNIEnv *env,
 /**
  * Called by Java's Socket::setsockopt(int option, String optval).
  */
-JNIEXPORT void JNICALL Java_org_zmq_Socket_setsockopt__ILjava_lang_String_2 (
-    JNIEnv *env, jobject obj, jint option, jstring optval)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setsockopt__ILjava_lang_String_2 (JNIEnv *env,
+                                                                                         jobject obj,
+                                                                                         jint option,
+                                                                                         jstring optval)
 {
     switch (option) {
     case ZMQ_IDENTITY:
@@ -214,8 +172,9 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_setsockopt__ILjava_lang_String_2 (
 /**
  * Called by Java's Socket::bind(String addr).
  */
-JNIEXPORT void JNICALL Java_org_zmq_Socket_bind (JNIEnv *env, jobject obj,
-    jstring addr)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_bind (JNIEnv *env,
+                                                             jobject obj,
+                                                             jstring addr)
 {
     void *s = get_socket (env, obj, 1);
 
@@ -243,8 +202,9 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_bind (JNIEnv *env, jobject obj,
 /**
  * Called by Java's Socket::connect(String addr).
  */
-JNIEXPORT void JNICALL Java_org_zmq_Socket_connect (JNIEnv *env,
-    jobject obj, jstring addr)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_connect (JNIEnv *env,
+                                                                jobject obj,
+                                                                jstring addr)
 {
     void *s = get_socket (env, obj, 1);
 
@@ -272,8 +232,10 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_connect (JNIEnv *env,
 /**
  * Called by Java's Socket::send(byte [] msg, long flags).
  */
-JNIEXPORT jboolean JNICALL Java_org_zmq_Socket_send (JNIEnv *env,
-    jobject obj, jbyteArray msg, jlong flags)
+JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
+                                                                 jobject obj,
+                                                                 jbyteArray msg,
+                                                                 jlong flags)
 {
     void *s = get_socket (env, obj, 1);
 
@@ -331,8 +293,9 @@ JNIEXPORT jboolean JNICALL Java_org_zmq_Socket_send (JNIEnv *env,
 /**
  * Called by Java's Socket::recv(long flags).
  */
-JNIEXPORT jbyteArray JNICALL Java_org_zmq_Socket_recv (JNIEnv *env,
-    jobject obj, jlong flags)
+JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv (JNIEnv *env,
+                                                                   jobject obj,
+                                                                   jlong flags)
 {
     void *s = get_socket (env, obj, 1);
 
@@ -379,4 +342,72 @@ JNIEXPORT jbyteArray JNICALL Java_org_zmq_Socket_recv (JNIEnv *env,
 
     env->SetByteArrayRegion (data, 0, sz, (jbyte*) pd);
     return data;
+}
+
+
+/**
+ * Make sure we have a valid pointer to Java's Socket::socketHandle.
+ */
+static void ensure_socket (JNIEnv *env,
+                           jobject obj)
+{
+    if (socket_handle_fid == NULL) {
+        jclass cls = env->GetObjectClass (obj);
+        assert (cls);
+        socket_handle_fid = env->GetFieldID (cls, "socketHandle", "J");
+        assert (socket_handle_fid);
+        env->DeleteLocalRef (cls);
+    }
+}
+
+/**
+ * Get the value of Java's Socket::socketHandle.
+ */
+static void *get_socket (JNIEnv *env,
+                         jobject obj,
+                         int do_assert)
+{
+    ensure_socket (env, obj);
+    void *s = (void*) env->GetLongField (obj, socket_handle_fid);
+
+    if (do_assert)
+        assert (s);
+
+    return s;
+}
+
+/**
+ * Set the value of Java's Socket::socketHandle.
+ */
+static void put_socket (JNIEnv *env,
+                        jobject obj,
+                        void *s)
+{
+    ensure_socket (env, obj);
+    env->SetLongField (obj, socket_handle_fid, (jlong) s);
+}
+
+/**
+ * Get the value of contextHandle for the specified Java Context.
+ */
+static void *fetch_context (JNIEnv *env,
+                            jobject context)
+{
+    static jmethodID get_context_handle_mid = NULL;
+
+    if (get_context_handle_mid == NULL) {
+        jclass cls = env->GetObjectClass (context);
+        assert (cls);
+        get_context_handle_mid = env->GetMethodID (cls,
+            "getContextHandle", "()J");
+        env->DeleteLocalRef (cls);
+        assert (get_context_handle_mid);
+    }
+
+    void *c = (void*) env->CallLongMethod (context, get_context_handle_mid);
+    if (env->ExceptionCheck ()) {
+        c = NULL;
+    }
+
+    return c;
 }

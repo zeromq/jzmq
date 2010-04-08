@@ -25,7 +25,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Compiling Java classes"
-				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zmq\Context.java ..\..\..\src\org\zmq\Socket.java ..\..\..\src\org\zmq\Poller.java&#x0D;&#x0A;"
+				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -85,7 +85,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Creating JAR archive"
-				CommandLine="cd ..\..\..\src\&#x0D;&#x0A;jar -cvf ..\lib\zmq.jar org\zmq\Context.class org\zmq\Socket.class org\zmq\Poller.class&#x0D;&#x0A;"
+				CommandLine="cd ..\..\..\src\&#x0D;&#x0A;jar -cvf ..\lib\zmq.jar org\zeromq\*.class&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -99,7 +99,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Compiling Java classes"
-				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zmq\Context.java ..\..\..\src\org\zmq\Socket.java ..\..\..\src\org\zmq\Poller.java&#x0D;&#x0A;"
+				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -161,7 +161,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Creating JAR archive"
-				CommandLine="cd ..\..\..\src\&#x0D;&#x0A;jar -cvf ..\lib\zmq.jar org\zmq\Context.class org\zmq\Socket.class org\zmq\Poller.class&#x0D;&#x0A;"
+				CommandLine="cd ..\..\..\src\&#x0D;&#x0A;jar -cvf ..\lib\zmq.jar org\zeromq\*.class&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -189,6 +189,10 @@
 				RelativePath="..\..\..\src\util.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\src\ZMQ.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Java Files"
@@ -196,7 +200,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\src\org\zmq\Context.java"
+				RelativePath="..\..\..\src\org\zeromq\ZMQ.java"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -204,8 +208,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating JNI header"
-						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zmq.Context&#x0D;&#x0A;"
-						Outputs="org_zmq_Context.h"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQ&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQ.h"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -214,56 +218,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating JNI header"
-						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zmq.Context&#x0D;&#x0A;"
-						Outputs="org_zmq_Context.h"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\..\src\org\zmq\Poller.java"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating JNI header"
-						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zmq.Poller&#x0D;&#x0A;"
-						Outputs="org_zmq_Poller.h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating JNI header"
-						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zmq.Poller&#x0D;&#x0A;"
-						Outputs="org_zmq_Poller.h"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\..\src\org\zmq\Socket.java"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating JNI header"
-						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zmq.Socket&#x0D;&#x0A;"
-						Outputs="org_zmq_Socket.h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating JNI header"
-						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zmq.Socket&#x0D;&#x0A;"
-						Outputs="org_zmq_Socket.h"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQ&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQ.h"
 					/>
 				</FileConfiguration>
 			</File>

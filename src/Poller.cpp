@@ -24,17 +24,20 @@
 
 #include "jzmq.hpp"
 #include "util.hpp"
-#include "org_zmq_Poller.h"
+#include "org_zeromq_ZMQ_Poller.h"
 
-static void *fetch_socket (JNIEnv *env, jobject socket);
 
-JNIEXPORT jlong JNICALL Java_org_zmq_Poller_run_1poll (JNIEnv *env,
-                                                       jobject obj,
-                                                       jint count,
-                                                       jobjectArray socket_0mq,
-                                                       jshortArray event_0mq,
-                                                       jshortArray revent_0mq,
-                                                       jlong timeout)
+static void *fetch_socket (JNIEnv *env,
+                           jobject socket);
+
+
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
+                                                                   jobject obj,
+                                                                   jint count,
+                                                                   jobjectArray socket_0mq,
+                                                                   jshortArray event_0mq,
+                                                                   jshortArray revent_0mq,
+                                                                   jlong timeout)
 {
     int ls = (int) count;
     if (ls <= 0)
@@ -102,11 +105,13 @@ JNIEXPORT jlong JNICALL Java_org_zmq_Poller_run_1poll (JNIEnv *env,
     delete [] pitem;
     return rc;
 }
+
   
 /**
  * Get the value of socketHandle for the specified Java Socket.
  */
-static void *fetch_socket (JNIEnv *env, jobject socket)
+static void *fetch_socket (JNIEnv *env,
+                           jobject socket)
 {
     static jmethodID get_socket_handle_mid = NULL;
 

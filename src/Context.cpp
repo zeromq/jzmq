@@ -24,53 +24,31 @@
 
 #include "jzmq.hpp"
 #include "util.hpp"
-#include "org_zmq_Context.h"
+#include "org_zeromq_ZMQ_Context.h"
+
 
 /** Handle to Java's Context::contextHandle. */
 static jfieldID ctx_handle_fid = NULL;
 
-/**
- * Make sure we have a valid pointer to Java's Context::contextHandle.
- */
-static void ensure_context (JNIEnv *env, jobject obj)
-{
-    if (ctx_handle_fid == NULL) {
-        jclass cls = env->GetObjectClass (obj);
-        assert (cls);
-        ctx_handle_fid = env->GetFieldID (cls, "contextHandle", "J");
-        assert (ctx_handle_fid);
-        env->DeleteLocalRef (cls);
-    }
-}
 
-/**
- * Get the value of Java's Context::contextHandle.
- */
-static void *get_context (JNIEnv *env, jobject obj, int do_assert)
-{
-    ensure_context (env, obj);
-    void *s = (void*) env->GetLongField (obj, ctx_handle_fid);
+static void ensure_context (JNIEnv *env,
+                            jobject obj);
+static void *get_context (JNIEnv *env,
+                          jobject obj,
+                          int do_assert);
+static void put_context (JNIEnv *env,
+                         jobject obj,
+                         void *s);
 
-    if (do_assert)
-        assert (s);
-
-    return s;
-}
-
-/**
- * Set the value of Java's Context::contextHandle.
- */
-static void put_context (JNIEnv *env, jobject obj, void *s)
-{
-    ensure_context (env, obj);
-    env->SetLongField (obj, ctx_handle_fid, (jlong) s);
-}
 
 /**
  * Called to construct a Java Context object.
  */
-JNIEXPORT void JNICALL Java_org_zmq_Context_construct (JNIEnv *env,
-    jobject obj, jint app_threads, jint io_threads, jint flags)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
+                                                                   jobject obj,
+                                                                   jint app_threads,
+                                                                   jint io_threads,
+                                                                   jint flags)
 {
     void *c = get_context (env, obj, 0);
     if (c)
@@ -89,8 +67,8 @@ JNIEXPORT void JNICALL Java_org_zmq_Context_construct (JNIEnv *env,
 /**
  * Called to destroy a Java Context object.
  */
-JNIEXPORT void JNICALL Java_org_zmq_Context_finalize (JNIEnv *env,
-    jobject obj)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_finalize (JNIEnv *env,
+                                                                  jobject obj)
 {
     void *c = get_context (env, obj, 0);
     if (! c)
@@ -105,4 +83,47 @@ JNIEXPORT void JNICALL Java_org_zmq_Context_finalize (JNIEnv *env,
         raise_exception (env, err);
         return;
     }
+}
+
+
+/**
+ * Make sure we have a valid pointer to Java's Context::contextHandle.
+ */
+static void ensure_context (JNIEnv *env,
+                            jobject obj)
+{
+    if (ctx_handle_fid == NULL) {
+        jclass cls = env->GetObjectClass (obj);
+        assert (cls);
+        ctx_handle_fid = env->GetFieldID (cls, "contextHandle", "J");
+        assert (ctx_handle_fid);
+        env->DeleteLocalRef (cls);
+    }
+}
+
+/**
+ * Get the value of Java's Context::contextHandle.
+ */
+static void *get_context (JNIEnv *env,
+                          jobject obj,
+                          int do_assert)
+{
+    ensure_context (env, obj);
+    void *s = (void*) env->GetLongField (obj, ctx_handle_fid);
+
+    if (do_assert)
+        assert (s);
+
+    return s;
+}
+
+/**
+ * Set the value of Java's Context::contextHandle.
+ */
+static void put_context (JNIEnv *env,
+                         jobject obj,
+                         void *s)
+{
+    ensure_context (env, obj);
+    env->SetLongField (obj, ctx_handle_fid, (jlong) s);
 }
