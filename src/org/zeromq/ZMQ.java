@@ -256,16 +256,18 @@ public class ZMQ {
             this.socket = new Socket[size];
             this.event = new short[size];
             this.revent = new short[size];
-            
-            for (int i = 0; i < size; ++i) {
-                this.event[i] = (POLLIN | POLLOUT | POLLERR);
-            }
         }
 
         public int register (Socket socket) {
+            return register(socket, POLLIN | POLLOUT | POLLERR);
+        }
+    
+        public int register (Socket socket,
+                             int events) {
             if (next >= size)
                 return -1;
             this.socket[next] = socket;
+            this.event[next] = (short) events;
             return next++;
         }
     
