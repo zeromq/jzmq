@@ -22,7 +22,8 @@
 
 #include <zmq.h>
 
-#include "config.hpp"
+#include "jzmq.hpp"
+#include "util.hpp"
 #include "org_zmq_Context.h"
 
 /** Handle to Java's Context::contextHandle. */
@@ -45,10 +46,14 @@ static void ensure_context (JNIEnv *env, jobject obj)
 /**
  * Get the value of Java's Context::contextHandle.
  */
-static void *get_context (JNIEnv *env, jobject obj)
+static void *get_context (JNIEnv *env, jobject obj, int do_assert)
 {
     ensure_context (env, obj);
     void *s = (void*) env->GetLongField (obj, ctx_handle_fid);
+
+    if (do_assert)
+        assert (s);
+
     return s;
 }
 
@@ -62,38 +67,21 @@ static void put_context (JNIEnv *env, jobject obj, void *s)
 }
 
 /**
- * Raise an exception that includes 0MQ's error message.
- */
-static void raise_exception (JNIEnv *env, int err)
-{
-    //  Get exception class.
-    jclass exception_class = env->FindClass ("java/lang/Exception");
-    assert (exception_class);
-
-    //  Get text description of the exception.
-    const char *err_msg = zmq_strerror (err);
-
-    //  Raise the exception.
-    int rc = env->ThrowNew (exception_class, err_msg);
-    env->DeleteLocalRef (exception_class);
-
-    assert (rc == 0);
-}
-
-/**
  * Called to construct a Java Context object.
  */
 JNIEXPORT void JNICALL Java_org_zmq_Context_construct (JNIEnv *env,
     jobject obj, jint app_threads, jint io_threads, jint flags)
 {
-    void *c = get_context (env, obj);
-    assert (!c);
+    void *c = get_context (env, obj, 0);
+    if (c)
+        return;
 
     c = zmq_init (app_threads, io_threads, flags);
+    int err = errno;
     put_context (env, obj, c);
 
-    if (!c) {
-        raise_exception (env, errno);
+    if (c == NULL) {
+        raise_exception (env, err);
         return;
     }
 }
@@ -104,10 +92,17 @@ JNIEXPORT void JNICALL Java_org_zmq_Context_construct (JNIEnv *env,
 JNIEXPORT void JNICALL Java_org_zmq_Context_finalize (JNIEnv *env,
     jobject obj)
 {
-    void *c = get_context (env, obj);
-    assert (c);
+    void *c = get_context (env, obj, 0);
+    if (! c)
+        return;
 
     int rc = zmq_term (c);
-    put_context (env, obj, NULL);
-    assert (rc == 0);
+    int err = errno;
+    c = NULL;
+    put_context (env, obj, c);
+
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
 }

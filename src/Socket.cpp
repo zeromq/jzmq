@@ -24,6 +24,7 @@
 #include <zmq.h>
 
 #include "jzmq.hpp"
+#include "util.hpp"
 #include "org_zmq_Socket.h"
 
 /** Handle to Java's Socket::socketHandle. */
@@ -46,10 +47,14 @@ static void ensure_socket (JNIEnv *env, jobject obj)
 /**
  * Get the value of Java's Socket::socketHandle.
  */
-static void *get_socket (JNIEnv *env, jobject obj)
+static void *get_socket (JNIEnv *env, jobject obj, int do_assert)
 {
     ensure_socket (env, obj);
     void *s = (void*) env->GetLongField (obj, socket_handle_fid);
+
+    if (do_assert)
+        assert (s);
+
     return s;
 }
 
@@ -69,7 +74,7 @@ static void *fetch_context (JNIEnv *env, jobject context)
 {
     static jmethodID get_context_handle_mid = NULL;
 
-    if (!get_context_handle_mid) {
+    if (get_context_handle_mid == NULL) {
         jclass cls = env->GetObjectClass (context);
         assert (cls);
         get_context_handle_mid = env->GetMethodID (cls,
@@ -83,27 +88,7 @@ static void *fetch_context (JNIEnv *env, jobject context)
         c = NULL;
     }
 
-    assert (c);
     return c;
-}
-
-/**
- * Raise an exception that includes 0MQ's error message.
- */
-static void raise_exception (JNIEnv *env, int err)
-{
-    //  Get exception class.
-    jclass exception_class = env->FindClass ("java/lang/Exception");
-    assert (exception_class);
-
-    //  Get text description of the exception.
-    const char *err_msg = zmq_strerror (err);
-
-    //  Raise the exception.
-    int rc = env->ThrowNew (exception_class, err_msg);
-    env->DeleteLocalRef (exception_class);
-
-    assert (rc == 0);
 }
 
 /**
@@ -112,15 +97,22 @@ static void raise_exception (JNIEnv *env, int err)
 JNIEXPORT void JNICALL Java_org_zmq_Socket_construct (JNIEnv *env,
     jobject obj, jobject context, jint type)
 {
-    void *s = get_socket (env, obj);
-    assert (! s);
+    void *s = get_socket (env, obj, 0);
+    if (s)
+        return;
 
     void *c = fetch_context (env, context);
+    if (c == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
     s = zmq_socket (c, type);
+    int err = errno;
     put_socket(env, obj, s);
 
     if (s == NULL) {
-        raise_exception (env, errno);
+        raise_exception (env, err);
         return;
     }
 }
@@ -131,14 +123,19 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_construct (JNIEnv *env,
 JNIEXPORT void JNICALL Java_org_zmq_Socket_finalize (JNIEnv *env,
     jobject obj)
 {
-    void *s = get_socket (env, obj);
+    void *s = get_socket (env, obj, 0);
     if (! s)
         return;
 
     int rc = zmq_close (s);
+    int err = errno;
     s = NULL;
     put_socket (env, obj, s);
-    assert (rc == 0);
+
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
 }
 
 /**
@@ -156,13 +153,16 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_setsockopt__IJ (JNIEnv *env,
     case ZMQ_RECOVERY_IVL:
     case ZMQ_MCAST_LOOP:
         {
-            void *s = get_socket (env, obj);
-            assert (s);
+            void *s = get_socket (env, obj, 1);
 
             int64_t value = optval;
             int rc = zmq_setsockopt (s, option, &value, sizeof (value));
-            if (rc != 0)
-                raise_exception (env, errno);
+            int err = errno;
+            if (rc != 0) {
+                raise_exception (env, err);
+                return;
+            }
+
             return;
         }
     default:
@@ -187,15 +187,22 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_setsockopt__ILjava_lang_String_2 (
                 return;
             }
 
-	    void *s = get_socket (env, obj);
-	    assert (s);
+	    void *s = get_socket (env, obj, 1);
 
             const char *value = env->GetStringUTFChars (optval, NULL);
-            assert (value);
+            if (! value) {
+                raise_exception (env, EINVAL);
+                return;
+            }
+
             int rc = zmq_setsockopt (s, option, value, strlen (value));
+            int err = errno;
             env->ReleaseStringUTFChars (optval, value);
-            if (rc != 0)
-                raise_exception (env, errno);
+            if (rc != 0) {
+                raise_exception (env, err);
+                return;
+            }
+
             return;
         }
     default:
@@ -210,8 +217,7 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_setsockopt__ILjava_lang_String_2 (
 JNIEXPORT void JNICALL Java_org_zmq_Socket_bind (JNIEnv *env, jobject obj,
     jstring addr)
 {
-    void *s = get_socket (env, obj);
-    assert (s);
+    void *s = get_socket (env, obj, 1);
 
     if (addr == NULL) {
         raise_exception (env, EINVAL);
@@ -225,10 +231,13 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_bind (JNIEnv *env, jobject obj,
     }
 
     int rc = zmq_bind (s, c_addr);
+    int err = errno;
     env->ReleaseStringUTFChars (addr, c_addr);
 
-    if (rc == -1)
-        raise_exception (env, errno);
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
 }
 
 /**
@@ -237,8 +246,7 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_bind (JNIEnv *env, jobject obj,
 JNIEXPORT void JNICALL Java_org_zmq_Socket_connect (JNIEnv *env,
     jobject obj, jstring addr)
 {
-    void *s = get_socket (env, obj);
-    assert (s);
+    void *s = get_socket (env, obj, 1);
 
     if (addr == NULL) {
         raise_exception (env, EINVAL);
@@ -252,10 +260,13 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_connect (JNIEnv *env,
     }
 
     int rc = zmq_connect (s, c_addr);
+    int err = errno;
     env->ReleaseStringUTFChars (addr, c_addr);
 
-    if (rc == -1)
-        raise_exception (env, errno);
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
 }
 
 /**
@@ -264,36 +275,56 @@ JNIEXPORT void JNICALL Java_org_zmq_Socket_connect (JNIEnv *env,
 JNIEXPORT jboolean JNICALL Java_org_zmq_Socket_send (JNIEnv *env,
     jobject obj, jbyteArray msg, jlong flags)
 {
-    void *s = get_socket (env, obj);
-    assert (s);
+    void *s = get_socket (env, obj, 1);
 
     jsize size = env->GetArrayLength (msg); 
-    jbyte *data = env->GetByteArrayElements (msg, 0);
-
     zmq_msg_t message;
     int rc = zmq_msg_init_size (&message, size);
-    assert (rc == 0);
+    int err = errno;
+    if (rc != 0) {
+        raise_exception (env, err);
+        return JNI_FALSE;
+    }
+
+    jbyte *data = env->GetByteArrayElements (msg, 0);
+    if (! data) {
+        raise_exception (env, EINVAL);
+        return JNI_FALSE;
+    }
+
     memcpy (zmq_msg_data (&message), data, size);
-
     env->ReleaseByteArrayElements (msg, data, 0);
-
     rc = zmq_send (s, &message, (int) flags);
+    err = errno;
         
-    if (rc == -1 && errno == EAGAIN) {
+    if (rc != 0 && err == EAGAIN) {
         rc = zmq_msg_close (&message);
-        assert (rc == 0);
+        err = errno;
+        if (rc != 0) {
+            raise_exception (env, err);
+            return JNI_FALSE;
+        }
         return JNI_FALSE;
     }
     
-    if (rc == -1) {
-        raise_exception (env, errno);
+    if (rc != 0) {
+        raise_exception (env, err);
         rc = zmq_msg_close (&message);
-        assert (rc == 0);
+        err = errno;
+        if (rc != 0) {
+            raise_exception (env, err);
+            return JNI_FALSE;
+        }
         return JNI_FALSE;
     }
 
     rc = zmq_msg_close (&message);
-    assert (rc == 0);
+    err = errno;
+    if (rc != 0) {
+        raise_exception (env, err);
+        return JNI_FALSE;
+    }
+
     return JNI_TRUE;
 }
 
@@ -303,29 +334,49 @@ JNIEXPORT jboolean JNICALL Java_org_zmq_Socket_send (JNIEnv *env,
 JNIEXPORT jbyteArray JNICALL Java_org_zmq_Socket_recv (JNIEnv *env,
     jobject obj, jlong flags)
 {
-    void *s = get_socket (env, obj);
-    assert (s);
+    void *s = get_socket (env, obj, 1);
 
     zmq_msg_t message;
-    zmq_msg_init (&message);
-    int rc = zmq_recv (s, &message, (int) flags);
-
-    if (rc == -1 && errno == EAGAIN) {
-        zmq_msg_close (&message);
+    int rc = zmq_msg_init (&message);
+    int err = errno;
+    if (rc != 0) {
+        raise_exception (env, err);
         return NULL;
     }
 
-    if (rc == -1) {
-        raise_exception (env, errno);
-        zmq_msg_close (&message);
+    rc = zmq_recv (s, &message, (int) flags);
+    err = errno;
+    if (rc != 0 && err == EAGAIN) {
+        rc = zmq_msg_close (&message);
+        err = errno;
+        if (rc != 0) {
+            raise_exception (env, err);
+            return NULL;
+        }
         return NULL;
     }
 
-    jbyteArray data = env->NewByteArray (zmq_msg_size (&message));
-    assert (data);
-    env->SetByteArrayRegion (data, 0, zmq_msg_size (&message),
-        (jbyte*) zmq_msg_data (&message));
+    if (rc != 0) {
+        raise_exception (env, err);
+        rc = zmq_msg_close (&message);
+        err = errno;
+        if (rc != 0) {
+            raise_exception (env, err);
+            return NULL;
+        }
+        return NULL;
+    }
 
+    // No errors are defined for these two functions. Should they?
+    int sz = zmq_msg_size (&message);
+    void* pd = zmq_msg_data (&message);
+
+    jbyteArray data = env->NewByteArray (sz);
+    if (! data) {
+        raise_exception (env, EINVAL);
+        return NULL;
+    }
+
+    env->SetByteArrayRegion (data, 0, sz, (jbyte*) pd);
     return data;
 }
-

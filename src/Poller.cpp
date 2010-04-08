@@ -23,6 +23,7 @@
 #include <zmq.h>
 
 #include "jzmq.hpp"
+#include "util.hpp"
 #include "org_zmq_Poller.h"
 
 static void *fetch_socket (JNIEnv *env, jobject socket);
@@ -66,8 +67,10 @@ JNIEXPORT jlong JNICALL Java_org_zmq_Poller_run_1poll (JNIEnv *env,
                 if (!s_0mq)
                     continue;
                 void *s = fetch_socket (env, s_0mq);
-                if (!s)
+                if (s == NULL) {
+                    raise_exception (env, EINVAL);
                     continue;
+                }
                 pitem [pc].socket = s;
                 pitem [pc].fd = 0;
                 pitem [pc].events = e_0mq [i];
@@ -102,7 +105,6 @@ JNIEXPORT jlong JNICALL Java_org_zmq_Poller_run_1poll (JNIEnv *env,
   
 /**
  * Get the value of socketHandle for the specified Java Socket.
- * TODO: move this to a single util.h file.
  */
 static void *fetch_socket (JNIEnv *env, jobject socket)
 {
@@ -122,6 +124,5 @@ static void *fetch_socket (JNIEnv *env, jobject socket)
         s = NULL;
     }
   
-    assert (s);
     return s;
 }
