@@ -13,19 +13,19 @@ jar_DATA = $(jarfile)
 dist_noinst_JAVA = \
 	org/zmq/Context.java \
 	org/zmq/Socket.java \
-	org/zmq/Poller.java \
+	org/zmq/Poller.java
 
 lib_LTLIBRARIES = libjzmq.la
 libjzmq_la_SOURCES = \
 	Context.cpp \
 	Socket.cpp \
 	Poller.cpp \
-	util.cpp \
+	util.cpp
 
 nodist_libjzmq_la_SOURCES = \
 	org_zmq_Context.h \
 	org_zmq_Socket.h \
-	org_zmq_Poller.h \
+	org_zmq_Poller.h
 
 libjzmq_la_CXXFLAGS = -Wall
 libjzmq_la_LDFLAGS = -version-info @JLTVER@
@@ -36,7 +36,7 @@ BUILT_SOURCES = \
 	org/zmq/Socket.class \
 	org_zmq_Socket.h \
 	org/zmq/Poller.class \
-	org/zmq/Poller.h \
+	org_zmq_Poller.h
 
 CLEANFILES = \
 	org/zmq/Context.class \
@@ -45,7 +45,7 @@ CLEANFILES = \
 	org_zmq_Socket.h \
 	org/zmq/Poller.class \
 	org_zmq_Poller.h \
-	zmq.jar \
+	zmq.jar
 
 $(srcdir)/Context.cpp: org_zmq_Context.h
 
@@ -68,7 +68,7 @@ org_zmq_Poller.h: org/zmq/Poller.class
 
 ./org/zmq/Poller.class: classdist_noinst.stamp
 
-$(srcdir)/util.cpp: util.h
+$(srcdir)/util.cpp: util.hpp
 
 dist-hook:
 	-rm $(distdir)/*.h
