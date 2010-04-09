@@ -24,13 +24,13 @@ public class ZMQ {
         System.loadLibrary("jzmq");
     }
 
-    // Values for third argument in Context constructor.
+    // Values for third argument when creating a Context.
     public static final int POLL = 1;
 
     // Values for flags in Socket's send and recv functions.
     public static final int NOBLOCK = 1;
 
-    // Socket types, used in Socket constructor.
+    // Socket types, used when creating a Socket.
     public static final int P2P = 0;
     public static final int PUB = 1;
     public static final int SUB = 2;
@@ -73,20 +73,6 @@ public class ZMQ {
     public static class Context {
 
         /**
-         * Class constructor.
-         *
-         * @param appThreads maximum number of application threads.
-         * @param ioThreads size of the threads pool to handle I/O
-         * operations.
-         * @param flags specific flags for this context.
-         */
-        public Context (int appThreads,
-                        int ioThreads,
-                        int flags) {
-            construct (appThreads, ioThreads, flags);
-        }
-
-        /**
          * This is an explicit "destructor".  It can be called to ensure
          * the corresponding 0MQ Context has been disposed of.
          */
@@ -114,6 +100,20 @@ public class ZMQ {
             return new Poller (this, size);
         }
 
+
+        /**
+         * Class constructor.
+         *
+         * @param appThreads maximum number of application threads.
+         * @param ioThreads size of the threads pool to handle I/O
+         * operations.
+         * @param flags specific flags for this context.
+         */
+        protected Context (int appThreads,
+                           int ioThreads,
+                           int flags) {
+            construct (appThreads, ioThreads, flags);
+        }
 
         /** Initialize the JNI interface */
         protected native void construct (int appThreads,
@@ -144,16 +144,6 @@ public class ZMQ {
      * Inner class: Socket.
      */
     public static class Socket {
-        /**
-         * Class constructor.
-         *
-         * @param context a 0MQ context previously created.
-         * @param type the socket type.
-         */
-        public Socket (Context context,
-                       int type) {
-            construct (context, type);
-        }
         
         /**
          * This is an explicit "destructor".  It can be called to
@@ -214,6 +204,18 @@ public class ZMQ {
          */
         public native byte [] recv (long flags);
 
+
+        /**
+         * Class constructor.
+         *
+         * @param context a 0MQ context previously created.
+         * @param type the socket type.
+         */
+        protected Socket (Context context,
+                          int type) {
+            construct (context, type);
+        }
+
         /** Initialize the JNI interface */
         protected native void construct (Context context,
                                          int type);
@@ -241,27 +243,25 @@ public class ZMQ {
      * Inner class: Poller.
      */
     public static class Poller {
-        /**
-         * Class constructor.
-         *
-         * @param context a 0MQ context previously created.
-         * @param size the number of Sockets this poller will contain.
-         */
-        public Poller (Context context,
-                       int size) {
-            this.context = context;
-            this.size = size;
-            this.next = 0;
-            
-            this.socket = new Socket[size];
-            this.event = new short[size];
-            this.revent = new short[size];
-        }
 
+        /**
+         * Register a Socket for polling on all events.
+         *
+         * @param socket the Socket we are registering.
+         * @return the index identifying this Socket in the poll set.
+         */
         public int register (Socket socket) {
             return register(socket, POLLIN | POLLOUT | POLLERR);
         }
     
+        /**
+         * Register a Socket for polling on the specified events.
+         *
+         * @param socket the Socket we are registering.
+         * @param events a mask composed by XORing POLLIN, POLLOUT and
+         * POLLERR.
+         * @return the index identifying this Socket in the poll set.
+         */
         public int register (Socket socket,
                              int events) {
             if (next >= size)
@@ -271,18 +271,39 @@ public class ZMQ {
             return next++;
         }
     
+        /**
+         * Get the current poll timeout.
+         *
+         * @return the current poll timeout in ms.
+         */
         public long getTimeout () {
             return this.timeout;
         }
     
+        /**
+         * Set the poll timeout.
+         *
+         * @param timeout the desired poll timeout in ms.
+         */
         public void setTimeout (long timeout) {
             this.timeout = timeout;
         }
 
+        /**
+         * Get the current poll set size.
+         *
+         * @return the current poll set size.
+         */
         public int getSize () {
             return this.size;
         }
 
+        /**
+         * Get the index for the next position in the poll set size.
+         *
+         * @return the index for the next position in the poll set
+         * size.
+         */
         public int getNext () {
             return this.next;
         }
@@ -302,16 +323,52 @@ public class ZMQ {
             return run_poll(next, socket, event, revent, timeout);
         }
 
+        /**
+         * Check whether the specified element in the poll set was
+         * signalled for input.
+         *
+         * @return true if the element was signalled.
+         */
         public boolean pollin(int index) {
             return poll_mask(index, POLLIN);
         }
 
+        /**
+         * Check whether the specified element in the poll set was
+         * signalled for output.
+         *
+         * @return true if the element was signalled.
+         */
         public boolean pollout(int index) {
             return poll_mask(index, POLLOUT);
         }
 
+        /**
+         * Check whether the specified element in the poll set was
+         * signalled for error.
+         *
+         * @return true if the element was signalled.
+         */
         public boolean pollerr(int index) {
             return poll_mask(index, POLLERR);
+        }
+
+
+        /**
+         * Class constructor.
+         *
+         * @param context a 0MQ context previously created.
+         * @param size the number of Sockets this poller will contain.
+         */
+        protected Poller (Context context,
+                          int size) {
+            this.context = context;
+            this.size = size;
+            this.next = 0;
+            
+            this.socket = new Socket[size];
+            this.event = new short[size];
+            this.revent = new short[size];
         }
 
         /**
