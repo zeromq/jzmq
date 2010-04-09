@@ -70,7 +70,7 @@ $(srcdir)/Socket.cpp: \
 	$(JZMQ_HPP_FILES)
 
 $(srcdir)/Poller.cpp: \
-	org_zeromq_ZMQ_Poller.h
+	org_zeromq_ZMQ_Poller.h \
 	$(JZMQ_HPP_FILES)
 
 $(srcdir)/util.cpp: \
