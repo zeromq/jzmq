@@ -19,9 +19,9 @@ libjzmq_la_SOURCES = \
 
 nodist_libjzmq_la_SOURCES = \
 	org_zeromq_ZMQ.h \
-	org_zeromq_Context.h \
-	org_zeromq_Socket.h \
-	org_zeromq_Poller.h
+	org_zeromq_ZMQ_Context.h \
+	org_zeromq_ZMQ_Socket.h \
+	org_zeromq_ZMQ_Poller.h
 
 libjzmq_la_CXXFLAGS = -Wall
 libjzmq_la_LDFLAGS = -version-info @JLTVER@
@@ -29,20 +29,20 @@ libjzmq_la_LDFLAGS = -version-info @JLTVER@
 BUILT_SOURCES = \
 	org/zeromq/ZMQ.class \
 	org/zeromq/ZMQ$$Context.class \
-	org_zeromq_Context.h \
+	org_zeromq_ZMQ_Context.h \
 	org/zeromq/ZMQ$$Socket.class \
-	org_zeromq_Socket.h \
+	org_zeromq_ZMQ_Socket.h \
 	org/zeromq/ZMQ$$Poller.class \
-	org_zeromq_Poller.h
+	org_zeromq_ZMQ_Poller.h
 
 CLEANFILES = \
 	org/zeromq/ZMQ.class \
 	org/zeromq/ZMQ$$Context.class \
-	org_zeromq_Context.h \
+	org_zeromq_ZMQ_Context.h \
 	org/zeromq/ZMQ$$Socket.class \
-	org_zeromq_Socket.h \
+	org_zeromq_ZMQ_Socket.h \
 	org/zeromq/ZMQ$$Poller.class \
-	org_zeromq_Poller.h \
+	org_zeromq_ZMQ_Poller.h \
 	zmq.jar
 
 $(srcdir)/ZMQ.cpp: \
