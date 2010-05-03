@@ -31,6 +31,8 @@ public class ZMQ {
     public static final int NOBLOCK = 1;
 
     // Socket types, used when creating a Socket.
+    public static final int PAIR = 0;
+    //  Note that P2P is obsoleted. PAIR should be used instead.
     public static final int P2P = 0;
     public static final int PUB = 1;
     public static final int SUB = 2;
