@@ -341,6 +341,10 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv (JNIEnv *env,
     }
 
     env->SetByteArrayRegion (data, 0, sz, (jbyte*) pd);
+
+    rc = zmq_msg_close(&message);
+    assert (rc == 0);
+
     return data;
 }
 
