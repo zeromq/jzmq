@@ -24,16 +24,11 @@ public class ZMQ {
         System.loadLibrary("jzmq");
     }
 
-    // Values for third argument when creating a Context.
-    public static final int POLL = 1;
-
     // Values for flags in Socket's send and recv functions.
     public static final int NOBLOCK = 1;
 
     // Socket types, used when creating a Socket.
     public static final int PAIR = 0;
-    //  Note that P2P is obsoleted. PAIR should be used instead.
-    public static final int P2P = 0;
     public static final int PUB = 1;
     public static final int SUB = 2;
     public static final int REQ = 3;
@@ -45,7 +40,6 @@ public class ZMQ {
 
     // Values for setsockopt.
     public static final int HWM = 1;
-    public static final int LWM = 2;
     public static final int SWAP = 3;
     public static final int AFFINITY = 4;
     public static final int IDENTITY = 5;
@@ -63,10 +57,8 @@ public class ZMQ {
     public static final int POLLERR = 4;
 
 
-    public static Context context(int appThreads,
-                                  int ioThreads,
-                                  int flags) {
-        return new Context (appThreads, ioThreads, flags);
+    public static Context context(int ioThreads) {
+        return new Context (ioThreads);
     }
 
     /**
@@ -106,21 +98,15 @@ public class ZMQ {
         /**
          * Class constructor.
          *
-         * @param appThreads maximum number of application threads.
          * @param ioThreads size of the threads pool to handle I/O
          * operations.
-         * @param flags specific flags for this context.
          */
-        protected Context (int appThreads,
-                           int ioThreads,
-                           int flags) {
-            construct (appThreads, ioThreads, flags);
+        protected Context (int ioThreads) {
+            construct (ioThreads);
         }
 
         /** Initialize the JNI interface */
-        protected native void construct (int appThreads,
-                                         int ioThreads,
-                                         int flags);
+        protected native void construct (int ioThreads);
 
         /** Free all resources used by JNI interface. */
         protected native void finalize ();

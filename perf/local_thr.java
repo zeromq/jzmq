@@ -33,7 +33,7 @@ class local_thr
         long messageSize = Integer.parseInt (args [1]);
         long messageCount = Integer.parseInt (args [2]);
 
-        ZMQ.Context ctx = ZMQ.context (1, 1, 0);
+        ZMQ.Context ctx = ZMQ.context (1);
         ZMQ.Socket s = ctx.socket (ZMQ.SUB);
 
         s.setsockopt (ZMQ.SUBSCRIBE , "");

@@ -33,7 +33,7 @@ class remote_lat
         int messageSize = Integer.parseInt (args [1]);
         int roundtripCount = Integer.parseInt (args [2]);
 
-        ZMQ.Context ctx = ZMQ.context (1, 1, 0);
+        ZMQ.Context ctx = ZMQ.context (1);
         ZMQ.Socket s = ctx.socket (ZMQ.REQ);
 
         //  Add your socket options here.

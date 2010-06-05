@@ -34,7 +34,7 @@ class remote_thr
         int messageSize = Integer.parseInt (args [1]);
         int messageCount = Integer.parseInt (args [2]);
 
-        ZMQ.Context ctx = ZMQ.context (1, 1, 0);
+        ZMQ.Context ctx = ZMQ.context (1);
         ZMQ.Socket s = ctx.socket (ZMQ.PUB);
 
         //  Add your socket options here.

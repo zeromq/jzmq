@@ -46,15 +46,13 @@ static void put_context (JNIEnv *env,
  */
 JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
                                                                    jobject obj,
-                                                                   jint app_threads,
-                                                                   jint io_threads,
-                                                                   jint flags)
+                                                                   jint io_threads)
 {
     void *c = get_context (env, obj, 0);
     if (c)
         return;
 
-    c = zmq_init (app_threads, io_threads, flags);
+    c = zmq_init (io_threads);
     int err = errno;
     put_context (env, obj, c);
 

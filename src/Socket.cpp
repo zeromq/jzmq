@@ -102,7 +102,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setsockopt__IJ (JNIEnv *e
 {
     switch (option) {
     case ZMQ_HWM:
-    case ZMQ_LWM:
     case ZMQ_SWAP:
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
