@@ -201,6 +201,9 @@ public class ZMQ {
          */
         protected Socket (Context context,
                           int type) {
+            // We keep a local handle to context so that
+            // garbage collection won't be too greedy on it.
+            this.context = context;
             construct (context, type);
         }
 
@@ -224,6 +227,8 @@ public class ZMQ {
 
         /** Opaque data used by JNI driver. */
         private long socketHandle;
+
+        private Context context = null;
     }
 
 
