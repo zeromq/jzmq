@@ -93,9 +93,75 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_finalize (JNIEnv *env,
 }
 
 /**
- * Called by Java's Socket::setsockopt(int option, long optval).
+ * Called by Java's Socket::getLongSockopt(int option).
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setsockopt__IJ (JNIEnv *env,
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env,
+                                                                        jobject obj,
+                                                                        jint option)
+{
+    switch (option) {
+    case ZMQ_HWM:
+    case ZMQ_SWAP:
+    case ZMQ_AFFINITY:
+    case ZMQ_RATE:
+    case ZMQ_RECOVERY_IVL:
+    case ZMQ_MCAST_LOOP:
+    case ZMQ_SNDBUF:
+    case ZMQ_RCVBUF:
+    case ZMQ_RCVMORE:
+        {
+            void *s = get_socket (env, obj, 1);
+
+            int64_t optval = 0;
+            size_t optvallen = sizeof(optval);
+            int rc = zmq_getsockopt (s, option, &optval, &optvallen);
+            int err = errno;
+            if (rc != 0) {
+                raise_exception (env, err);
+                return 0L;
+            }
+
+            return (jlong) optval;
+        }
+    default:
+        raise_exception (env, EINVAL);
+        return 0L;
+    }
+}
+
+/**
+ * Called by Java's Socket::getStringSockopt(int option).
+ */
+JNIEXPORT jstring JNICALL Java_org_zeromq_ZMQ_00024Socket_getStringSockopt (JNIEnv *env,
+                                                                            jobject obj,
+                                                                            jint option)
+{
+    switch (option) {
+    case ZMQ_IDENTITY:
+        {
+	    void *s = get_socket (env, obj, 1);
+
+            char optval[1024];
+            size_t optvallen = 1024;
+            int rc = zmq_getsockopt (s, option, optval, &optvallen);
+            int err = errno;
+            if (rc != 0) {
+                raise_exception (env, err);
+                return env->NewStringUTF("");
+            }
+
+            return env->NewStringUTF(optval);
+        }
+    default:
+        raise_exception (env, EINVAL);
+        return env->NewStringUTF("");
+    }
+}
+
+/**
+ * Called by Java's Socket::setLongSockopt(int option, long optval).
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *env,
                                                                        jobject obj,
                                                                        jint option,
                                                                        jlong optval)
@@ -107,6 +173,8 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setsockopt__IJ (JNIEnv *e
     case ZMQ_RATE:
     case ZMQ_RECOVERY_IVL:
     case ZMQ_MCAST_LOOP:
+    case ZMQ_SNDBUF:
+    case ZMQ_RCVBUF:
         {
             void *s = get_socket (env, obj, 1);
 
@@ -127,12 +195,12 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setsockopt__IJ (JNIEnv *e
 }
 
 /**
- * Called by Java's Socket::setsockopt(int option, String optval).
+ * Called by Java's Socket::setStringSockopt(int option, String optval).
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setsockopt__ILjava_lang_String_2 (JNIEnv *env,
-                                                                                         jobject obj,
-                                                                                         jint option,
-                                                                                         jstring optval)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setStringSockopt (JNIEnv *env,
+                                                                         jobject obj,
+                                                                         jint option,
+                                                                         jstring optval)
 {
     switch (option) {
     case ZMQ_IDENTITY:

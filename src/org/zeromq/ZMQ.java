@@ -40,6 +40,7 @@ public class ZMQ {
 
     // Values for setsockopt.
     public static final int HWM = 1;
+    // public static final int LWM = 2;  // No longer supported
     public static final int SWAP = 3;
     public static final int AFFINITY = 4;
     public static final int IDENTITY = 5;
@@ -50,6 +51,7 @@ public class ZMQ {
     public static final int MCAST_LOOP = 10;
     public static final int SNDBUF = 11;
     public static final int RCVBUF = 12;
+    public static final int RCVMORE = 13;
 
     // Polling types for a Poller.
     public static final int POLLIN = 1;
@@ -140,25 +142,100 @@ public class ZMQ {
         public void close () {
             finalize ();
         }
-        
-        /**
-         * Set the socket option value, given as a long.
-         *
-         * @param option ID of the option to set.
-         * @param optval value (as a long) to set the option to.
-         */
-        public native void setsockopt (int option,
-                                       long optval);
+
 
         /**
-         * Set the socket option value, given as a String.
-         *
-         * @param option ID of the option to set.
-         * @param optval value (as a String) to set the option to.
+         * Methods to get socket options.
          */
-        public native void setsockopt (int option,
-                                       String optval);
-        
+        public long getHWM() {
+            return getLongSockopt(HWM);
+        }
+
+        public long getSwap() {
+            return getLongSockopt(SWAP);
+        }
+
+        public long getAffinity() {
+            return getLongSockopt(AFFINITY);
+        }
+
+        public String getIdentity() {
+            return getStringSockopt(IDENTITY);
+        }
+
+        public long getRate() {
+            return getLongSockopt(RATE);
+        }
+
+        public long getRecoveryInterval() {
+            return getLongSockopt(RECOVERY_IVL);
+        }
+
+        public boolean getMulticastLoop() {
+            return getLongSockopt(MCAST_LOOP) != 0;
+        }
+
+        public long getSendBufferSize() {
+            return getLongSockopt(SNDBUF);
+        }
+
+        public long getReceiveBufferSize() {
+            return getLongSockopt(RCVBUF);
+        }
+
+        public boolean getReceiveMore() {
+            return getLongSockopt(RCVMORE) != 0;
+        }
+
+
+        /**
+         * Methods to set socket options.
+         */
+        public void setHWM(long hwm) {
+            setLongSockopt(HWM, hwm);
+        }
+
+        public void setSwap(long swap) {
+            setLongSockopt(SWAP, swap);
+        }
+
+        public void setAffinity(long affinity) {
+            setLongSockopt(AFFINITY, affinity);
+        }
+
+        public void setIdentity(String identity) {
+            setStringSockopt(IDENTITY, identity);
+        }
+
+        public void setSubscribe(String subscribe) {
+            setStringSockopt(SUBSCRIBE, subscribe);
+        }
+
+        public void setUnsubscribe(String unsubscribe) {
+            setStringSockopt(UNSUBSCRIBE, unsubscribe);
+        }
+
+        public void setRate(long rate) {
+            setLongSockopt(RATE, rate);
+        }
+
+        public void setRecoveryInterval(long recovery_ivl) {
+            setLongSockopt(RECOVERY_IVL, recovery_ivl);
+        }
+
+        public void setMulticastLoop(boolean mcast_loop) {
+            setLongSockopt(MCAST_LOOP, mcast_loop ? 1 : 0);
+        }
+
+        public void setSendBufferSize(long sndbuf) {
+            setLongSockopt(SNDBUF, sndbuf);
+        }
+
+        public void setReceiveBufferSize(long rcvbuf) {
+            setLongSockopt(RCVBUF, rcvbuf);
+        }
+
+
         /**
          * Bind to network interface. Start listening for new
          * connections.
@@ -181,7 +258,7 @@ public class ZMQ {
          * @param flags the flags to apply to the send operation.
          * @return true if send was successful, false otherwise.
          */
-        public native boolean send (byte [] msg,
+        public native boolean send (byte[] msg,
                                     long flags);
         
         /**
@@ -190,7 +267,7 @@ public class ZMQ {
          * @param flags the flags to apply to the receive operation.
          * @return the message received, as an array of bytes; null on error.
          */
-        public native byte [] recv (long flags);
+        public native byte[] recv (long flags);
 
 
         /**
@@ -214,6 +291,40 @@ public class ZMQ {
         /** Free all resources used by JNI interface. */
         protected native void finalize ();
 
+        /**
+         * Get the socket option value, as a long.
+         *
+         * @param option ID of the option to set.
+         * @return The socket option value (as a long).
+         */
+        protected native long getLongSockopt (int option);
+
+        /**
+         * Get the socket option value, as a String.
+         *
+         * @param option ID of the option to set.
+         * @return The socket option value (as a String).
+         */
+        protected native String getStringSockopt (int option);
+        
+        /**
+         * Set the socket option value, given as a long.
+         *
+         * @param option ID of the option to set.
+         * @param optval value (as a long) to set the option to.
+         */
+        protected native void setLongSockopt (int option,
+                                              long optval);
+
+        /**
+         * Set the socket option value, given as a String.
+         *
+         * @param option ID of the option to set.
+         * @param optval value (as a String) to set the option to.
+         */
+        protected native void setStringSockopt (int option,
+                                                String optval);
+        
         /**
          * Get the underlying socket handle.
          * This is private because it is only accessed from JNI, where
