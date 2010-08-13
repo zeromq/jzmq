@@ -26,6 +26,7 @@ public class ZMQ {
 
     // Values for flags in Socket's send and recv functions.
     public static final int NOBLOCK = 1;
+    public static final int SNDMORE = 2;
 
     // Socket types, used when creating a Socket.
     public static final int PAIR = 0;
