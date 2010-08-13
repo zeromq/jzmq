@@ -36,8 +36,10 @@ public class ZMQ {
     public static final int REP = 4;
     public static final int XREQ = 5;
     public static final int XREP = 6;
-    public static final int UPSTREAM = 7;
-    public static final int DOWNSTREAM = 8;
+    public static final int PULL = 7;
+    public static final int PUSH = 8;
+    public static final int UPSTREAM = PULL;
+    public static final int DOWNSTREAM = PUSH;
 
     // Values for setsockopt.
     public static final int HWM = 1;
