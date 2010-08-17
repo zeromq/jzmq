@@ -174,7 +174,7 @@ public class ZMQ {
             return getLongSockopt(RECOVERY_IVL);
         }
 
-        public boolean getMulticastLoop() {
+        public boolean hasMulticastLoop() {
             return getLongSockopt(MCAST_LOOP) != 0;
         }
 
@@ -186,7 +186,7 @@ public class ZMQ {
             return getLongSockopt(RCVBUF);
         }
 
-        public boolean getReceiveMore() {
+        public boolean hasReceiveMore() {
             return getLongSockopt(RCVMORE) != 0;
         }
 
@@ -210,12 +210,12 @@ public class ZMQ {
             setBytesSockopt(IDENTITY, identity);
         }
 
-        public void setSubscribe(byte[] subscribe) {
-            setBytesSockopt(SUBSCRIBE, subscribe);
+        public void subscribe(byte[] topic) {
+            setBytesSockopt(SUBSCRIBE, topic);
         }
 
-        public void setUnsubscribe(byte[] unsubscribe) {
-            setBytesSockopt(UNSUBSCRIBE, unsubscribe);
+        public void unsubscribe(byte[] topic) {
+            setBytesSockopt(UNSUBSCRIBE, topic);
         }
 
         public void setRate(long rate) {

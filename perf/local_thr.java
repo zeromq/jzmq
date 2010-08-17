@@ -36,7 +36,7 @@ class local_thr
         ZMQ.Context ctx = ZMQ.context (1);
         ZMQ.Socket s = ctx.socket (ZMQ.SUB);
 
-        s.setSubscribe(new byte[0]);
+        s.subscribe(new byte[0]);
 
         //  Add your socket options here.
         //  For example ZMQ_RATE, ZMQ_RECOVERY_IVL and ZMQ_MCAST_LOOP for PGM.

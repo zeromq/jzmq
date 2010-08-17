@@ -141,6 +141,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
         {
             void *s = get_socket (env, obj, 1);
 
+            // Warning: hard-coded limit here.
             char optval[1024];
             size_t optvallen = 1024;
             int rc = zmq_getsockopt (s, option, optval, &optvallen);
@@ -151,10 +152,13 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
             }
 
             jbyteArray array = env->NewByteArray (optvallen);
-            if (array != NULL) {
-                env->SetByteArrayRegion (array, 0, optvallen, (const jbyte*) optval);
-                return array;
+            if (array == NULL) {
+                raise_exception (env, EINVAL);
+                return env->NewByteArray(0);
             }
+
+            env->SetByteArrayRegion (array, 0, optvallen, (const jbyte*) optval);
+            return array;
         }
     default:
         raise_exception (env, EINVAL);
@@ -230,6 +234,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *
             if (rc != 0) {
                 raise_exception (env, err);
             }
+
             return;
         }
     default:
