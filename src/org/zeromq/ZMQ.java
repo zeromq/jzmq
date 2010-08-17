@@ -162,8 +162,8 @@ public class ZMQ {
             return getLongSockopt(AFFINITY);
         }
 
-        public String getIdentity() {
-            return getStringSockopt(IDENTITY);
+        public byte[] getIdentity() {
+            return getBytesSockopt(IDENTITY);
         }
 
         public long getRate() {
@@ -206,16 +206,16 @@ public class ZMQ {
             setLongSockopt(AFFINITY, affinity);
         }
 
-        public void setIdentity(String identity) {
-            setStringSockopt(IDENTITY, identity);
+        public void setIdentity(byte[] identity) {
+            setBytesSockopt(IDENTITY, identity);
         }
 
-        public void setSubscribe(String subscribe) {
-            setStringSockopt(SUBSCRIBE, subscribe);
+        public void setSubscribe(byte[] subscribe) {
+            setBytesSockopt(SUBSCRIBE, subscribe);
         }
 
-        public void setUnsubscribe(String unsubscribe) {
-            setStringSockopt(UNSUBSCRIBE, unsubscribe);
+        public void setUnsubscribe(byte[] unsubscribe) {
+            setBytesSockopt(UNSUBSCRIBE, unsubscribe);
         }
 
         public void setRate(long rate) {
@@ -303,12 +303,12 @@ public class ZMQ {
         protected native long getLongSockopt (int option);
 
         /**
-         * Get the socket option value, as a String.
+         * Get the socket option value, as a byte array.
          *
          * @param option ID of the option to set.
-         * @return The socket option value (as a String).
+         * @return The socket option value (as a byte array).
          */
-        protected native String getStringSockopt (int option);
+        protected native byte[] getBytesSockopt (int option);
         
         /**
          * Set the socket option value, given as a long.
@@ -320,13 +320,13 @@ public class ZMQ {
                                               long optval);
 
         /**
-         * Set the socket option value, given as a String.
+         * Set the socket option value, given as a byte array.
          *
          * @param option ID of the option to set.
-         * @param optval value (as a String) to set the option to.
+         * @param optval value (as a byte array) to set the option to.
          */
-        protected native void setStringSockopt (int option,
-                                                String optval);
+        protected native void setBytesSockopt (int option,
+                                               byte[] optval);
         
         /**
          * Get the underlying socket handle.

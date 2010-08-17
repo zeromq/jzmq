@@ -130,16 +130,16 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
 }
 
 /**
- * Called by Java's Socket::getStringSockopt(int option).
+ * Called by Java's Socket::getBytesSockopt(int option).
  */
-JNIEXPORT jstring JNICALL Java_org_zeromq_ZMQ_00024Socket_getStringSockopt (JNIEnv *env,
-                                                                            jobject obj,
-                                                                            jint option)
+JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JNIEnv *env,
+                                                                              jobject obj,
+                                                                              jint option)
 {
     switch (option) {
     case ZMQ_IDENTITY:
         {
-	    void *s = get_socket (env, obj, 1);
+            void *s = get_socket (env, obj, 1);
 
             char optval[1024];
             size_t optvallen = 1024;
@@ -147,14 +147,18 @@ JNIEXPORT jstring JNICALL Java_org_zeromq_ZMQ_00024Socket_getStringSockopt (JNIE
             int err = errno;
             if (rc != 0) {
                 raise_exception (env, err);
-                return env->NewStringUTF("");
+                return env->NewByteArray (0);
             }
 
-            return env->NewStringUTF(optval);
+            jbyteArray array = env->NewByteArray (optvallen);
+            if (array != NULL) {
+                env->SetByteArrayRegion (array, 0, optvallen, (const jbyte*) optval);
+                return array;
+            }
         }
     default:
         raise_exception (env, EINVAL);
-        return env->NewStringUTF("");
+        return env->NewByteArray(0);
     }
 }
 
@@ -195,12 +199,12 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 }
 
 /**
- * Called by Java's Socket::setStringSockopt(int option, String optval).
+ * Called by Java's Socket::setBytesSockopt(int option, byte[] optval).
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setStringSockopt (JNIEnv *env,
-                                                                         jobject obj,
-                                                                         jint option,
-                                                                         jstring optval)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *env,
+                                                                        jobject obj,
+                                                                        jint option,
+                                                                        jbyteArray optval)
 {
     switch (option) {
     case ZMQ_IDENTITY:
@@ -212,22 +216,20 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setStringSockopt (JNIEnv 
                 return;
             }
 
-	    void *s = get_socket (env, obj, 1);
+            void *s = get_socket (env, obj, 1);
 
-            const char *value = env->GetStringUTFChars (optval, NULL);
+            jbyte *value = env->GetByteArrayElements (optval, NULL);
             if (! value) {
                 raise_exception (env, EINVAL);
                 return;
             }
 
-            int rc = zmq_setsockopt (s, option, value, strlen (value));
+            int rc = zmq_setsockopt (s, option, value, env->GetArrayLength (optval));
             int err = errno;
-            env->ReleaseStringUTFChars (optval, value);
+            env->ReleaseByteArrayElements (optval, value, 0);
             if (rc != 0) {
                 raise_exception (env, err);
-                return;
             }
-
             return;
         }
     default:
