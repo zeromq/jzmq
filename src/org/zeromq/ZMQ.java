@@ -379,6 +379,18 @@ public class ZMQ {
         }
     
         /**
+         * Get the socket associated with an index.
+         *
+         * @param index the desired index.
+         * @return the Socket associated with that index (or null).
+         */
+        public Socket getSocket (int index) {
+            if (index < 0 || index >= next)
+                return null;
+            return socket[index];
+        }
+    
+        /**
          * Get the current poll timeout.
          *
          * @return the current poll timeout in ms.
