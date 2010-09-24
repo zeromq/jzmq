@@ -79,10 +79,12 @@ public class ZMQ {
 	/**
 	 * @see ZMQ#PULL
 	 */
+	@Deprecated
 	public static final int UPSTREAM = PULL;
 	/**
 	 * @see ZMQ#PUSH
 	 */
+	@Deprecated
 	public static final int DOWNSTREAM = PUSH;
 
 	/**
@@ -409,7 +411,11 @@ public class ZMQ {
 		 * @param topic
 		 */
 		public void subscribe(byte[] topic) {
-			setBytesSockopt(SUBSCRIBE, topic);
+			if (this._type == SUB) {
+				setBytesSockopt(SUBSCRIBE, topic);
+			} else {
+				throw new IllegalArgumentException("subscribe is only possible on ZMQ_SUB sockets.");
+			}
 		}
 
 		/**
@@ -422,7 +428,11 @@ public class ZMQ {
 		 * @param topic
 		 */
 		public void unsubscribe(byte[] topic) {
-			setBytesSockopt(UNSUBSCRIBE, topic);
+			if (this._type == SUB) {
+				setBytesSockopt(UNSUBSCRIBE, topic);
+			} else {
+				throw new IllegalArgumentException("unsubscribe is only possible on ZMQ_SUB sockets.");
+			}
 		}
 
 		/**
@@ -537,6 +547,7 @@ public class ZMQ {
 			// We keep a local handle to context so that
 			// garbage collection won't be too greedy on it.
 			this.context = context;
+			this._type = type;
 			construct(context, type);
 		}
 
@@ -598,6 +609,7 @@ public class ZMQ {
 		/** Opaque data used by JNI driver. */
 		private long socketHandle;
 		private Context context = null;
+		private int _type;
 		// private Constants use the appropriate setter instead.
 		private static final int HWM = 1;
 		// public static final int LWM = 2; // No longer supported
