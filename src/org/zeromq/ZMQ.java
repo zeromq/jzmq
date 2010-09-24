@@ -26,7 +26,7 @@ package org.zeromq;
  */
 public class ZMQ {
     static {
-        System.loadLibrary("jzmq");
+        System.loadLibrary ("jzmq");
     }
 
     // Values for flags in Socket's send and recv functions.
@@ -95,8 +95,8 @@ public class ZMQ {
      *            Number of threads to use, usually 1 is sufficient for most use cases.
      * @return the Context
      */
-    public static Context context(int ioThreads) {
-        return new Context(ioThreads);
+    public static Context context (int ioThreads) {
+        return new Context (ioThreads);
     }
 
     /**
@@ -108,8 +108,8 @@ public class ZMQ {
          * This is an explicit "destructor". It can be called to ensure the corresponding 0MQ
          * Context has been disposed of.
          */
-        public void term() {
-            finalize();
+        public void term () {
+            finalize ();
         }
 
         /**
@@ -119,8 +119,8 @@ public class ZMQ {
          *            the socket type.
          * @return the newly created Socket.
          */
-        public Socket socket(int type) {
-            return new Socket(this, type);
+        public Socket socket (int type) {
+            return new Socket (this, type);
         }
 
         /**
@@ -130,8 +130,8 @@ public class ZMQ {
          *            the poller size.
          * @return the newly created Poller.
          */
-        public Poller poller(int size) {
-            return new Poller(this, size);
+        public Poller poller (int size) {
+            return new Poller (this, size);
         }
 
         /**
@@ -140,16 +140,16 @@ public class ZMQ {
          * @param ioThreads
          *            size of the threads pool to handle I/O operations.
          */
-        protected Context(int ioThreads) {
-            construct(ioThreads);
+        protected Context (int ioThreads) {
+            construct (ioThreads);
         }
 
         /** Initialize the JNI interface */
-        protected native void construct(int ioThreads);
+        protected native void construct (int ioThreads);
 
         /** Free all resources used by JNI interface. */
         @Override
-        protected native void finalize();
+        protected native void finalize ();
 
         /**
          * Get the underlying context handle. This is private because it is only accessed from JNI,
@@ -157,7 +157,7 @@ public class ZMQ {
          * 
          * @return the internal 0MQ context handle.
          */
-        private long getContextHandle() {
+        private long getContextHandle () {
             return this.contextHandle;
         }
 
@@ -173,8 +173,8 @@ public class ZMQ {
          * This is an explicit "destructor". It can be called to ensure the corresponding 0MQ Socket
          * has been disposed of.
          */
-        public void close() {
-            finalize();
+        public void close () {
+            finalize ();
         }
 
         /**
@@ -191,8 +191,8 @@ public class ZMQ {
          * 
          * @return the High Water Mark.
          */
-        public long getHWM() {
-            return getLongSockopt(HWM);
+        public long getHWM () {
+            return getLongSockopt (HWM);
         }
 
         /**
@@ -205,8 +205,8 @@ public class ZMQ {
          * 
          * @return the number of messages to swap at most.
          */
-        public long getSwap() {
-            return getLongSockopt(SWAP);
+        public long getSwap () {
+            return getLongSockopt (SWAP);
         }
 
         /**
@@ -225,8 +225,8 @@ public class ZMQ {
          * 
          * @return the affinity.
          */
-        public long getAffinity() {
-            return getLongSockopt(AFFINITY);
+        public long getAffinity () {
+            return getLongSockopt (AFFINITY);
         }
 
         /**
@@ -246,8 +246,8 @@ public class ZMQ {
          * 
          * @return the Identitiy.
          */
-        public byte[] getIdentity() {
-            return getBytesSockopt(IDENTITY);
+        public byte [] getIdentity () {
+            return getBytesSockopt (IDENTITY);
         }
 
         /**
@@ -256,8 +256,8 @@ public class ZMQ {
          * 
          * @return the Rate.
          */
-        public long getRate() {
-            return getLongSockopt(RATE);
+        public long getRate () {
+            return getLongSockopt (RATE);
         }
 
         /**
@@ -272,8 +272,8 @@ public class ZMQ {
          * 
          * @return the RecoveryIntervall.
          */
-        public long getRecoveryInterval() {
-            return getLongSockopt(RECOVERY_IVL);
+        public long getRecoveryInterval () {
+            return getLongSockopt (RECOVERY_IVL);
         }
 
         /**
@@ -286,8 +286,8 @@ public class ZMQ {
          * 
          * @return the Multicast Loop.
          */
-        public boolean hasMulticastLoop() {
-            return getLongSockopt(MCAST_LOOP) != 0;
+        public boolean hasMulticastLoop () {
+            return getLongSockopt (MCAST_LOOP) != 0;
         }
 
         /**
@@ -298,8 +298,8 @@ public class ZMQ {
          * 
          * @return the kernel send buffer size.
          */
-        public long getSendBufferSize() {
-            return getLongSockopt(SNDBUF);
+        public long getSendBufferSize () {
+            return getLongSockopt (SNDBUF);
         }
 
         /**
@@ -310,8 +310,8 @@ public class ZMQ {
          * 
          * @return the kernel receive buffer size.
          */
-        public long getReceiveBufferSize() {
-            return getLongSockopt(RCVBUF);
+        public long getReceiveBufferSize () {
+            return getLongSockopt (RCVBUF);
         }
 
         /**
@@ -323,8 +323,8 @@ public class ZMQ {
          * 
          * @return true if there are more messages to receive.
          */
-        public boolean hasReceiveMore() {
-            return getLongSockopt(RCVMORE) != 0;
+        public boolean hasReceiveMore () {
+            return getLongSockopt (RCVMORE) != 0;
         }
 
         /**
@@ -340,8 +340,8 @@ public class ZMQ {
          * @param hwm
          *            the number of messages to queue.
          */
-        public void setHWM(long hwm) {
-            setLongSockopt(HWM, hwm);
+        public void setHWM (long hwm) {
+            setLongSockopt (HWM, hwm);
         }
 
         /**
@@ -353,8 +353,8 @@ public class ZMQ {
          * @param swap
          *            The value of 'ZMQ_SWAP' defines the maximum size of the swap space in bytes.
          */
-        public void setSwap(long swap) {
-            setLongSockopt(SWAP, swap);
+        public void setSwap (long swap) {
+            setLongSockopt (SWAP, swap);
         }
 
         /**
@@ -374,8 +374,8 @@ public class ZMQ {
          * @param affinity
          *            the affinity.
          */
-        public void setAffinity(long affinity) {
-            setLongSockopt(AFFINITY, affinity);
+        public void setAffinity (long affinity) {
+            setLongSockopt (AFFINITY, affinity);
         }
 
         /**
@@ -395,8 +395,8 @@ public class ZMQ {
          * 
          * @param identity
          */
-        public void setIdentity(byte[] identity) {
-            setBytesSockopt(IDENTITY, identity);
+        public void setIdentity (byte [] identity) {
+            setBytesSockopt (IDENTITY, identity);
         }
 
         /**
@@ -411,8 +411,8 @@ public class ZMQ {
          * 
          * @param topic
          */
-        public void subscribe(byte[] topic) {
-            setBytesSockopt(SUBSCRIBE, topic);
+        public void subscribe (byte [] topic) {
+            setBytesSockopt (SUBSCRIBE, topic);
         }
 
         /**
@@ -424,8 +424,8 @@ public class ZMQ {
          * 
          * @param topic
          */
-        public void unsubscribe(byte[] topic) {
-            setBytesSockopt(UNSUBSCRIBE, topic);
+        public void unsubscribe (byte [] topic) {
+            setBytesSockopt (UNSUBSCRIBE, topic);
         }
 
         /**
@@ -434,8 +434,8 @@ public class ZMQ {
          * 
          * @param rate
          */
-        public void setRate(long rate) {
-            setLongSockopt(RATE, rate);
+        public void setRate (long rate) {
+            setLongSockopt (RATE, rate);
         }
 
         /**
@@ -450,8 +450,8 @@ public class ZMQ {
          * 
          * @param recovery_ivl
          */
-        public void setRecoveryInterval(long recovery_ivl) {
-            setLongSockopt(RECOVERY_IVL, recovery_ivl);
+        public void setRecoveryInterval (long recovery_ivl) {
+            setLongSockopt (RECOVERY_IVL, recovery_ivl);
         }
 
         /**
@@ -464,8 +464,8 @@ public class ZMQ {
          * 
          * @param mcast_loop
          */
-        public void setMulticastLoop(boolean mcast_loop) {
-            setLongSockopt(MCAST_LOOP, mcast_loop ? 1 : 0);
+        public void setMulticastLoop (boolean mcast_loop) {
+            setLongSockopt (MCAST_LOOP, mcast_loop ? 1 : 0);
         }
 
         /**
@@ -476,8 +476,8 @@ public class ZMQ {
          * 
          * @param sndbuf
          */
-        public void setSendBufferSize(long sndbuf) {
-            setLongSockopt(SNDBUF, sndbuf);
+        public void setSendBufferSize (long sndbuf) {
+            setLongSockopt (SNDBUF, sndbuf);
         }
 
         /**
@@ -488,8 +488,8 @@ public class ZMQ {
          * 
          * @param rcvbuf
          */
-        public void setReceiveBufferSize(long rcvbuf) {
-            setLongSockopt(RCVBUF, rcvbuf);
+        public void setReceiveBufferSize (long rcvbuf) {
+            setLongSockopt (RCVBUF, rcvbuf);
         }
 
         /**
@@ -498,7 +498,7 @@ public class ZMQ {
          * @param addr
          *            the endpoint to bind to.
          */
-        public native void bind(String addr);
+        public native void bind (String addr);
 
         /**
          * Connect to remote application.
@@ -506,7 +506,7 @@ public class ZMQ {
          * @param addr
          *            the endpoint to connect to.
          */
-        public native void connect(String addr);
+        public native void connect (String addr);
 
         /**
          * Send a message.
@@ -517,7 +517,7 @@ public class ZMQ {
          *            the flags to apply to the send operation.
          * @return true if send was successful, false otherwise.
          */
-        public native boolean send(byte[] msg, long flags);
+        public native boolean send (byte [] msg, long flags);
 
         /**
          * Receive a message.
@@ -526,7 +526,7 @@ public class ZMQ {
          *            the flags to apply to the receive operation.
          * @return the message received, as an array of bytes; null on error.
          */
-        public native byte[] recv(long flags);
+        public native byte [] recv (long flags);
 
         /**
          * Class constructor.
@@ -536,19 +536,19 @@ public class ZMQ {
          * @param type
          *            the socket type.
          */
-        protected Socket(Context context, int type) {
+        protected Socket (Context context, int type) {
             // We keep a local handle to context so that
             // garbage collection won't be too greedy on it.
             this.context = context;
-            construct(context, type);
+            construct (context, type);
         }
 
         /** Initialize the JNI interface */
-        protected native void construct(Context ctx, int type);
+        protected native void construct (Context ctx, int type);
 
         /** Free all resources used by JNI interface. */
         @Override
-        protected native void finalize();
+        protected native void finalize ();
 
         /**
          * Get the socket option value, as a long.
@@ -557,7 +557,7 @@ public class ZMQ {
          *            ID of the option to set.
          * @return The socket option value (as a long).
          */
-        protected native long getLongSockopt(int option);
+        protected native long getLongSockopt (int option);
 
         /**
          * Get the socket option value, as a byte array.
@@ -566,7 +566,7 @@ public class ZMQ {
          *            ID of the option to set.
          * @return The socket option value (as a byte array).
          */
-        protected native byte[] getBytesSockopt(int option);
+        protected native byte [] getBytesSockopt (int option);
 
         /**
          * Set the socket option value, given as a long.
@@ -576,7 +576,7 @@ public class ZMQ {
          * @param optval
          *            value (as a long) to set the option to.
          */
-        protected native void setLongSockopt(int option, long optval);
+        protected native void setLongSockopt (int option, long optval);
 
         /**
          * Set the socket option value, given as a byte array.
@@ -586,7 +586,7 @@ public class ZMQ {
          * @param optval
          *            value (as a byte array) to set the option to.
          */
-        protected native void setBytesSockopt(int option, byte[] optval);
+        protected native void setBytesSockopt (int option, byte [] optval);
 
         /**
          * Get the underlying socket handle. This is private because it is only accessed from JNI,
@@ -594,7 +594,7 @@ public class ZMQ {
          * 
          * @return the internal 0MQ socket handle.
          */
-        private long getSocketHandle() {
+        private long getSocketHandle () {
             return this.socketHandle;
         }
 
@@ -628,8 +628,8 @@ public class ZMQ {
          *            the Socket we are registering.
          * @return the index identifying this Socket in the poll set.
          */
-        public int register(Socket socket) {
-            return register(socket, POLLIN | POLLOUT | POLLERR);
+        public int register (Socket socket) {
+            return register (socket, POLLIN | POLLOUT | POLLERR);
         }
 
         /**
@@ -641,12 +641,12 @@ public class ZMQ {
          *            a mask composed by XORing POLLIN, POLLOUT and POLLERR.
          * @return the index identifying this Socket in the poll set.
          */
-        public int register(Socket socket, int events) {
+        public int register (Socket socket, int events) {
             if (this.next >= this.size) {
                 return -1;
             }
-            this._sockets[this.next] = socket;
-            this._events[this.next] = (short) events;
+            this.sockets [this.next] = socket;
+            this.events [this.next] = (short) events;
             return this.next++;
         }
 
@@ -657,10 +657,10 @@ public class ZMQ {
          *            the desired index.
          * @return the Socket associated with that index (or null).
          */
-        public Socket getSocket(int index) {
+        public Socket getSocket (int index) {
             if (index < 0 || index >= this.next)
                 return null;
-            return this._sockets[index];
+            return this.sockets [index];
         }
 
         /**
@@ -668,8 +668,8 @@ public class ZMQ {
          * 
          * @return the current poll timeout in ms.
          */
-        public long getTimeout() {
-            return this._timeout;
+        public long getTimeout () {
+            return this.timeout;
         }
 
         /**
@@ -678,8 +678,8 @@ public class ZMQ {
          * @param timeout
          *            the desired poll timeout in ms.
          */
-        public void setTimeout(long timeout) {
-            this._timeout = timeout;
+        public void setTimeout (long timeout) {
+            this.timeout = timeout;
         }
 
         /**
@@ -687,7 +687,7 @@ public class ZMQ {
          * 
          * @return the current poll set size.
          */
-        public int getSize() {
+        public int getSize () {
             return this.size;
         }
 
@@ -696,23 +696,23 @@ public class ZMQ {
          * 
          * @return the index for the next position in the poll set size.
          */
-        public int getNext() {
+        public int getNext () {
             return this.next;
         }
 
         /**
          * Issue a poll call.
          * 
-         * @return how many objects where signalled by poll().
+         * @return how many objects where signalled by poll ().
          */
-        public long poll() {
+        public long poll () {
             if (this.size <= 0 || this.next <= 0) {
                 return 0;
             }
             for (int i = 0; i < this.next; ++i) {
-                this._revents[i] = 0;
+                this.revents [i] = 0;
             }
-            return run_poll(this.next, this._sockets, this._events, this._revents, this._timeout);
+            return run_poll (this.next, this.sockets, this.events, this.revents, this.timeout);
         }
 
         /**
@@ -722,8 +722,8 @@ public class ZMQ {
          * 
          * @return true if the element was signalled.
          */
-        public boolean pollin(int index) {
-            return poll_mask(index, POLLIN);
+        public boolean pollin (int index) {
+            return poll_mask (index, POLLIN);
         }
 
         /**
@@ -733,8 +733,8 @@ public class ZMQ {
          * 
          * @return true if the element was signalled.
          */
-        public boolean pollout(int index) {
-            return poll_mask(index, POLLOUT);
+        public boolean pollout (int index) {
+            return poll_mask (index, POLLOUT);
         }
 
         /**
@@ -744,8 +744,8 @@ public class ZMQ {
          * 
          * @return true if the element was signalled.
          */
-        public boolean pollerr(int index) {
-            return poll_mask(index, POLLERR);
+        public boolean pollerr (int index) {
+            return poll_mask (index, POLLERR);
         }
 
         /**
@@ -756,14 +756,14 @@ public class ZMQ {
          * @param size
          *            the number of Sockets this poller will contain.
          */
-        protected Poller(Context context, int size) {
+        protected Poller (Context context, int size) {
             this.context = context;
             this.size = size;
             this.next = 0;
 
-            this._sockets = new Socket[size];
-            this._events = new short[size];
-            this._revents = new short[size];
+            this.sockets = new Socket [this.size];
+            this.events = new short [this.size];
+            this.revents = new short [this.size];
         }
 
         /**
@@ -777,9 +777,9 @@ public class ZMQ {
          *            an array of short values with the results.
          * @param timeout
          *            the maximum timeout in microseconds.
-         * @return how many objects where signalled by poll().
+         * @return how many objects where signalled by poll ().
          */
-        private native long run_poll(int count, Socket[] sockets, short[] events, short[] revents, long timeout);
+        private native long run_poll (int count, Socket [] sockets, short [] events, short [] revents, long timeout);
 
         /**
          * Check whether a specific mask was signalled by latest poll call.
@@ -790,20 +790,20 @@ public class ZMQ {
          *            a combination of POLLIN, POLLOUT and POLLERR.
          * @return true if specific socket was signalled as specified.
          */
-        private boolean poll_mask(int index, int mask) {
+        private boolean poll_mask (int index, int mask) {
             if (mask <= 0 || index < 0 || index >= this.next) {
                 return false;
             }
-            return (this._revents[index] & mask) > 0;
+            return (this.revents [index] & mask) > 0;
         }
 
         private Context context = null;
-        private long _timeout = 0;
+        private long timeout = 0;
         private int size = 0;
         private int next = 0;
-        private Socket[] _sockets = null;
-        private short[] _events = null;
-        private short[] _revents = null;
+        private Socket [] sockets = null;
+        private short [] events = null;
+        private short [] revents = null;
 
         private static final int POLLIN = 1;
         private static final int POLLOUT = 2;
