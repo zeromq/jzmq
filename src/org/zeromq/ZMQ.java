@@ -278,7 +278,7 @@ public class ZMQ {
          * 
          * If this limit has been reached the socket shall enter an exceptional state and depending
          * on the socket type, 0MQ shall take appropriate action such as blocking or dropping sent
-         * messages. Refer to the individual socket descriptions in linkzmq:zmq_socket[3] for
+         * messages. Refer to the individual socket descriptions in the man page of zmq_socket[3] for
          * details on the exact action taken for each socket type.
          * 
          * @param hwm
@@ -312,7 +312,7 @@ public class ZMQ {
          * bit to thread 2 and so on. For example, a value of 3 specifies that subsequent
          * connections on 'socket' shall be handled exclusively by I/O threads 1 and 2.
          * 
-         * See also linkzmq:zmq_init[3] for details on allocating the number of I/O threads for a
+         * See also  in the man page of zmq_init[3] for details on allocating the number of I/O threads for a
          * specific _context_.
          * 
          * @param affinity
@@ -374,7 +374,7 @@ public class ZMQ {
 
         /**
          * The 'ZMQ_RATE' option shall set the maximum send or receive data rate for multicast
-         * transports such as linkzmq:zmq_pgm[7] using the specified 'socket'.
+         * transports such as  in the man page of zmq_pgm[7] using the specified 'socket'.
          * 
          * @param rate
          */
