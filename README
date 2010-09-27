@@ -6,4 +6,8 @@ To build, set JAVA_HOME to the location of your JDK and run:
 ./configure
 make
 
+If your zmq installation is not found by configure you can add this information manually e.g. --with-zeromq=/usr/local/lib.
+ 
+On Mac OS X you may need to compile and make install pkg-config if configure fails with "syntax error near unexpected token `newline'". See http://stackoverflow.com/questions/3522248/how-do-i-compile-jzmq-for-zeromq-on-osx for details. You may also need to symlink the header files of your standard Java installation (e.g. /System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers/*.h) into a suitable directory (e.g. /usr/local/include) and point the JAVA_HOME environment variable to the parent directory (e.g. /usr/local).
+
 For more information, refer to the 0MQ website at http://www.zeromq.org/.
