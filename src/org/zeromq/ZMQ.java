@@ -178,16 +178,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_HWM' option shall set the high water mark for the specified 'socket'. The high
-         * water mark is a hard limit on the maximum number of outstanding messages 0MQ shall queue
-         * in memory for any single peer that the specified 'socket' is communicating with.
-         * 
-         * If this limit has been reached the socket shall enter an exceptional state and depending
-         * on the socket type, 0MQ shall take appropriate action such as blocking or dropping sent
-         * messages. Refer to the individual socket descriptions in linkzmq:zmq_socket[3] for
-         * details on the exact action taken for each socket type.
-         * 
-         * The default 'ZMQ_HWM' value of zero means "no limit".
+         * @see #setHWM(long)
          * 
          * @return the High Water Mark.
          */
@@ -196,12 +187,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_SWAP' option shall set the disk offload (swap) size for the specified 'socket'.
-         * A socket which has 'ZMQ_SWAP' set to a non-zero value may exceed its high water mark; in
-         * this case outstanding messages shall be offloaded to storage on disk rather than held in
-         * memory.
-         * 
-         * The value of 'ZMQ_SWAP' defines the maximum size of the swap space in bytes.
+         * @see #setSwap(long)
          * 
          * @return the number of messages to swap at most.
          */
@@ -210,18 +196,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_AFFINITY' option shall set the I/O thread affinity for newly created connections
-         * on the specified 'socket'.
-         * 
-         * Affinity determines which threads from the 0MQ I/O thread pool associated with the
-         * socket's _context_ shall handle newly created connections. A value of zero specifies no
-         * affinity, meaning that work shall be distributed fairly among all 0MQ I/O threads in the
-         * thread pool. For non-zero values, the lowest bit corresponds to thread 1, second lowest
-         * bit to thread 2 and so on. For example, a value of 3 specifies that subsequent
-         * connections on 'socket' shall be handled exclusively by I/O threads 1 and 2.
-         * 
-         * See also linkzmq:zmq_init[3] for details on allocating the number of I/O threads for a
-         * specific _context_.
+         * @see #setAffinity(long)
          * 
          * @return the affinity.
          */
@@ -230,19 +205,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_IDENTITY' option shall set the identity of the specified 'socket'. Socket
-         * identity determines if existing 0MQ infastructure (_message queues_, _forwarding
-         * devices_) shall be identified with a specific application and persist across multiple
-         * runs of the application.
-         * 
-         * If the socket has no identity, each run of an application is completely separate from
-         * other runs. However, with identity set the socket shall re-use any existing 0MQ
-         * infrastructure configured by the previous run(s). Thus the application may receive
-         * messages that were sent in the meantime, _message queue_ limits shall be shared with
-         * previous run(s) and so on.
-         * 
-         * Identity should be at least one byte and at most 255 bytes long. Identities starting with
-         * binary zero are reserved for use by 0MQ infrastructure.
+         * @see #setIdentity(byte[])
          * 
          * @return the Identitiy.
          */
@@ -251,8 +214,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_RATE' option shall set the maximum send or receive data rate for multicast
-         * transports such as linkzmq:zmq_pgm[7] using the specified 'socket'.
+         * @see #setRate(long)
          * 
          * @return the Rate.
          */
@@ -261,14 +223,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_RECOVERY_IVL' option shall set the recovery interval for multicast transports
-         * using the specified 'socket'. The recovery interval determines the maximum time in
-         * seconds that a receiver can be absent from a multicast group before unrecoverable data
-         * loss will occur.
-         * 
-         * CAUTION: Excersize care when setting large recovery intervals as the data needed for
-         * recovery will be held in memory. For example, a 1 minute recovery interval at a data rate
-         * of 1Gbps requires a 7GB in-memory buffer.
+         * @see #setRecoveryInterval(long)
          * 
          * @return the RecoveryIntervall.
          */
@@ -277,12 +232,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_MCAST_LOOP' option shall control whether data sent via multicast transports
-         * using the specified 'socket' can also be received by the sending host via loopback. A
-         * value of zero disables the loopback functionality, while the default value of 1 enables
-         * the loopback functionality. Leaving multicast loopback enabled when it is not required
-         * can have a negative impact on performance. Where possible, disable 'ZMQ_MCAST_LOOP' in
-         * production environments.
+         * @see #setMulticastLoop(boolean)
          * 
          * @return the Multicast Loop.
          */
@@ -291,10 +241,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_SNDBUF' option shall set the underlying kernel transmit buffer size for the
-         * 'socket' to the specified size in bytes. A value of zero means leave the OS default
-         * unchanged. For details please refer to your operating system documentation for the
-         * 'SO_SNDBUF' socket option.
+         * @see #setSendBufferSize(long)
          * 
          * @return the kernel send buffer size.
          */
@@ -303,10 +250,7 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_RCVBUF' option shall set the underlying kernel receive buffer size for the
-         * 'socket' to the specified size in bytes. A value of zero means leave the OS default
-         * unchanged. For details refer to your operating system documentation for the 'SO_RCVBUF'
-         * socket option.
+         * @see #setReceiveBufferSize(long)
          * 
          * @return the kernel receive buffer size.
          */
@@ -334,7 +278,7 @@ public class ZMQ {
          * 
          * If this limit has been reached the socket shall enter an exceptional state and depending
          * on the socket type, 0MQ shall take appropriate action such as blocking or dropping sent
-         * messages. Refer to the individual socket descriptions in linkzmq:zmq_socket[3] for
+         * messages. Refer to the individual socket descriptions in the man page of zmq_socket[3] for
          * details on the exact action taken for each socket type.
          * 
          * @param hwm
@@ -368,7 +312,7 @@ public class ZMQ {
          * bit to thread 2 and so on. For example, a value of 3 specifies that subsequent
          * connections on 'socket' shall be handled exclusively by I/O threads 1 and 2.
          * 
-         * See also linkzmq:zmq_init[3] for details on allocating the number of I/O threads for a
+         * See also  in the man page of zmq_init[3] for details on allocating the number of I/O threads for a
          * specific _context_.
          * 
          * @param affinity
@@ -430,7 +374,7 @@ public class ZMQ {
 
         /**
          * The 'ZMQ_RATE' option shall set the maximum send or receive data rate for multicast
-         * transports such as linkzmq:zmq_pgm[7] using the specified 'socket'.
+         * transports such as  in the man page of zmq_pgm[7] using the specified 'socket'.
          * 
          * @param rate
          */
