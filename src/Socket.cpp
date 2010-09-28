@@ -100,6 +100,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
                                                                         jint option)
 {
     switch (option) {
+    case ZMQ_TYPE:
     case ZMQ_HWM:
     case ZMQ_SWAP:
     case ZMQ_AFFINITY:

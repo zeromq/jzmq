@@ -78,6 +78,21 @@ public class ZMQ {
     public static final int PUSH = 8;
 
     /**
+     * Flag to specify a STREAMER device.
+     */
+    public static final int STREAMER = 1;
+
+    /**
+     * Flag to specify a FORWARDER device.
+     */
+    public static final int FORWARDER = 2;
+
+    /**
+     * Flag to specify a QUEUE device.
+     */
+    public static final int QUEUE = 3;
+
+    /**
      * @see ZMQ#PULL
      */
     @Deprecated
@@ -175,6 +190,15 @@ public class ZMQ {
          */
         public void close () {
             finalize ();
+        }
+
+        /**
+         * The 'ZMQ_TYPE' option shall get the socket type.
+         *
+         * @return the socket type.
+         */
+        public long getType () {
+            return getLongSockopt (TYPE);
         }
 
         /**
@@ -559,6 +583,9 @@ public class ZMQ {
         private static final int SNDBUF = 11;
         private static final int RCVBUF = 12;
         private static final int RCVMORE = 13;
+        private static final int FD = 14;
+        private static final int EVENTS = 15;
+        private static final int TYPE = 16;
     }
 
     /**
