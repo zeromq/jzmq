@@ -139,10 +139,19 @@ public class ZMQ {
         }
 
         /**
-         * Create a new Poller within this context.
+         * Create a new Poller within this context, with a default size.
+         * 
+         * @return the newly created Poller.
+         */
+        public Poller poller () {
+            return new Poller (this);
+        }
+
+        /**
+         * Create a new Poller within this context, with a specified initial size.
          * 
          * @param size
-         *            the poller size.
+         *            the poller initial size.
          * @return the newly created Poller.
          */
         public Poller poller (int size) {
@@ -633,6 +642,8 @@ public class ZMQ {
 
         /**
          * Register a Socket for polling on the specified events.
+         *
+         * Automatically grow the internal representation if needed.
          * 
          * @param socket
          *            the Socket we are registering.
@@ -642,8 +653,28 @@ public class ZMQ {
          */
         public int register (Socket socket, int events) {
             if (this.next >= this.size) {
-                return -1;
+                // Compute new size for internal arrays.
+                int nsize = this.size + SIZE_INCREMENT;
+
+                // Create new internal arrays.
+                Socket [] ns = new Socket [nsize];
+                short [] ne = new short [nsize];
+                short [] nr = new short [nsize];
+
+                // Copy contents of current arrays into new arrays.
+                for (int i = 0; i < this.next; ++i) {
+                    ns[i] = this.sockets[i];
+                    ne[i] = this.events[i];
+                    nr[i] = this.revents[i];
+                }
+
+                // Swap internal arrays and size to new values.
+                this.size = nsize;
+                this.sockets = ns;
+                this.events = ne;
+                this.revents = nr;
             }
+
             this.sockets [this.next] = socket;
             this.events [this.next] = (short) events;
             return this.next++;
@@ -752,6 +783,16 @@ public class ZMQ {
          * 
          * @param context
          *            a 0MQ context previously created.
+         */
+        protected Poller (Context context) {
+            this(context, SIZE_DEFAULT);
+        }
+
+        /**
+         * Class constructor.
+         * 
+         * @param context
+         *            a 0MQ context previously created.
          * @param size
          *            the number of Sockets this poller will contain.
          */
@@ -808,5 +849,7 @@ public class ZMQ {
         private static final int POLLOUT = 2;
         private static final int POLLERR = 4;
 
+        private static final int SIZE_DEFAULT = 32;
+        private static final int SIZE_INCREMENT = 16;
     }
 }
