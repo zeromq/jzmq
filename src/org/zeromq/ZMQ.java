@@ -193,7 +193,9 @@ public class ZMQ {
         }
 
         /**
-         * The 'ZMQ_TYPE' option shall get the socket type.
+         * The 'ZMQ_TYPE option shall retrieve the socket type for the specified
+         * 'socket'.  The socket type is specified at socket creation time and
+         * cannot be modified afterwards.
          *
          * @return the socket type.
          */
@@ -293,6 +295,32 @@ public class ZMQ {
          */
         public boolean hasReceiveMore () {
             return getLongSockopt (RCVMORE) != 0;
+        }
+
+        /**
+         * The 'ZMQ_FD' option shall retrieve file descriptor associated with the 0MQ
+         * socket. The descriptor can be used to integrate 0MQ socket into an existing
+         * event loop. It should never be used for anything else than polling -- such as
+         * reading or writing. The descriptor signals edge-triggered IN event when
+         * something has happened within the 0MQ socket. It does not necessarily mean that
+         * the messages can be read or written. Check ZMQ_EVENTS option to find out whether
+         * the 0MQ socket is readable or writeable.
+         * 
+         * @return the underlying file descriptor.
+         */
+        public long getFD () {
+            return getLongSockopt (FD);
+        }
+
+        /**
+         * The 'ZMQ_EVENTS' option shall retrieve event flags for the specified socket.
+         * If a message can be read from the socket ZMQ_POLLIN flag is set. If message can
+         * be written to the socket ZMQ_POLLOUT flag is set.
+         * 
+         * @return the mask of outstanding events.
+         */
+        public long getEvents () {
+            return getLongSockopt (EVENTS);
         }
 
         /**

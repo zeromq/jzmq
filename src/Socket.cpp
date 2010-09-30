@@ -110,6 +110,8 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_SNDBUF:
     case ZMQ_RCVBUF:
     case ZMQ_RCVMORE:
+    case ZMQ_FD:
+    case ZMQ_EVENTS:
         {
             void *s = get_socket (env, obj, 1);
 
