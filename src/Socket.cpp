@@ -114,17 +114,39 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_EVENTS:
         {
             void *s = get_socket (env, obj, 1);
+            jlong ret = 0;
+            int rc = 0;
+            int err = 0;
 
-            int64_t optval = 0;
-            size_t optvallen = sizeof(optval);
-            int rc = zmq_getsockopt (s, option, &optval, &optvallen);
-            int err = errno;
+            switch (option) {
+                // 32 bits options
+            case ZMQ_TYPE:
+            case ZMQ_HWM:
+            case ZMQ_EVENTS:
+                {
+                    uint32_t optval = 0;
+                    size_t optvallen = sizeof(optval);
+                    rc = zmq_getsockopt (s, option, &optval, &optvallen);
+                    err = errno;
+                    ret = (jlong) optval;
+                }
+
+                // 64 bits options
+            default:
+                {
+                    uint64_t optval = 0;
+                    size_t optvallen = sizeof(optval);
+                    rc = zmq_getsockopt (s, option, &optval, &optvallen);
+                    err = errno;
+                    ret = (jlong) optval;
+                }
+            }
+
             if (rc != 0) {
                 raise_exception (env, err);
                 return 0L;
             }
-
-            return (jlong) optval;
+            return ret;
         }
     default:
         raise_exception (env, EINVAL);
