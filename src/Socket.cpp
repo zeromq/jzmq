@@ -129,6 +129,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
                     rc = zmq_getsockopt (s, option, &optval, &optvallen);
                     err = errno;
                     ret = (jlong) optval;
+                    break;
                 }
 
                 // 64 bits options
@@ -139,6 +140,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
                     rc = zmq_getsockopt (s, option, &optval, &optvallen);
                     err = errno;
                     ret = (jlong) optval;
+                    break;
                 }
             }
 
@@ -192,12 +194,12 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
 }
 
 /**
- * Called by Java's Socket::setLongSockopt(int option, long optval).
+ * Called by Java's Socket::setLongSockopt(int option, long value).
  */
 JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *env,
                                                                        jobject obj,
                                                                        jint option,
-                                                                       jlong optval)
+                                                                       jlong value)
 {
     switch (option) {
     case ZMQ_HWM:
@@ -210,15 +212,31 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_RCVBUF:
         {
             void *s = get_socket (env, obj, 1);
+            int rc = 0;
+            int err = 0;
 
-            int64_t value = optval;
-            int rc = zmq_setsockopt (s, option, &value, sizeof (value));
-            int err = errno;
-            if (rc != 0) {
-                raise_exception (env, err);
-                return;
+            switch (option) {
+                // 32 bits options
+            case ZMQ_HWM:
+                {
+                    uint32_t optval = (uint32_t) value;
+                    size_t optvallen = sizeof(optval);
+                    rc = zmq_setsockopt (s, option, &optval, optvallen);
+                    err = errno;
+                    break;
+                }
+            default:
+                {
+                    uint64_t optval = (uint64_t) value;
+                    size_t optvallen = sizeof(optval);
+                    rc = zmq_setsockopt (s, option, &optval, optvallen);
+                    err = errno;
+                }
             }
 
+            if (rc != 0) {
+                raise_exception (env, err);
+            }
             return;
         }
     default:
@@ -228,34 +246,34 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 }
 
 /**
- * Called by Java's Socket::setBytesSockopt(int option, byte[] optval).
+ * Called by Java's Socket::setBytesSockopt(int option, byte[] value).
  */
 JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *env,
                                                                         jobject obj,
                                                                         jint option,
-                                                                        jbyteArray optval)
+                                                                        jbyteArray value)
 {
     switch (option) {
     case ZMQ_IDENTITY:
     case ZMQ_SUBSCRIBE:
     case ZMQ_UNSUBSCRIBE:
         {
-            if (optval == NULL) {
+            if (value == NULL) {
                 raise_exception (env, EINVAL);
                 return;
             }
 
             void *s = get_socket (env, obj, 1);
 
-            jbyte *value = env->GetByteArrayElements (optval, NULL);
-            if (! value) {
+            jbyte *optval = env->GetByteArrayElements (value, NULL);
+            if (! optval) {
                 raise_exception (env, EINVAL);
                 return;
             }
-
-            int rc = zmq_setsockopt (s, option, value, env->GetArrayLength (optval));
+            size_t optvallen = env->GetArrayLength (value);
+            int rc = zmq_setsockopt (s, option, optval, optvallen);
             int err = errno;
-            env->ReleaseByteArrayElements (optval, value, 0);
+            env->ReleaseByteArrayElements (value, optval, 0);
             if (rc != 0) {
                 raise_exception (env, err);
             }
