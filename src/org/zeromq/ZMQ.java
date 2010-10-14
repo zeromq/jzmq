@@ -103,6 +103,12 @@ public class ZMQ {
     @Deprecated
     public static final int DOWNSTREAM = PUSH;
 
+    protected static native int version_full();
+    protected static native int version_major();
+    protected static native int version_minor();
+    protected static native int version_patch();
+    protected static native int make_version(int major, int minor, int patch);
+
     /**
      * Create a new Context.
      * 
@@ -207,8 +213,12 @@ public class ZMQ {
          * cannot be modified afterwards.
          *
          * @return the socket type.
+         * @since 2.1.0
          */
         public long getType () {
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 0))
+                return -1;
+
             return getLongSockopt (TYPE);
         }
 
@@ -316,8 +326,12 @@ public class ZMQ {
          * the 0MQ socket is readable or writeable.
          * 
          * @return the underlying file descriptor.
+         * @since 2.1.0
          */
         public long getFD () {
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 0))
+                return -1;
+
             return getLongSockopt (FD);
         }
 
@@ -327,8 +341,12 @@ public class ZMQ {
          * be written to the socket ZMQ_POLLOUT flag is set.
          * 
          * @return the mask of outstanding events.
+         * @since 2.1.0
          */
         public long getEvents () {
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 0))
+                return -1;
+
             return getLongSockopt (EVENTS);
         }
 

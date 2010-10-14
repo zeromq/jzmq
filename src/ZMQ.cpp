@@ -25,3 +25,51 @@
 #include "jzmq.hpp"
 #include "util.hpp"
 #include "org_zeromq_ZMQ.h"
+
+/**
+ * Called by Java's ZMQ::version_full().
+ */
+JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_version_1full (JNIEnv *env,
+                                                          jclass cls)
+{
+    return ZMQ_VERSION;
+}
+
+/*
+ * Called by Java's ZMQ::version_major().
+ */
+JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_version_1major (JNIEnv *env,
+                                                          jclass cls)
+{
+    return ZMQ_VERSION_MAJOR;
+}
+
+/*
+ * Called by Java's ZMQ::version_minor().
+ */
+JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_version_1minor (JNIEnv *env,
+                                                          jclass cls)
+{
+    return ZMQ_VERSION_MINOR;
+}
+
+/*
+ * Called by Java's ZMQ::version_patch().
+ */
+JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_version_1patch (JNIEnv *env,
+                                                          jclass cls)
+{
+    return ZMQ_VERSION_PATCH;
+}
+
+/*
+ * Called by Java's ZMQ::version_make().
+ */
+JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_make_1version (JNIEnv *env,
+                                                          jclass cls,
+                                                          jint major,
+                                                          jint minor,
+                                                          jint patch)
+{
+    return ZMQ_MAKE_VERSION(major, minor, patch);
+}

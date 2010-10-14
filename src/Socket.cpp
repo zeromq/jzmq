@@ -100,7 +100,11 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
                                                                         jint option)
 {
     switch (option) {
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
     case ZMQ_TYPE:
+    case ZMQ_FD:
+    case ZMQ_EVENTS:
+#endif
     case ZMQ_HWM:
     case ZMQ_SWAP:
     case ZMQ_AFFINITY:
@@ -110,39 +114,17 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_SNDBUF:
     case ZMQ_RCVBUF:
     case ZMQ_RCVMORE:
-    case ZMQ_FD:
-    case ZMQ_EVENTS:
         {
             void *s = get_socket (env, obj, 1);
             jlong ret = 0;
             int rc = 0;
             int err = 0;
 
-            switch (option) {
-                // 32 bits options
-            case ZMQ_TYPE:
-            case ZMQ_HWM:
-            case ZMQ_EVENTS:
-                {
-                    uint32_t optval = 0;
-                    size_t optvallen = sizeof(optval);
-                    rc = zmq_getsockopt (s, option, &optval, &optvallen);
-                    err = errno;
-                    ret = (jlong) optval;
-                    break;
-                }
-
-                // 64 bits options
-            default:
-                {
-                    uint64_t optval = 0;
-                    size_t optvallen = sizeof(optval);
-                    rc = zmq_getsockopt (s, option, &optval, &optvallen);
-                    err = errno;
-                    ret = (jlong) optval;
-                    break;
-                }
-            }
+            uint64_t optval = 0;
+            size_t optvallen = sizeof(optval);
+            rc = zmq_getsockopt (s, option, &optval, &optvallen);
+            err = errno;
+            ret = (jlong) optval;
 
             if (rc != 0) {
                 raise_exception (env, err);
@@ -215,24 +197,10 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
             int rc = 0;
             int err = 0;
 
-            switch (option) {
-                // 32 bits options
-            case ZMQ_HWM:
-                {
-                    uint32_t optval = (uint32_t) value;
-                    size_t optvallen = sizeof(optval);
-                    rc = zmq_setsockopt (s, option, &optval, optvallen);
-                    err = errno;
-                    break;
-                }
-            default:
-                {
-                    uint64_t optval = (uint64_t) value;
-                    size_t optvallen = sizeof(optval);
-                    rc = zmq_setsockopt (s, option, &optval, optvallen);
-                    err = errno;
-                }
-            }
+            uint64_t optval = (uint64_t) value;
+            size_t optvallen = sizeof(optval);
+            rc = zmq_setsockopt (s, option, &optval, optvallen);
+            err = errno;
 
             if (rc != 0) {
                 raise_exception (env, err);
