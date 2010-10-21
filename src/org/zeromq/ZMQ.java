@@ -223,6 +223,19 @@ public class ZMQ {
         }
 
         /**
+         * @see #setLinger(long)
+         *
+         * @return the linger period.
+         * @since 2.1.0
+         */
+        public long getLinger () {
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 0))
+                return -1;
+
+            return getLongSockopt (LINGER);
+        }
+
+        /**
          * @see #setHWM(long)
          * 
          * @return the High Water Mark.
@@ -348,6 +361,25 @@ public class ZMQ {
                 return -1;
 
             return getLongSockopt (EVENTS);
+        }
+
+        /**
+         * The 'ZMQ_LINGER' option shall retrieve the period for pending outbound
+         * messages to linger in memory after closing the socket. Value of -1 means
+         * infinite. Pending messages will be kept until they are fully transferred to
+         * the peer. Value of 0 means that all the pending messages are dropped immediately
+         * when socket is closed. Positive value means number of milliseconds to keep
+         * trying to send the pending messages before discarding them.
+         *
+         * @param linger
+         *            the linger period.
+         * @since 2.1.0
+         */
+        public void setLinger (long linger) {
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 0))
+                return;
+
+            setLongSockopt (LINGER, linger);
         }
 
         /**
@@ -641,6 +673,7 @@ public class ZMQ {
         private static final int FD = 14;
         private static final int EVENTS = 15;
         private static final int TYPE = 16;
+        private static final int LINGER = 17;
     }
 
     /**

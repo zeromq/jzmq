@@ -104,6 +104,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_TYPE:
     case ZMQ_FD:
     case ZMQ_EVENTS:
+    case ZMQ_LINGER:
 #endif
     case ZMQ_HWM:
     case ZMQ_SWAP:
@@ -184,6 +185,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                                                                        jlong value)
 {
     switch (option) {
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
+    case ZMQ_LINGER:
+#endif
     case ZMQ_HWM:
     case ZMQ_SWAP:
     case ZMQ_AFFINITY:
