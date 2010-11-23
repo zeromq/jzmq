@@ -681,6 +681,13 @@ public class ZMQ {
      */
     public static class Poller {
         /**
+         * These values can be ORed to specify what we want to poll for.
+         */
+        public static final int POLLIN = 1;
+        public static final int POLLOUT = 2;
+        public static final int POLLERR = 4;
+
+        /**
          * Register a Socket for polling on all events.
          * 
          * @param socket
@@ -895,10 +902,6 @@ public class ZMQ {
         private Socket [] sockets = null;
         private short [] events = null;
         private short [] revents = null;
-
-        private static final int POLLIN = 1;
-        private static final int POLLOUT = 2;
-        private static final int POLLERR = 4;
 
         private static final int SIZE_DEFAULT = 32;
         private static final int SIZE_INCREMENT = 16;
