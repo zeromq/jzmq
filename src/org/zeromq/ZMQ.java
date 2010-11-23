@@ -754,7 +754,7 @@ public class ZMQ {
         /**
          * Get the current poll timeout.
          * 
-         * @return the current poll timeout in ms.
+         * @return the current poll timeout in microseconds.
          */
         public long getTimeout () {
             return this.timeout;
@@ -764,7 +764,7 @@ public class ZMQ {
          * Set the poll timeout.
          * 
          * @param timeout
-         *            the desired poll timeout in ms.
+         *            the desired poll timeout in microseconds.
          */
         public void setTimeout (long timeout) {
             this.timeout = timeout;
