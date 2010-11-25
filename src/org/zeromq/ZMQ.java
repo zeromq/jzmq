@@ -572,7 +572,7 @@ public class ZMQ {
          *            the flags to apply to the send operation.
          * @return true if send was successful, false otherwise.
          */
-        public native boolean send (byte [] msg, long flags);
+        public native boolean send (byte [] msg, int flags);
 
         /**
          * Receive a message.
@@ -581,7 +581,7 @@ public class ZMQ {
          *            the flags to apply to the receive operation.
          * @return the message received, as an array of bytes; null on error.
          */
-        public native byte [] recv (long flags);
+        public native byte [] recv (int flags);
 
         /**
          * Class constructor.
@@ -755,6 +755,7 @@ public class ZMQ {
          * Get the current poll timeout.
          * 
          * @return the current poll timeout in microseconds.
+         * @deprecated Timeout handling has been moved to the poll() methods.
          */
         public long getTimeout () {
             return this.timeout;
@@ -765,8 +766,12 @@ public class ZMQ {
          * 
          * @param timeout
          *            the desired poll timeout in microseconds.
+         * @deprecated Timeout handling has been moved to the poll() methods.
          */
         public void setTimeout (long timeout) {
+            if (timeout < -1)
+                return;
+
             this.timeout = timeout;
         }
 
@@ -789,18 +794,45 @@ public class ZMQ {
         }
 
         /**
-         * Issue a poll call.
+         * Issue a poll call. If the poller's internal timeout value
+         * has been set, use that value as timeout; otherwise, block
+         * indefinitely.
          * 
          * @return how many objects where signalled by poll ().
          */
         public long poll () {
+            long tout = -1;
+            if (this.timeout > -1) {
+                tout = this.timeout;
+            }
+            return poll(tout);
+        }
+
+        /**
+         * Issue a poll call, using the specified timeout value.
+         * 
+         * @param tout
+         *            the timeout in microseconds, as per zmq_poll ();
+         *            if -1, it will block indefinitely until an event
+         *            happens; if 0, it will return immediately;
+         *            otherwise, it will wait for at most that many
+         *            microseconds.
+         *
+         * @return how many objects where signalled by poll ()
+         */
+        public long poll (long tout) {
+            if (tout < -1) {
+                return 0;
+            }
+
             if (this.size <= 0 || this.next <= 0) {
                 return 0;
             }
+
             for (int i = 0; i < this.next; ++i) {
                 this.revents [i] = 0;
             }
-            return run_poll (this.next, this.sockets, this.events, this.revents, this.timeout);
+            return run_poll (this.next, this.sockets, this.events, this.revents, tout);
         }
 
         /**
@@ -896,7 +928,7 @@ public class ZMQ {
         }
 
         private Context context = null;
-        private long timeout = 0;
+        private long timeout = -2; // mark as uninitialized
         private int size = 0;
         private int next = 0;
         private Socket [] sockets = null;
