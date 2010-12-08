@@ -2,7 +2,10 @@ jarfile = zmq.jar
 jardir = $(datadir)/java
 
 JZMQ_JAVA_FILES = \
-	org/zeromq/ZMQ.java
+	org/zeromq/ZMQ.java \
+	org/zeromq/ZMQQueue.java \
+	org/zeromq/ZMQForwarder.java \
+	org/zeromq/ZMQStreamer.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \

@@ -1,7 +1,8 @@
 package org.zeromq;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class ZMQQueueTest {
 
@@ -49,5 +50,7 @@ public class ZMQQueueTest {
 
 			assertArrayEquals(rsp, rspTmp);
 		}
+
+		context.term();
 	}
 }
