@@ -22,6 +22,7 @@ src/Zmq.jar
 src/config.hpp*
 src/org_zeromq_*.h
 lib/
+target/
 builds/msvc/msvc.ncb
 builds/msvc/msvc.suo
 builds/msvc/jzmq/jzmq.vcproj.*
