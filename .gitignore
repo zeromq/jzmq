@@ -23,6 +23,9 @@ src/config.hpp*
 src/org_zeromq_*.h
 lib/
 target/
+.classpath
+.project
+.settings/
 build-stamp
 configure-stamp
 builds/msvc/msvc.ncb
