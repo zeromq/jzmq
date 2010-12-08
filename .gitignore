@@ -23,6 +23,8 @@ src/config.hpp*
 src/org_zeromq_*.h
 lib/
 target/
+build-stamp
+configure-stamp
 builds/msvc/msvc.ncb
 builds/msvc/msvc.suo
 builds/msvc/jzmq/jzmq.vcproj.*
