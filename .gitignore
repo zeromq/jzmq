@@ -1,3 +1,7 @@
+INSTALL
+aclocal.m4
+config/
+src/zmq.jar
 Makefile
 Makefile.in
 autom4te.cache
