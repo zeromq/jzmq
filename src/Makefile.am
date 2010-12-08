@@ -3,6 +3,7 @@ jardir = $(datadir)/java
 
 JZMQ_JAVA_FILES = \
 	org/zeromq/ZMQ.java \
+	org/zeromq/ZMQException.java \
 	org/zeromq/ZMQQueue.java \
 	org/zeromq/ZMQForwarder.java \
 	org/zeromq/ZMQStreamer.java

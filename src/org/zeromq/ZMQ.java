@@ -109,6 +109,68 @@ public class ZMQ {
     protected static native int version_patch();
     protected static native int make_version(int major, int minor, int patch);
 
+    protected static native long ENOTSUP();
+	protected static native long EPROTONOSUPPORT();
+	protected static native long ENOBUFS();
+	protected static native long ENETDOWN();
+	protected static native long EADDRINUSE();
+	protected static native long EADDRNOTAVAIL();
+	protected static native long ECONNREFUSED();
+	protected static native long EINPROGRESS();
+	protected static native long EMTHREAD();
+	protected static native long EFSM();
+	protected static native long ENOCOMPATPROTO();
+	protected static native long ETERM();         
+    
+    /**
+     * Inner class: Error.
+     */
+	public enum Error {
+
+		ENOTSUP(ENOTSUP()),
+		
+		EPROTONOSUPPORT(EPROTONOSUPPORT()),
+		
+		ENOBUFS(ENOBUFS()),
+		
+		ENETDOWN(ENETDOWN()),
+		
+		EADDRINUSE(EADDRINUSE()),
+
+		EADDRNOTAVAIL(EADDRNOTAVAIL()),
+		
+		ECONNREFUSED(ECONNREFUSED()),
+		
+		EINPROGRESS(EINPROGRESS()),
+		
+		EMTHREAD(EMTHREAD()),
+		
+		EFSM(EFSM()),
+		
+		ENOCOMPATPROTO(ENOCOMPATPROTO()),
+		
+		ETERM(ETERM());
+
+		private final long code;
+
+		Error(long code) {
+			this.code = code;
+		}
+
+		public long getCode() {
+			return code;
+		}
+
+		public static Error findByCode(int code) {
+			for (Error e : Error.class.getEnumConstants()) {
+				if (e.getCode() == code) {
+					return e;
+				}
+			}
+			throw new IllegalArgumentException("Unknown " + Error.class.getName() + " enum code:" + code);
+		}
+	}
+	
     /**
      * Create a new Context.
      * 

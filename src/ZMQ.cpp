@@ -73,3 +73,111 @@ JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_make_1version (JNIEnv *env,
 {
     return ZMQ_MAKE_VERSION(major, minor, patch);
 }
+
+/**
+ * Called by Java's ZMQ::ENOTSUP().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ENOTSUP (JNIEnv *env,
+                                                     jclass cls)
+{
+    return ENOTSUP;
+}
+
+/**
+ * Called by Java's ZMQ::EPROTONOSUPPORT().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EPROTONOSUPPORT (JNIEnv *env,
+                                                             jclass cls)
+{
+    return EPROTONOSUPPORT;
+}
+
+/**
+ * Called by Java's ZMQ::ENOBUFS().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ENOBUFS (JNIEnv *env,
+                                                     jclass cls)
+{
+    return ENOBUFS;
+}
+
+/**
+ * Called by Java's ZMQ::ENETDOWN().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ENETDOWN (JNIEnv *env,
+                                                      jclass cls)
+{
+    return ENETDOWN;
+}
+
+/**
+ * Called by Java's ZMQ::EADDRINUSE().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EADDRINUSE (JNIEnv *env,
+                                                        jclass cls)
+{
+    return EADDRINUSE;
+}
+
+/**
+ * Called by Java's ZMQ::EADDRNOTAVAIL().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EADDRNOTAVAIL (JNIEnv *env,
+                                                           jclass cls)
+{
+    return EADDRNOTAVAIL;
+}
+
+/**
+ * Called by Java's ZMQ::ECONNREFUSED().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ECONNREFUSED (JNIEnv *env,
+                                                          jclass cls)
+{
+    return ECONNREFUSED;
+}
+
+/**
+ * Called by Java's ZMQ::EINPROGRESS().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EINPROGRESS (JNIEnv *env,
+                                                         jclass cls)
+{
+    return EINPROGRESS;
+}
+
+/**
+ * Called by Java's ZMQ::EMTHREAD().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EMTHREAD (JNIEnv *env,
+                                                      jclass cls)
+{
+    return EMTHREAD;
+}
+
+/**
+ * Called by Java's ZMQ::EFSM().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EFSM (JNIEnv *env,
+                                                  jclass cls)
+{
+    return EFSM;
+}
+
+/**
+ * Called by Java's ZMQ::ENOCOMPATPROTO().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ENOCOMPATPROTO (JNIEnv *env,
+                                                            jclass cls)
+{
+    return ENOCOMPATPROTO;
+}
+
+/**
+ * Called by Java's ZMQ::ETERM().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ETERM (JNIEnv *env,
+                                                   jclass cls)
+{
+    return ETERM;
+}

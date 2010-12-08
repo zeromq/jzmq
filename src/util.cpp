@@ -29,19 +29,27 @@
 void raise_exception (JNIEnv *env, int err)
 {
     //  Get exception class.
-    jclass exception_class = env->FindClass ("java/lang/Exception");
+    jclass exception_class = env->FindClass ("org/zeromq/ZMQException");
     assert (exception_class);
+
+    //  Get exception class constructor
+    jmethodID constructor_method = env->GetMethodID(exception_class,
+    	"<init>", "(Ljava/lang/String;I)V");
+    assert (constructor_method);
 
     //  Get text description of the exception.
     const char *err_desc = zmq_strerror (err);
+    
+    jstring err_str = env->NewStringUTF(err_desc);
 
-    // Include the error number in the exception text.
-    char err_msg[512];
-    sprintf(err_msg, "%d - 0x%x - %s", err, err, err_desc);
+    //  Create exception class instance
+    jthrowable exception = static_cast<jthrowable>(env->NewObject(
+    	exception_class, constructor_method, err_str, err));
 
     //  Raise the exception.
-    int rc = env->ThrowNew (exception_class, err_msg);
+    int rc = env->Throw (exception);
     env->DeleteLocalRef (exception_class);
+    env->DeleteLocalRef (err_str);
 
     assert (rc == 0);
 }
