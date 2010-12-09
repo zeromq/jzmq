@@ -1,5 +1,5 @@
 Name:          jzmq
-Version:       2.0.9
+Version:       2.1.0
 Release:       1%{?dist}
 Summary:       The Java ZeroMQ bindings
 Group:         Applications/Internet
@@ -66,9 +66,7 @@ This package contains Java Bindings for ZeroMQ related development libraries and
 %doc AUTHORS ChangeLog COPYING COPYING.LESSER NEWS README
 
 # libraries
-%{_libdir}/libjzmq.so
-%{_libdir}/libjzmq.so.0
-%{_libdir}/libjzmq.so.0.0.0
+%{_libdir}/libjzmq.so*
 /usr/share/java/zmq.jar
 
 %files devel
@@ -77,5 +75,7 @@ This package contains Java Bindings for ZeroMQ related development libraries and
 %{_libdir}/libjzmq.a
 
 %changelog
+* Thu Dec 09 2010 Alois Belaska <alois.belaska@gmail.com>
+- version of package changed to 2.1.0
 * Tue Sep 21 2010 Stefan Majer <stefan.majer@gmail.com> 
 - Initial packaging
