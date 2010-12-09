@@ -41,36 +41,46 @@ public class ZMQQueue implements Runnable {
 		byte[] msg = null;
 		boolean more = true;
 
-		while (true) {
-			// wait while there are either requests or replies to process
-			poller.poll();
+		while (!Thread.currentThread().isInterrupted()) {
+			try {
+				// wait while there are either requests or replies to process
+				if (poller.poll(250) < 1) {
+					continue;
+				}
 
-			// process a request
-			if (poller.pollin(0)) {
-				more = true;
-				while (more) {
-					msg = inSocket.recv(0);
+				// process a request
+				if (poller.pollin(0)) {
+					more = true;
+					while (more) {
+						msg = inSocket.recv(0);
 
-					more = inSocket.hasReceiveMore();
+						more = inSocket.hasReceiveMore();
 
-					if (msg != null) {
-						outSocket.send(msg, more ? ZMQ.SNDMORE : 0);
+						if (msg != null) {
+							outSocket.send(msg, more ? ZMQ.SNDMORE : 0);
+						}
 					}
 				}
-			}
 
-			// process a reply
-			if (poller.pollin(1)) {
-				more = true;
-				while (more) {
-					msg = outSocket.recv(0);
+				// process a reply
+				if (poller.pollin(1)) {
+					more = true;
+					while (more) {
+						msg = outSocket.recv(0);
 
-					more = outSocket.hasReceiveMore();
+						more = outSocket.hasReceiveMore();
 
-					if (msg != null) {
-						inSocket.send(msg, more ? ZMQ.SNDMORE : 0);
+						if (msg != null) {
+							inSocket.send(msg, more ? ZMQ.SNDMORE : 0);
+						}
 					}
 				}
+			} catch (ZMQException e) {
+				// context destroyed, exit
+				if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) {
+					break;
+				}
+				throw e;
 			}
 		}
 	}

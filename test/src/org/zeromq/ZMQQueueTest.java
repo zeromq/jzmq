@@ -50,6 +50,8 @@ public class ZMQQueueTest {
 
 			assertArrayEquals(rsp, rspTmp);
 		}
+		
+		t.interrupt();
 
 		context.term();
 	}

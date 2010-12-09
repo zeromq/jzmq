@@ -22,7 +22,7 @@ public class ZMQForwarderTest {
 		ZMQ.Socket worker = context.socket(ZMQ.PAIR);
 		worker.connect("inproc://fw_workers");
 
-		Thread t = new Thread(new ZMQForwarder(clients, workers));
+		Thread t = new Thread(new ZMQForwarder(context, clients, workers));
 		t.start();
 
 		Thread.sleep(100);
@@ -39,7 +39,9 @@ public class ZMQForwarderTest {
 
 			assertArrayEquals(req, reqTmp);
 		}
-
+		
+		t.interrupt();
+		
 		context.term();
 	}
 }

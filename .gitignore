@@ -46,3 +46,10 @@ builds/msvc/local_lat/Release/
 builds/msvc/local_thr/Release/
 builds/msvc/remote_lat/Release/
 builds/msvc/remote_thr/Release/
+debian/files
+debian/jzmq.debhelper.log
+debian/jzmq.postinst.debhelper
+debian/jzmq.postrm.debhelper
+debian/jzmq.substvars
+debian/jzmq/
+debian/tmp/
