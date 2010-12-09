@@ -17,6 +17,7 @@ JZMQ_CPP_FILES = \
 
 JZMQ_H_FILES = \
 	org_zeromq_ZMQ.h \
+	org_zeromq_ZMQ_Error.h \
 	org_zeromq_ZMQ_Context.h \
 	org_zeromq_ZMQ_Socket.h \
 	org_zeromq_ZMQ_Poller.h
@@ -28,7 +29,12 @@ JZMQ_CLASS_FILES = \
 	org/zeromq/ZMQ.class \
 	org/zeromq/ZMQ$$Context.class \
 	org/zeromq/ZMQ$$Socket.class \
-	org/zeromq/ZMQ$$Poller.class
+	org/zeromq/ZMQ$$Poller.class \
+	org/zeromq/ZMQ$$Error.class \
+	org/zeromq/ZMQException.class \
+	org/zeromq/ZMQQueue.class \
+	org/zeromq/ZMQForwarder.class \
+	org/zeromq/ZMQStreamer.class
 
 $(jarfile): $(dist_noinst_JAVA)
 	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
