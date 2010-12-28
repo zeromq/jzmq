@@ -25,7 +25,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Compiling Java classes"
-				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java&#x0D;&#x0A;"
+				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java ..\..\..\src\org\zeromq\ZMQException.java ..\..\..\src\org\zeromq\ZMQForwarder.java ..\..\..\src\org\zeromq\ZMQQueue.java ..\..\..\src\org\zeromq\ZMQStreamer.java&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -99,7 +99,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Compiling Java classes"
-				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java&#x0D;&#x0A;"
+				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java ..\..\..\src\org\zeromq\ZMQException.java ..\..\..\src\org\zeromq\ZMQForwarder.java ..\..\..\src\org\zeromq\ZMQQueue.java ..\..\..\src\org\zeromq\ZMQStreamer.java&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -220,6 +220,102 @@
 						Description="Generating JNI header"
 						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQ&#x0D;&#x0A;"
 						Outputs="org_zeromq_ZMQ.h"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\org\zeromq\ZMQException.java"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating JNI header"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQException&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQException.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating JNI header"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQException&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQException.h"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\org\zeromq\ZMQForwarder.java"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating JNI header"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQForwarder&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQForwarder.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating JNI header"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQForwarder&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQForwarder.h"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\org\zeromq\ZMQQueue.java"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating JNI header"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQQueue&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQQueue.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating JNI header"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQQueue&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQQueue.h"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\org\zeromq\ZMQStreamer.java"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating JNI header"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQStreamer&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQSrteamer.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating JNI header"
+						CommandLine="javah -jni -classpath ..\..\..\src -d ..\..\..\src org.zeromq.ZMQStreamer&#x0D;&#x0A;"
+						Outputs="org_zeromq_ZMQSrteamer.h"
 					/>
 				</FileConfiguration>
 			</File>
