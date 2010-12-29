@@ -1,22 +1,24 @@
 /*
-    Copyright (c) 2007-2010 iMatix Corporation
+  Copyright (c) 2007-2010 iMatix Corporation
 
-    This file is part of 0MQ.
+  This file is part of 0MQ.
 
-    0MQ is free software; you can redistribute it and/or modify it under
-    the terms of the Lesser GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+  0MQ is free software; you can redistribute it and/or modify it under
+  the terms of the Lesser GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    Lesser GNU General Public License for more details.
+  0MQ is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  Lesser GNU General Public License for more details.
 
-    You should have received a copy of the Lesser GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+  You should have received a copy of the Lesser GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package org.zeromq;
+
+import java.util.LinkedList;
 
 /**
  * ZeroMQ JNI Bindings.
@@ -96,12 +98,12 @@ public class ZMQ {
      * @see ZMQ#PULL
      */
     @Deprecated
-    public static final int UPSTREAM = PULL;
+        public static final int UPSTREAM = PULL;
     /**
      * @see ZMQ#PUSH
      */
     @Deprecated
-    public static final int DOWNSTREAM = PUSH;
+        public static final int DOWNSTREAM = PUSH;
 
     protected static native int version_full();
     protected static native int version_major();
@@ -110,66 +112,66 @@ public class ZMQ {
     protected static native int make_version(int major, int minor, int patch);
 
     protected static native long ENOTSUP();
-	protected static native long EPROTONOSUPPORT();
-	protected static native long ENOBUFS();
-	protected static native long ENETDOWN();
-	protected static native long EADDRINUSE();
-	protected static native long EADDRNOTAVAIL();
-	protected static native long ECONNREFUSED();
-	protected static native long EINPROGRESS();
-	protected static native long EMTHREAD();
-	protected static native long EFSM();
-	protected static native long ENOCOMPATPROTO();
-	protected static native long ETERM();         
+    protected static native long EPROTONOSUPPORT();
+    protected static native long ENOBUFS();
+    protected static native long ENETDOWN();
+    protected static native long EADDRINUSE();
+    protected static native long EADDRNOTAVAIL();
+    protected static native long ECONNREFUSED();
+    protected static native long EINPROGRESS();
+    protected static native long EMTHREAD();
+    protected static native long EFSM();
+    protected static native long ENOCOMPATPROTO();
+    protected static native long ETERM();         
     
     /**
      * Inner class: Error.
      */
-	public enum Error {
+    public enum Error {
+        
+        ENOTSUP(ENOTSUP()),
+            
+            EPROTONOSUPPORT(EPROTONOSUPPORT()),
+		
+            ENOBUFS(ENOBUFS()),
+		
+            ENETDOWN(ENETDOWN()),
+		
+            EADDRINUSE(EADDRINUSE()),
 
-		ENOTSUP(ENOTSUP()),
+            EADDRNOTAVAIL(EADDRNOTAVAIL()),
 		
-		EPROTONOSUPPORT(EPROTONOSUPPORT()),
+            ECONNREFUSED(ECONNREFUSED()),
 		
-		ENOBUFS(ENOBUFS()),
+            EINPROGRESS(EINPROGRESS()),
 		
-		ENETDOWN(ENETDOWN()),
+            EMTHREAD(EMTHREAD()),
 		
-		EADDRINUSE(EADDRINUSE()),
+            EFSM(EFSM()),
+		
+            ENOCOMPATPROTO(ENOCOMPATPROTO()),
+		
+            ETERM(ETERM());
 
-		EADDRNOTAVAIL(EADDRNOTAVAIL()),
-		
-		ECONNREFUSED(ECONNREFUSED()),
-		
-		EINPROGRESS(EINPROGRESS()),
-		
-		EMTHREAD(EMTHREAD()),
-		
-		EFSM(EFSM()),
-		
-		ENOCOMPATPROTO(ENOCOMPATPROTO()),
-		
-		ETERM(ETERM());
+        private final long code;
 
-		private final long code;
+        Error(long code) {
+            this.code = code;
+        }
 
-		Error(long code) {
-			this.code = code;
-		}
+        public long getCode() {
+            return code;
+        }
 
-		public long getCode() {
-			return code;
-		}
-
-		public static Error findByCode(int code) {
-			for (Error e : Error.class.getEnumConstants()) {
-				if (e.getCode() == code) {
-					return e;
-				}
-			}
-			throw new IllegalArgumentException("Unknown " + Error.class.getName() + " enum code:" + code);
-		}
-	}
+        public static Error findByCode(int code) {
+            for (Error e : Error.class.getEnumConstants()) {
+                if (e.getCode() == code) {
+                    return e;
+                }
+            }
+            throw new IllegalArgumentException("Unknown " + Error.class.getName() + " enum code:" + code);
+        }
+    }
 	
     /**
      * Create a new Context.
@@ -241,7 +243,7 @@ public class ZMQ {
 
         /** Free all resources used by JNI interface. */
         @Override
-        protected native void finalize ();
+            protected native void finalize ();
 
         /**
          * Get the underlying context handle. This is private because it is only accessed from JNI,
@@ -665,7 +667,7 @@ public class ZMQ {
 
         /** Free all resources used by JNI interface. */
         @Override
-        protected native void finalize ();
+            protected native void finalize ();
 
         /**
          * Get the socket option value, as a long.
@@ -772,32 +774,65 @@ public class ZMQ {
          * @return the index identifying this Socket in the poll set.
          */
         public int register (Socket socket, int events) {
-            if (this.next >= this.size) {
-                // Compute new size for internal arrays.
-                int nsize = this.size + SIZE_INCREMENT;
+            int pos = -1;
 
-                // Create new internal arrays.
-                Socket [] ns = new Socket [nsize];
-                short [] ne = new short [nsize];
-                short [] nr = new short [nsize];
+            if (! this.freeSlots.isEmpty()) {
+                // If there are free slots in our array, remove one
+                // from the free list and use it.
+                pos = this.freeSlots.remove();
+            } else {
+                if (this.next >= this.size) {
+                    // It is necessary to grow the arrays.
 
-                // Copy contents of current arrays into new arrays.
-                for (int i = 0; i < this.next; ++i) {
-                    ns[i] = this.sockets[i];
-                    ne[i] = this.events[i];
-                    nr[i] = this.revents[i];
+                    // Compute new size for internal arrays.
+                    int nsize = this.size + SIZE_INCREMENT;
+
+                    // Create new internal arrays.
+                    Socket [] ns = new Socket [nsize];
+                    short [] ne = new short [nsize];
+                    short [] nr = new short [nsize];
+                    
+                    // Copy contents of current arrays into new arrays.
+                    for (int i = 0; i < this.next; ++i) {
+                        ns[i] = this.sockets[i];
+                        ne[i] = this.events[i];
+                        nr[i] = this.revents[i];
+                    }
+                    
+                    // Swap internal arrays and size to new values.
+                    this.size = nsize;
+                    this.sockets = ns;
+                    this.events = ne;
+                    this.revents = nr;
                 }
-
-                // Swap internal arrays and size to new values.
-                this.size = nsize;
-                this.sockets = ns;
-                this.events = ne;
-                this.revents = nr;
+                pos = this.next++;
             }
 
-            this.sockets [this.next] = socket;
-            this.events [this.next] = (short) events;
-            return this.next++;
+            this.sockets[pos] = socket;
+            this.events[pos] = (short) events;
+            this.used++;
+            return pos;
+        }
+
+        /**
+         * Unregister a Socket for polling on the specified events.
+         *
+         * @param socket 
+         *          the Socket to be unregistered
+         */
+        public void unregister (Socket socket) {
+            for (int i = 0; i < this.next; ++i) {
+                if (this.sockets[i] == socket) {
+                    this.sockets[i] = null;
+                    this.events[i] = 0;
+                    this.revents[i] = 0;
+                    
+                    this.freeSlots.add(i);
+                    --this.used;
+
+                    break;
+                }
+            }
         }
 
         /**
@@ -894,7 +929,7 @@ public class ZMQ {
             for (int i = 0; i < this.next; ++i) {
                 this.revents [i] = 0;
             }
-            return run_poll (this.next, this.sockets, this.events, this.revents, tout);
+            return run_poll (this.used, this.sockets, this.events, this.revents, tout);
         }
 
         /**
@@ -956,6 +991,8 @@ public class ZMQ {
             this.sockets = new Socket [this.size];
             this.events = new short [this.size];
             this.revents = new short [this.size];
+
+            freeSlots = new LinkedList<Integer>();
         }
 
         /**
@@ -993,9 +1030,12 @@ public class ZMQ {
         private long timeout = -2; // mark as uninitialized
         private int size = 0;
         private int next = 0;
+        private int used = 0;
         private Socket [] sockets = null;
         private short [] events = null;
         private short [] revents = null;
+        // When socket is removed from polling, store free slots here
+        private LinkedList<Integer> freeSlots = null;
 
         private static final int SIZE_DEFAULT = 32;
         private static final int SIZE_INCREMENT = 16;

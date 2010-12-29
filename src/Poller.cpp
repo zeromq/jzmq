@@ -61,7 +61,9 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
     short pc = 0;
     int rc = 0;
 
-    //  Add 0MQ sockets.
+    // Add 0MQ sockets.  Array containing them can be "sparse": there
+    // may be null elements.  The count argument has the real number
+    // of valid sockets in the array.
     if (ls_0mq > 0) {
         jshort *e_0mq = env->GetShortArrayElements (event_0mq, 0);
         if (e_0mq != NULL) {
@@ -84,6 +86,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
         }
     }
 
+    // Count of non-null sockets must be equal to passed-in arg.
     if (pc == ls) {
         pc = 0;
         long tout = (long) timeout;

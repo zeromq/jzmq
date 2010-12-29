@@ -10,78 +10,78 @@ import org.zeromq.ZMQ.Socket;
  */
 public class ZMQQueue implements Runnable {
 
-	private final ZMQ.Poller poller;
-	private final ZMQ.Socket inSocket;
-	private final ZMQ.Socket outSocket;
+    private final ZMQ.Poller poller;
+    private final ZMQ.Socket inSocket;
+    private final ZMQ.Socket outSocket;
 
-	/**
-	 * Class constructor.
-	 * 
-	 * @param context
-	 *            a 0MQ context previously created.
-	 * @param inSocket
-	 *            input socket
-	 * @param outSocket
-	 *            output socket
-	 */
-	public ZMQQueue(Context context, Socket inSocket, Socket outSocket) {
-		this.inSocket = inSocket;
-		this.outSocket = outSocket;
+    /**
+     * Class constructor.
+     * 
+     * @param context
+     *            a 0MQ context previously created.
+     * @param inSocket
+     *            input socket
+     * @param outSocket
+     *            output socket
+     */
+    public ZMQQueue(Context context, Socket inSocket, Socket outSocket) {
+        this.inSocket = inSocket;
+        this.outSocket = outSocket;
 
-		this.poller = context.poller(2);
-		this.poller.register(inSocket, ZMQ.Poller.POLLIN);
-		this.poller.register(outSocket, ZMQ.Poller.POLLIN);
-	}
+        this.poller = context.poller(2);
+        this.poller.register(inSocket, ZMQ.Poller.POLLIN);
+        this.poller.register(outSocket, ZMQ.Poller.POLLIN);
+    }
 
-	/**
-	 * Queuing of requests and replies.
-	 */
-	@Override
+    /**
+     * Queuing of requests and replies.
+     */
+    @Override
 	public void run() {
-		byte[] msg = null;
-		boolean more = true;
+        byte[] msg = null;
+        boolean more = true;
 
-		while (!Thread.currentThread().isInterrupted()) {
-			try {
-				// wait while there are either requests or replies to process
-				if (poller.poll(250) < 1) {
-					continue;
-				}
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                // wait while there are either requests or replies to process
+                if (poller.poll(250) < 1) {
+                    continue;
+                }
 
-				// process a request
-				if (poller.pollin(0)) {
-					more = true;
-					while (more) {
-						msg = inSocket.recv(0);
+                // process a request
+                if (poller.pollin(0)) {
+                    more = true;
+                    while (more) {
+                        msg = inSocket.recv(0);
 
-						more = inSocket.hasReceiveMore();
+                        more = inSocket.hasReceiveMore();
 
-						if (msg != null) {
-							outSocket.send(msg, more ? ZMQ.SNDMORE : 0);
-						}
-					}
-				}
+                        if (msg != null) {
+                            outSocket.send(msg, more ? ZMQ.SNDMORE : 0);
+                        }
+                    }
+                }
 
-				// process a reply
-				if (poller.pollin(1)) {
-					more = true;
-					while (more) {
-						msg = outSocket.recv(0);
+                // process a reply
+                if (poller.pollin(1)) {
+                    more = true;
+                    while (more) {
+                        msg = outSocket.recv(0);
 
-						more = outSocket.hasReceiveMore();
+                        more = outSocket.hasReceiveMore();
 
-						if (msg != null) {
-							inSocket.send(msg, more ? ZMQ.SNDMORE : 0);
-						}
-					}
-				}
-			} catch (ZMQException e) {
-				// context destroyed, exit
-				if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) {
-					break;
-				}
-				throw e;
-			}
-		}
-	}
+                        if (msg != null) {
+                            inSocket.send(msg, more ? ZMQ.SNDMORE : 0);
+                        }
+                    }
+                }
+            } catch (ZMQException e) {
+                // context destroyed, exit
+                if (ZMQ.Error.ETERM.getCode() == e.getErrorCode()) {
+                    break;
+                }
+                throw e;
+            }
+        }
+    }
 }
