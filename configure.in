@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.61)
+#AC_PREREQ(2.61)
 #
 # Change the version number below after doing a public release.
 # The version in git should reflect the *next* version planned.
@@ -26,7 +26,7 @@ AC_SUBST(JLTVER)
 
 # Checks for programs.
 AC_PROG_LIBTOOL
-AC_PROG_SED
+#AC_PROG_SED
 AC_PROG_AWK
 AM_PROG_CC_C_O
 AC_PROG_CXX

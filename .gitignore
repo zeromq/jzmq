@@ -19,7 +19,7 @@ stamp-*
 *.o
 *.lo
 *~
-src/Zmq.jar
+src/zmq.jar
 src/config.hpp*
 src/org_zeromq_*.h
 lib/
