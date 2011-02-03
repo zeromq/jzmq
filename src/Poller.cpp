@@ -98,6 +98,9 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
         jshort *r_0mq = env->GetShortArrayElements (revent_0mq, 0);
         if (r_0mq) {
             for (int i = 0; i < ls_0mq; ++i) {
+                jobject s_0mq = env->GetObjectArrayElement (socket_0mq, i);
+                if (!s_0mq)
+                    continue;
                 r_0mq [i] = pitem [pc].revents;
                 ++pc;
             }
