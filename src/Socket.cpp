@@ -200,22 +200,19 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
             void *s = get_socket (env, obj, 1);
             int rc = 0;
             int err = 0;
+            uint64_t optval = (uint64_t) value;
             
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
-            if(option==ZMQ_LINGER) {
-                uint64_t optval = (uint64_t) value;
-                int ival=optval;
+            if (option == ZMQ_LINGER) {
+                int ival = (int) optval;
                 size_t optvallen = sizeof(ival);
                 rc = zmq_setsockopt (s, option, &ival, optvallen);
-            } else {
+            } else
 #endif
-
-                uint64_t optval = (uint64_t) value;
+            {
                 size_t optvallen = sizeof(optval);
                 rc = zmq_setsockopt (s, option, &optval, optvallen);
-#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)            
             }
-#endif
             err = errno;
 
             if (rc != 0) {
