@@ -18,7 +18,6 @@
 */
 
 #include <assert.h>
-#include <errno.h>
 
 #include <zmq.h>
 
