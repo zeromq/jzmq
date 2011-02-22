@@ -2,6 +2,7 @@ INSTALL
 aclocal.m4
 config/
 src/zmq.jar
+src/Zmq.jar
 perf/zmq-perf.jar
 Makefile
 Makefile.in
@@ -19,7 +20,6 @@ stamp-*
 *.o
 *.lo
 *~
-src/Zmq.jar
 src/config.hpp*
 src/org_zeromq_*.h
 lib/
