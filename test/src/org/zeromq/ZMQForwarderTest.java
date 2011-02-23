@@ -41,7 +41,5 @@ public class ZMQForwarderTest {
 		}
 		
 		t.interrupt();
-		
-		context.term();
 	}
 }

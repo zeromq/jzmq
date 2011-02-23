@@ -52,7 +52,5 @@ public class ZMQQueueTest {
 		}
 		
 		t.interrupt();
-
-		context.term();
 	}
 }
