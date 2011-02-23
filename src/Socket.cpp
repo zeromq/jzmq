@@ -18,7 +18,6 @@
 */
 
 #include <assert.h>
-#include <errno.h>
 #include <string.h>
 
 #include <zmq.h>
@@ -62,7 +61,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_construct (JNIEnv *env,
     }
 
     s = zmq_socket (c, type);
-    int err = errno;
+    int err = zmq_errno();
     put_socket(env, obj, s);
 
     if (s == NULL) {
@@ -82,7 +81,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_finalize (JNIEnv *env,
         return;
 
     int rc = zmq_close (s);
-    int err = errno;
+    int err = zmq_errno();
     s = NULL;
     put_socket (env, obj, s);
 
@@ -124,7 +123,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
             uint64_t optval = 0;
             size_t optvallen = sizeof(optval);
             rc = zmq_getsockopt (s, option, &optval, &optvallen);
-            err = errno;
+            err = zmq_errno();
             ret = (jlong) optval;
 
             if (rc != 0) {
@@ -155,7 +154,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
             char optval[1024];
             size_t optvallen = 1024;
             int rc = zmq_getsockopt (s, option, optval, &optvallen);
-            int err = errno;
+            int err = zmq_errno();
             if (rc != 0) {
                 raise_exception (env, err);
                 return env->NewByteArray (0);
@@ -200,11 +199,20 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
             void *s = get_socket (env, obj, 1);
             int rc = 0;
             int err = 0;
-
             uint64_t optval = (uint64_t) value;
-            size_t optvallen = sizeof(optval);
-            rc = zmq_setsockopt (s, option, &optval, optvallen);
-            err = errno;
+            
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
+            if (option == ZMQ_LINGER) {
+                int ival = (int) optval;
+                size_t optvallen = sizeof(ival);
+                rc = zmq_setsockopt (s, option, &ival, optvallen);
+            } else
+#endif
+            {
+                size_t optvallen = sizeof(optval);
+                rc = zmq_setsockopt (s, option, &optval, optvallen);
+            }
+            err = zmq_errno();
 
             if (rc != 0) {
                 raise_exception (env, err);
@@ -244,7 +252,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *
             }
             size_t optvallen = env->GetArrayLength (value);
             int rc = zmq_setsockopt (s, option, optval, optvallen);
-            int err = errno;
+            int err = zmq_errno();
             env->ReleaseByteArrayElements (value, optval, 0);
             if (rc != 0) {
                 raise_exception (env, err);
@@ -279,7 +287,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_bind (JNIEnv *env,
     }
 
     int rc = zmq_bind (s, c_addr);
-    int err = errno;
+    int err = zmq_errno();
     env->ReleaseStringUTFChars (addr, c_addr);
 
     if (rc != 0) {
@@ -309,7 +317,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_connect (JNIEnv *env,
     }
 
     int rc = zmq_connect (s, c_addr);
-    int err = errno;
+    int err = zmq_errno();
     env->ReleaseStringUTFChars (addr, c_addr);
 
     if (rc != 0) {
@@ -331,7 +339,7 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     jsize size = env->GetArrayLength (msg); 
     zmq_msg_t message;
     int rc = zmq_msg_init_size (&message, size);
-    int err = errno;
+    int err = zmq_errno();
     if (rc != 0) {
         raise_exception (env, err);
         return JNI_FALSE;
@@ -346,11 +354,11 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     memcpy (zmq_msg_data (&message), data, size);
     env->ReleaseByteArrayElements (msg, data, 0);
     rc = zmq_send (s, &message, flags);
-    err = errno;
+    err = zmq_errno();
         
     if (rc != 0 && err == EAGAIN) {
         rc = zmq_msg_close (&message);
-        err = errno;
+        err = zmq_errno();
         if (rc != 0) {
             raise_exception (env, err);
             return JNI_FALSE;
@@ -361,7 +369,7 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     if (rc != 0) {
         raise_exception (env, err);
         rc = zmq_msg_close (&message);
-        err = errno;
+        err = zmq_errno();
         if (rc != 0) {
             raise_exception (env, err);
             return JNI_FALSE;
@@ -370,7 +378,7 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     }
 
     rc = zmq_msg_close (&message);
-    err = errno;
+    err = zmq_errno();
     if (rc != 0) {
         raise_exception (env, err);
         return JNI_FALSE;
@@ -390,17 +398,17 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv (JNIEnv *env,
 
     zmq_msg_t message;
     int rc = zmq_msg_init (&message);
-    int err = errno;
+    int err = zmq_errno();
     if (rc != 0) {
         raise_exception (env, err);
         return NULL;
     }
 
     rc = zmq_recv (s, &message, flags);
-    err = errno;
+    err = zmq_errno();
     if (rc != 0 && err == EAGAIN) {
         rc = zmq_msg_close (&message);
-        err = errno;
+        err = zmq_errno();
         if (rc != 0) {
             raise_exception (env, err);
             return NULL;
@@ -411,7 +419,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv (JNIEnv *env,
     if (rc != 0) {
         raise_exception (env, err);
         rc = zmq_msg_close (&message);
-        err = errno;
+        err = zmq_errno();
         if (rc != 0) {
             raise_exception (env, err);
             return NULL;

@@ -18,7 +18,6 @@
 */
 
 #include <assert.h>
-#include <errno.h>
 
 #include <zmq.h>
 
@@ -53,7 +52,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
         return;
 
     c = zmq_init (io_threads);
-    int err = errno;
+    int err = zmq_errno();
     put_context (env, obj, c);
 
     if (c == NULL) {
@@ -73,7 +72,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_finalize (JNIEnv *env,
         return;
 
     int rc = zmq_term (c);
-    int err = errno;
+    int err = zmq_errno();
     c = NULL;
     put_context (env, obj, c);
 
