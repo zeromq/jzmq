@@ -43,7 +43,7 @@ public class ZMQForwarder implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 // wait while there are requests to process
-                if (poller.poll(250) < 1) {
+                if (poller.poll(250000) < 1) {
                     continue;
                 }
 
