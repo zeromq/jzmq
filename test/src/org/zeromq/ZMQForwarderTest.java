@@ -25,14 +25,10 @@ public class ZMQForwarderTest {
 		Thread t = new Thread(new ZMQForwarder(context, clients, workers));
 		t.start();
 
-		Thread.sleep(100);
-
 		for (int i = 0; i < 10; i++) {
 			byte[] req = ("request" + i).getBytes();
 
 			client.send(req, 0);
-
-			Thread.sleep(100);
 
 			// worker receives request
 			byte[] reqTmp = worker.recv(0);

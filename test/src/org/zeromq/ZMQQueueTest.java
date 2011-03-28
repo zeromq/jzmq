@@ -25,15 +25,11 @@ public class ZMQQueueTest {
 		Thread t = new Thread(new ZMQQueue(context, clients, workers));
 		t.start();
 
-		Thread.sleep(100);
-
 		for (int i = 0; i < 10; i++) {
 			byte[] req = ("request" + i).getBytes();
 			byte[] rsp = ("response" + i).getBytes();
 
 			client.send(req, 0);
-
-			Thread.sleep(100);
 
 			// worker receives request
 			byte[] reqTmp = worker.recv(0);
@@ -42,8 +38,6 @@ public class ZMQQueueTest {
 
 			// worker sends response
 			worker.send(rsp, 0);
-
-			Thread.sleep(100);
 
 			// client receives response
 			byte[] rspTmp = client.recv(0);
