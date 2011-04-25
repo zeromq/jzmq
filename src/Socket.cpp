@@ -105,6 +105,16 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_EVENTS:
     case ZMQ_LINGER:
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+	case ZMQ_SNDHWM:
+	case ZMQ_RCVHWM:
+	case ZMQ_AFFINITY:
+	case ZMQ_RATE:
+	case ZMQ_RECOVERY_IVL:
+	case ZMQ_SNDBUF:
+	case ZMQ_RCVBUF:
+	case ZMQ_RCVMORE:
+#else
     case ZMQ_HWM:
     case ZMQ_SWAP:
     case ZMQ_AFFINITY:
@@ -114,6 +124,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_SNDBUF:
     case ZMQ_RCVBUF:
     case ZMQ_RCVMORE:
+#endif
         {
             void *s = get_socket (env, obj, 1);
             jlong ret = 0;
@@ -187,6 +198,15 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
     case ZMQ_LINGER:
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+    case ZMQ_SNDHWM:
+    case ZMQ_RCVHWM:
+    case ZMQ_AFFINITY:
+    case ZMQ_RATE:
+    case ZMQ_RECOVERY_IVL:
+    case ZMQ_SNDBUF:
+    case ZMQ_RCVBUF:
+#else
     case ZMQ_HWM:
     case ZMQ_SWAP:
     case ZMQ_AFFINITY:
@@ -195,6 +215,8 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_MCAST_LOOP:
     case ZMQ_SNDBUF:
     case ZMQ_RCVBUF:
+#endif
+
         {
             void *s = get_socket (env, obj, 1);
             int rc = 0;
@@ -353,7 +375,11 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
 
     memcpy (zmq_msg_data (&message), data, size);
     env->ReleaseByteArrayElements (msg, data, 0);
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+    rc = zmq_sendmsg (s, &message, flags);
+#else
     rc = zmq_send (s, &message, flags);
+#endif
     err = zmq_errno();
         
     if (rc != 0 && err == EAGAIN) {
@@ -403,8 +429,11 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv (JNIEnv *env,
         raise_exception (env, err);
         return NULL;
     }
-
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+    rc = zmq_recvmsg (s, &message, flags);
+#else
     rc = zmq_recv (s, &message, flags);
+#endif    
     err = zmq_errno();
     if (rc != 0 && err == EAGAIN) {
         rc = zmq_msg_close (&message);
