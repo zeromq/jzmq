@@ -36,6 +36,7 @@ public class ZMQ {
      * Socket flag to indicate a nonblocking send or recv mode.
      */
     public static final int NOBLOCK = 1;
+    public static final int DONTWAIT = 1;
     /**
      * Socket flag to indicate that more message parts are coming.
      */
@@ -300,11 +301,92 @@ public class ZMQ {
         }
 
         /**
+         * @see #setReconnectIVL(long)
+         *
+         * @return the reconnectIVL.
+         * @since 3.0.0
+         */
+        public long getReconnectIVL () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return -1;
+
+            return getLongSockopt (RECONNECT_IVL);
+        }
+
+        /**
+         * @see #setBacklog(long)
+         *
+         * @return the backlog.
+         * @since 3.0.0
+         */
+        public long getBacklog () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return -1;
+
+            return getLongSockopt (BACKLOG);
+        }
+
+        /**
+         * @see #setReconnectIVLMax(long)
+         *
+         * @return the reconnectIVLMax.
+         * @since 3.0.0
+         */
+        public long getReconnectIVLMax () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return -1;
+
+            return getLongSockopt (RECONNECT_IVL_MAX);
+        }
+
+        /**
+         * @see #setMaxMsgSize(long)
+         *
+         * @return the maxMsgSize.
+         * @since 3.0.0
+         */
+        public long getMaxMsgSize () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return -1;
+
+            return getLongSockopt (MAXMSGSIZE);
+        }
+
+        /**
+         * @see #setSndHWM(long)
+         *
+         * @return the SndHWM.
+         * @since 3.0.0
+         */
+        public long getSndHWM () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return -1;
+
+            return getLongSockopt (SNDHWM);
+        }
+
+        /**
+         * @see #setRcvHWM(long)
+         *
+         * @return the recvHWM period.
+         * @since 3.0.0
+         */
+        public long getRcvHWM () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return -1;
+
+            return getLongSockopt (RCVHWM);
+        }
+
+        /**
          * @see #setHWM(long)
          * 
          * @return the High Water Mark.
          */
         public long getHWM () {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return -1;
+
             return getLongSockopt (HWM);
         }
 
@@ -314,6 +396,9 @@ public class ZMQ {
          * @return the number of messages to swap at most.
          */
         public long getSwap () {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return -1;
+
             return getLongSockopt (SWAP);
         }
 
@@ -359,6 +444,9 @@ public class ZMQ {
          * @return the Multicast Loop.
          */
         public boolean hasMulticastLoop () {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return false;
+
             return getLongSockopt (MCAST_LOOP) != 0;
         }
 
@@ -447,6 +535,66 @@ public class ZMQ {
         }
 
         /**
+         * @since 3.0.0
+         */
+        public void setReconnectIVL (long reconnectIVL) {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (RECONNECT_IVL, reconnectIVL);
+        }
+
+        /**
+         * @since 3.0.0
+         */
+        public void setBacklog (long backlog) {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (BACKLOG, backlog);
+        }
+
+        /**
+         * @since 3.0.0
+         */
+        public void setReconnectIVLMax (long reconnectIVLMax) {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (RECONNECT_IVL_MAX, reconnectIVLMax);
+        }
+
+        /**
+         * @since 3.0.0
+         */
+        public void setMaxMsgSize (long maxMsgSize) {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (MAXMSGSIZE, maxMsgSize);
+        }
+
+        /**
+         * @since 3.0.0
+         */
+        public void setSndHWM (long sndHWM) {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (SNDHWM, sndHWM);
+        }
+
+        /**
+         * @since 3.0.0
+         */
+        public void setRcvHWM (long rcvHWM) {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (RCVHWM, rcvHWM);
+        }
+
+        /**
          * The 'ZMQ_HWM' option shall set the high water mark for the specified 'socket'. The high
          * water mark is a hard limit on the maximum number of outstanding messages 0MQ shall queue
          * in memory for any single peer that the specified 'socket' is communicating with.
@@ -460,6 +608,9 @@ public class ZMQ {
          *            the number of messages to queue.
          */
         public void setHWM (long hwm) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return;
+
             setLongSockopt (HWM, hwm);
         }
 
@@ -473,6 +624,9 @@ public class ZMQ {
          *            The value of 'ZMQ_SWAP' defines the maximum size of the swap space in bytes.
          */
         public void setSwap (long swap) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return;
+
             setLongSockopt (SWAP, swap);
         }
 
@@ -584,6 +738,9 @@ public class ZMQ {
          * @param mcast_loop
          */
         public void setMulticastLoop (boolean mcast_loop) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return;
+
             setLongSockopt (MCAST_LOOP, mcast_loop ? 1 : 0);
         }
 
@@ -738,6 +895,12 @@ public class ZMQ {
         private static final int EVENTS = 15;
         private static final int TYPE = 16;
         private static final int LINGER = 17;
+        private static final int RECONNECT_IVL = 18;
+        private static final int BACKLOG = 19;
+        private static final int RECONNECT_IVL_MAX = 21;
+        private static final int MAXMSGSIZE = 22;
+        private static final int SNDHWM = 23;
+        private static final int RCVHWM = 24;
     }
 
     /**
