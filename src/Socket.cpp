@@ -371,7 +371,11 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
 
     memcpy (zmq_msg_data (&message), data, size);
     env->ReleaseByteArrayElements (msg, data, 0);
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     rc = zmq_sendmsg (s, &message, flags);
+#else
+    rc = zmq_send (s, &message, flags);
+#endif
     err = zmq_errno();
         
     if (rc != 0 && err == EAGAIN) {
@@ -422,7 +426,11 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv (JNIEnv *env,
         return NULL;
     }
 
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     rc = zmq_recvmsg (s, &message, flags);
+#else
+    rc = zmq_recv (s, &message, flags);
+#endif
     err = zmq_errno();
     if (rc != 0 && err == EAGAIN) {
         rc = zmq_msg_close (&message);
