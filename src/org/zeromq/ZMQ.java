@@ -34,10 +34,12 @@ import java.util.LinkedList;
  * 
  */
 public class ZMQ {
+	
+	static final String LIB_LOCATION;
 
 	static {
 
-		boolean usedNativeLibrary = false;
+		boolean usedEmbeddedLibrary = false;
 
 		// attempt to locate embedded native library within JAR at following location:
 		// /NATIVE/${os.arch}/${os.name}/libjzmq.[so|dylib|dll]
@@ -79,7 +81,7 @@ public class ZMQ {
 				
 				libfile.delete();
 
-				usedNativeLibrary = true;
+				usedEmbeddedLibrary = true;
 
 			} catch (IOException x) {
 				// mission failed, do nothing
@@ -89,9 +91,13 @@ public class ZMQ {
 		} // nativeLibraryUrl exists
 
 		// if no embedded native library, revert to loading from java.library.path
-		if (!usedNativeLibrary)
+		if (!usedEmbeddedLibrary)
 			System.loadLibrary ("jzmq");
 
+		// set LIB_LOCATION
+		LIB_LOCATION = (usedEmbeddedLibrary ? "embedded" : "java.library.path");
+		
+		
 	}
 
     // Values for flags in Socket's send and recv functions.

@@ -24,6 +24,8 @@ public class App {
 		System.out.printf("%s build time:   %s%n", appname, version[1]);
 		System.out.printf("%s build commit: %s%n", appname, version[0]);
 
+		System.out.printf("%s location:  %s%n", "JNI lib", ZMQ.LIB_LOCATION);
+
 	}
 
 }
