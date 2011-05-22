@@ -18,6 +18,13 @@
 */
 package org.zeromq;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.LinkedList;
 
 /**
@@ -27,9 +34,65 @@ import java.util.LinkedList;
  * 
  */
 public class ZMQ {
-    static {
-        System.loadLibrary ("jzmq");
-    }
+
+	static {
+
+		boolean usedNativeLibrary = false;
+
+		// attempt to locate embedded native library within JAR at following location:
+		// /NATIVE/${os.arch}/${os.name}/libjzmq.[so|dylib|dll]
+		String[] allowedExtensions = new String[] {"so", "dylib", "dll"};
+		StringBuilder url = new StringBuilder();
+		url.append("/NATIVE/");
+		url.append(System.getProperty("os.arch"));
+		url.append("/");
+		url.append(System.getProperty("os.name"));
+		url.append("/libjzmq.");    	
+		URL nativeLibraryUrl = null;
+		// loop through extensions, stopping after finding first one
+		for (String ext : allowedExtensions) {
+			nativeLibraryUrl = ZMQ.class.getResource(url.toString() + ext);
+			if (nativeLibraryUrl != null)
+				break;
+		}
+
+		if (nativeLibraryUrl != null) {
+
+			// native library found within JAR, extract and load
+
+			try {
+
+				final File libfile = File.createTempFile("libjzmq-", ".lib");
+				libfile.deleteOnExit(); // just in case
+
+				final InputStream in = nativeLibraryUrl.openStream();
+				final OutputStream out = new BufferedOutputStream(new FileOutputStream(libfile));
+
+				int len = 0;
+				byte[] buffer = new byte[8192];
+				while ((len = in.read(buffer)) > -1)
+					out.write(buffer, 0, len);
+				out.close();
+				in.close();
+
+				System.load(libfile.getAbsolutePath());
+				
+				libfile.delete();
+
+				usedNativeLibrary = true;
+
+			} catch (IOException x) {
+				// mission failed, do nothing
+			}
+
+
+		} // nativeLibraryUrl exists
+
+		// if no embedded native library, revert to loading from java.library.path
+		if (!usedNativeLibrary)
+			System.loadLibrary ("jzmq");
+
+	}
 
     // Values for flags in Socket's send and recv functions.
     /**
