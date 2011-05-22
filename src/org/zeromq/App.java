@@ -15,16 +15,27 @@ public class App {
 		final String versionMaven = p.getSpecificationVersion();
 		final String[] version = p.getImplementationVersion().split(" ", 2);
 
-		final int major = ZMQ.version_major();
-		final int minor = ZMQ.version_minor();
-		final int patch = ZMQ.version_patch();
+		String zmqVersion = null;
+		String libzmqLocation = null;
+		
+		try {
 
-		System.out.printf("%s version:    %s.%s.%s%n", "ZeroMQ", major, minor, patch);
+			final int major = ZMQ.version_major();
+			final int minor = ZMQ.version_minor();
+			final int patch = ZMQ.version_patch();
+			zmqVersion = major + "." + minor + "." + patch;
+			libzmqLocation = ZMQ.LIB_LOCATION;
+	
+		} catch (Throwable x) {
+			zmqVersion = "ERROR! " + x.getMessage();
+			libzmqLocation = "ERROR! Not found.";
+		}
+		
+		System.out.printf("%s version:    %s%n", "ZeroMQ", zmqVersion);
 		System.out.printf("%s version:      %s%n", appname, versionMaven);
 		System.out.printf("%s build time:   %s%n", appname, version[1]);
 		System.out.printf("%s build commit: %s%n", appname, version[0]);
-
-		System.out.printf("%s location:  %s%n", "JNI lib", ZMQ.LIB_LOCATION);
+		System.out.printf("%s location:  %s%n", "JNI lib", libzmqLocation);
 
 	}
 
