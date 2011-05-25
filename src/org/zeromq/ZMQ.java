@@ -106,6 +106,70 @@ public class ZMQ {
     @Deprecated
         public static final int DOWNSTREAM = PUSH;
 
+
+    /**
+     * @return Major version number of the ZMQ library.
+     */
+    public static int getMajorVersion ()
+    {
+      return version_major ();
+    }
+  
+  
+    /**
+     * @return Major version number of the ZMQ library.
+     */
+    public static int getMinorVersion ()
+    {
+      return version_minor ();
+    }
+  
+  
+    /**
+     * @return Major version number of the ZMQ library.
+     */
+    public static int getPatchVersion ()
+    {
+      return version_patch ();
+    }
+  
+  
+    /**
+     * @return Full version number of the ZMQ library used for comparing versions.
+     */
+    public static int getFullVersion ()
+    {
+      return version_full ();
+    }
+  
+  
+    /**
+     * @param major Version major component.
+     * @param minor Version minor component.
+     * @param patch Version patch component.
+     * 
+     * @return Comparible single int version number.
+     */
+    public static int makeVersion ( final int major,
+                                    final int minor,
+                                    final int patch )
+    {
+      return make_version ( major, minor, patch );
+    }
+  
+  
+    /**
+     * @return String version number in the form major.minor.patch.
+     */
+    public static String getVersionString ()
+    {
+      return String.format ( "%d.%d.%d",
+                             version_major (),
+                             version_minor (),
+                             version_patch () );
+    }
+  
+
     protected static native int version_full();
     protected static native int version_major();
     protected static native int version_minor();
