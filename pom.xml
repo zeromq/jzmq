@@ -60,6 +60,19 @@
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test/src</testSourceDirectory>
 
+		<resources>
+			<resource>
+				<filtering>false</filtering>
+				<targetPath>NATIVE/${os.arch}/${os.name}</targetPath>
+				<directory>${basedir}/src/.libs</directory>
+				<includes>
+					<include>libjzmq.so</include>
+					<include>libjzmq.dylib</include>
+					<include>libjzmq.dll</include>
+				</includes>
+			</resource>
+		</resources>
+
 		<plugins>
 
 			<plugin>
