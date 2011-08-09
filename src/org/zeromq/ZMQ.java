@@ -331,7 +331,6 @@ public class ZMQ {
      * Inner class: Socket.
      */
     public static class Socket {
-        public long socketMsg = 0;
         /**
          * This is an explicit "destructor". It can be called to ensure the corresponding 0MQ Socket
          * has been disposed of.
