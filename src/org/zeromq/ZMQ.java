@@ -872,6 +872,23 @@ public class ZMQ {
         public native byte [] recv (int flags);
 
         /**
+         * Receive a message in to a specified buffer.
+         * 
+         * @param buffer
+         *            byte[] to copy zmq message payload in to.
+         * @param offset
+         *            offset in buffer to write data
+         * @param len
+         *            max bytes to write to buffer.  
+         *            If len is smaller than the incoming message size, 
+         *            the message will be truncated.
+         * @param flags
+         *            the flags to apply to the receive operation.
+         * @return the message received, as an array of bytes; null on error.
+         */
+        public native int recv (byte[] buffer, int offset, int len, int flags);
+
+        /**
          * Class constructor.
          * 
          * @param context
