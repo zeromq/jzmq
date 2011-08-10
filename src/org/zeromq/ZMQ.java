@@ -884,7 +884,7 @@ public class ZMQ {
          *            the message will be truncated.
          * @param flags
          *            the flags to apply to the receive operation.
-         * @return the message received, as an array of bytes; null on error.
+         * @return the number of bytes read, -1 on error
          */
         public native int recv (byte[] buffer, int offset, int len, int flags);
 
