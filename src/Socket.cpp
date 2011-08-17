@@ -155,6 +155,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
                                                                               jint option)
 {
     switch (option) {
+#if (ZMQ_VERSION_MAJOR <= 3)
     case ZMQ_IDENTITY:
         {
             void *s = get_socket (env, obj, 1);
@@ -178,6 +179,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
             env->SetByteArrayRegion (array, 0, optvallen, (const jbyte*) optval);
             return array;
         }
+#endif
     default:
         raise_exception (env, EINVAL);
         return env->NewByteArray(0);
@@ -252,7 +254,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *
                                                                         jbyteArray value)
 {
     switch (option) {
+#if (ZMQ_VERSION_MAJOR <= 3)
     case ZMQ_IDENTITY:
+#endif
     case ZMQ_SUBSCRIBE:
     case ZMQ_UNSUBSCRIBE:
         {
