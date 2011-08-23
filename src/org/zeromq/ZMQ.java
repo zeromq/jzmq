@@ -347,11 +347,11 @@ public class ZMQ {
          * @return the socket type.
          * @since 2.1.0
          */
-        public long getType () {
+        public int getType () {
             if (ZMQ.version_full() < ZMQ.make_version(2, 1, 0))
                 return -1;
 
-            return getLongSockopt (TYPE);
+            return (int) getLongSockopt (TYPE);
         }
 
         /**
