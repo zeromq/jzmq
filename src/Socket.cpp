@@ -206,9 +206,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_HWM:
     case ZMQ_SWAP:
     case ZMQ_MCAST_LOOP:
+#endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
     case ZMQ_LINGER:
-#endif
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
