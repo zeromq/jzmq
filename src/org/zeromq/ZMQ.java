@@ -511,7 +511,7 @@ public class ZMQ {
          * @return the Multicast Loop.
          */
         public boolean hasMulticastLoop () {
-            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return false;
 
             return getLongSockopt (MCAST_LOOP) != 0;
@@ -525,7 +525,7 @@ public class ZMQ {
          * @param mcast_hops
          */
         public void setMulticastHops (long mcast_hops) {
-            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return;
 
             setLongSockopt (MULTICAST_HOPS, mcast_hops);
@@ -537,6 +537,8 @@ public class ZMQ {
          * @return the Multicast Hops.
          */
         public long getMulticastHops () {
+			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return 1;
             return getLongSockopt (MULTICAST_HOPS);
         }
         /**
@@ -549,7 +551,7 @@ public class ZMQ {
          * @param timeout
          */
         public void setReceiveTimeOut (long timeout) {
-            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return;
 
             setLongSockopt (RCVTIMEO, timeout);
@@ -561,6 +563,8 @@ public class ZMQ {
          * @return the Receive Timeout
          */
         public long getReceiveTimeOut () {
+			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return -1;
             return getLongSockopt (RCVTIMEO);
         }
 
@@ -574,7 +578,7 @@ public class ZMQ {
          * @param timeout
          */
         public void setSendTimeOut (long timeout) {
-            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return;
 
             setLongSockopt (SNDTIMEO, timeout);
@@ -586,6 +590,8 @@ public class ZMQ {
          * @return the Send Timeout.
          */
         public long getSendTimeOut () {
+			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+                return -1;
             return getLongSockopt (SNDTIMEO);
         }
 
