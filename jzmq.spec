@@ -42,7 +42,7 @@ This package contains Java Bindings for ZeroMQ related development libraries and
 %build
 %configure
 
-%{__make} %{?_smp_mflags}
+%{__make}
 
 %install
 [ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
