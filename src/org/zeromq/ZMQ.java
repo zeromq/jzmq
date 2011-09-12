@@ -518,6 +518,78 @@ public class ZMQ {
         }
 
         /**
+         * Sets the time-to-live field in every multicast packet sent from this socket.
+         * The default is 1 which means that the multicast packets don't leave the local
+         * network.
+         * 
+         * @param mcast_hops
+         */
+        public void setMulticastHops (long mcast_hops) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (MULTICAST_HOPS, mcast_hops);
+        }
+
+        /**
+         * @see #setMulticastHops(long)
+         * 
+         * @return the Multicast Hops.
+         */
+        public long getMulticastHops () {
+            return getLongSockopt (MULTICAST_HOPS);
+        }
+        /**
+         * Sets the timeout for receive operation on the socket. If the value is 0, recv 
+         * will return immediately, with a EAGAIN error if there is no message to receive. 
+         * If the value is -1, it will block until a message is available. For all other 
+         * values, it will wait for a message for that amount of time before returning with
+         * an EAGAIN error.
+         * 
+         * @param timeout
+         */
+        public void setReceiveTimeOut (long timeout) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (RCVTIMEO, timeout);
+        }
+
+        /**
+         * @see #setReceiveTimeOut(long)
+         * 
+         * @return the Receive Timeout
+         */
+        public long getReceiveTimeOut () {
+            return getLongSockopt (RCVTIMEO);
+        }
+
+        /**
+         * Sets the timeout for send operation on the socket. If the value is 0, send
+         * will return immediately, with a EAGAIN error if the message cannot be sent.
+         * If the value is -1, it will block until the message is sent. For all other
+         * values, it will try to send the message for that amount of time before
+         * returning with an EAGAIN error.
+         * 
+         * @param timeout
+         */
+        public void setSendTimeOut (long timeout) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
+                return;
+
+            setLongSockopt (SNDTIMEO, timeout);
+        }
+
+        /**
+         * @see #setSendTimeOut(long)
+         * 
+         * @return the Send Timeout.
+         */
+        public long getSendTimeOut () {
+            return getLongSockopt (SNDTIMEO);
+        }
+
+        /**
          * @see #setSendBufferSize(long)
          * 
          * @return the kernel send buffer size.
@@ -985,6 +1057,9 @@ public class ZMQ {
         private static final int MAXMSGSIZE = 22;
         private static final int SNDHWM = 23;
         private static final int RCVHWM = 24;
+        private static final int MULTICAST_HOPS = 25;
+        private static final int RCVTIMEO = 27;
+        private static final int SNDTIMEO = 28;
     }
 
     /**
