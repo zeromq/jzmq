@@ -1,14 +1,19 @@
 This is the Java language binding for 0MQ.
 
-To build, set JAVA_HOME to the location of your JDK and run:
+To build, run:
 
-./autogen.sh
 ./configure
 make
 
 To build Debian package run:
 
 $ dpkg-buildpackage -rfakeroot
+
+To build RPM package run:
+
+$ rpmbuild -tb jzmq-X.Y.Z.tar.gz 
+
+Where X.Y.Z is replaced with the version that you've downloaded.
 
 If your zmq installation is not found by configure you can add this information manually e.g. --with-zeromq=/usr/local/lib.
  

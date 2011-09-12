@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-# AC_PREREQ(2.61)
+# AC_PREREQ(2.59)
 #
 # Change the version number below after doing a public release.
 # The version in git should reflect the *next* version planned.
@@ -26,6 +26,7 @@ AC_SUBST(JLTVER)
 
 # Checks for programs.
 AC_PROG_LIBTOOL
+#AC_PROG_RANLIB
 # AC_PROG_SED
 AC_PROG_AWK
 AM_PROG_CC_C_O
@@ -67,53 +68,31 @@ AC_CHECK_LIB([zmq], [zmq_init], [],
     [AC_MSG_ERROR([cannot link with -lzmq])])
 
 # Check for JDK
-if test "x$JAVA_HOME" = "x"; then
-    AC_MSG_ERROR([the JAVA_HOME environment variable must be set to your JDK location.]);
-fi
-AC_PATH_PROG(JAVAC, javac, [no], [$PATH:$JAVA_HOME/bin])
-if test "x$JAVAC" = "xno"; then
-    AC_MSG_ERROR([cannot find javac.]);
-fi
-AC_PATH_PROG(JAVAH, javah, [no], [$PATH:$JAVA_HOME/bin])
-if test "x$JAVAH" = "xno"; then
-    AC_MSG_ERROR([cannot find javah.]);
-fi
-AC_PATH_PROG(JAR, jar, [no], [$PATH:$JAVA_HOME/bin])
-if test "x$JAR" = "xno"; then
-    AC_MSG_ERROR([cannot find jar.]);
-fi
+test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac)
+test "x$JAVAC" = x && AC_MSG_ERROR([cannot find javac])
+AC_SUBST(JAVAC)
 
-# Check for JNI headers
-AC_MSG_CHECKING([for jni.h in $JAVA_HOME/include])
-if test -f $JAVA_HOME/include/jni.h; then
-    AC_MSG_RESULT([yes])
-else
-    AC_MSG_ERROR([cannot find jni.h in $JAVA_HOME/include.]);
-fi
-CPPFLAGS="$CPPFLAGS -I${JAVA_HOME}/include"
+test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, javah)
+test "x$JAVAH" = x && AC_MSG_ERROR([cannot find javah])
+AC_SUBST(JAVAH)
 
-# Need host-specific path for jni_md.h on some systems, this is braindead
-AC_CANONICAL_HOST
-case "${host_os}" in
-    *solaris*)
-        CPPFLAGS="$CPPFLAGS -I${JAVA_HOME}/include/solaris"
-    ;;
-    *openbsd*)
-        CPPFLAGS="$CPPFLAGS -I${JAVA_HOME}/include/openbsd"
-    ;;
-    *linux*)
-        CPPFLAGS="$CPPFLAGS -I${JAVA_HOME}/include/linux"
-    ;;
-    *darwin*)
-        # Darwin does not need an extra -I path
-    ;;
-    *)
-        AC_MSG_ERROR([don't know how to find jni_md.h on this platform])
-    ;;
-esac
+test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar)
+test "x$JAR" = x && AC_MSG_ERROR([cannot find jar])
+AC_SUBST(JAR)
 
 JAVAROOT=.
 AC_SUBST(JAVAROOT)
+
+# Checks for libraries.
+AX_JNI_INCLUDE_DIR
+for JNI_INCLUDE_DIR in $JNI_INCLUDE_DIRS; do
+  CPPFLAGS="$CPPFLAGS -I$JNI_INCLUDE_DIR"
+done
+AC_SUBST(CPPFLAGS)
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
 
 AC_OUTPUT(Makefile src/Makefile perf/Makefile)
 
