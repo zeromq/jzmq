@@ -1,15 +1,12 @@
-INSTALL
-aclocal.m4
-config/
 src/zmq.jar
 src/Zmq.jar
 perf/zmq-perf.jar
 Makefile
-Makefile.in
 autom4te.cache
+autoscan.log
 config.log
 config.status
-configure
+configure.scan
 libtool
 *.stamp
 stamp-*
@@ -20,7 +17,7 @@ stamp-*
 *.o
 *.lo
 *~
-src/config.hpp*
+src/config.hpp
 src/org_zeromq_*.h
 lib/
 target/
