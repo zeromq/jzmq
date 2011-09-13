@@ -106,6 +106,9 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_MAXMSGSIZE:
     case ZMQ_SNDHWM:
     case ZMQ_RCVHWM:
+    case ZMQ_MULTICAST_HOPS:
+    case ZMQ_RCVTIMEO:
+    case ZMQ_SNDTIMEO:
 #else
     case ZMQ_HWM:
     case ZMQ_SWAP:
@@ -202,6 +205,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_MAXMSGSIZE:
     case ZMQ_SNDHWM:
     case ZMQ_RCVHWM:
+    case ZMQ_MULTICAST_HOPS:
+    case ZMQ_RCVTIMEO:
+    case ZMQ_SNDTIMEO:
 #else
     case ZMQ_HWM:
     case ZMQ_SWAP:
