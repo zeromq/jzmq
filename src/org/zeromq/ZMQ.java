@@ -1237,11 +1237,11 @@ public class ZMQ {
          * Issue a poll call, using the specified timeout value.
          * 
          * @param tout
-         *            the timeout in microseconds, as per zmq_poll ();
+         *            the timeout in milliseconds, as per zmq_poll ();
          *            if -1, it will block indefinitely until an event
          *            happens; if 0, it will return immediately;
          *            otherwise, it will wait for at most that many
-         *            microseconds.
+         *            milliseconds.
          *
          * @return how many objects where signalled by poll ()
          */
@@ -1333,7 +1333,7 @@ public class ZMQ {
          * @param revents
          *            an array of short values with the results.
          * @param timeout
-         *            the maximum timeout in microseconds.
+         *            the maximum timeout in milliseconds.
          * @return how many objects where signalled by poll ().
          */
         private native long run_poll (int count, Socket [] sockets, short [] events, short [] revents, long timeout);
