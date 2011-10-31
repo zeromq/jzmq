@@ -6,7 +6,10 @@ JZMQ_JAVA_FILES = \
 	org/zeromq/ZMQException.java \
 	org/zeromq/ZMQQueue.java \
 	org/zeromq/ZMQForwarder.java \
-	org/zeromq/ZMQStreamer.java
+	org/zeromq/ZMQStreamer.java \
+        org/zeromq/ZContext.java \
+        org/zeromq/ZFrame.java \
+        org/zeromq/ZMsg.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \
@@ -34,7 +37,10 @@ JZMQ_CLASS_FILES = \
 	org/zeromq/ZMQException.class \
 	org/zeromq/ZMQQueue.class \
 	org/zeromq/ZMQForwarder.class \
-	org/zeromq/ZMQStreamer.class
+	org/zeromq/ZMQStreamer.class \
+        org/zeromq/ZContext.class \
+        org/zeromq/ZFrame.class \
+        org/zeromq/ZMsg.class
 
 $(jarfile): $(dist_noinst_JAVA)
 	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
