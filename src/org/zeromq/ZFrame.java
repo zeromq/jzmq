@@ -216,10 +216,10 @@ public class ZFrame {
 		
 		StringBuffer b = new StringBuffer();
 		for (int nbr = 0;nbr<data.length;nbr++) {
-			byte b1 = (byte) (data[nbr] >> 4);
-			byte b2 = (byte) (data[nbr] & 15);
-			b.append(hexChar.charAt((int)b1 & 0xff));
-			b.append(hexChar.charAt((int)b2 & 0xff));
+			int b1 = data[nbr] >>> 4 & 0xf;
+			int b2 = data[nbr] & 0xf;
+			b.append(hexChar.charAt(b1));
+			b.append(hexChar.charAt(b2));
 		}
 		return b.toString();
 	}
