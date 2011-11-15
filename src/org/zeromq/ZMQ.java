@@ -67,13 +67,35 @@ public class ZMQ {
      */
     public static final int REP = 4;
     /**
-     * Flag to specify a XREQ socket, receiving side must be a XREP.
+     * Flag to specify a DEALER socket (aka XREQ). 
+     * DEALER is really a combined ventilator / sink 
+     * that does load-balancing on output and fair-queuing on input 
+     * with no other semantics. It is the only socket type that lets 
+     * you shuffle messages out to N nodes and shuffle the replies 
+     * back, in a raw bidirectional asynch pattern.
      */
-    public static final int XREQ = 5;
+    public static final int DEALER = 5;
     /**
-     * Flag to specify the receiving part of a XREQ socket.
+     * Old alias for DEALER flag.
+     * Flag to specify a XREQ socket, receiving side must be a XREP.
+     *
+     * @deprecated  As of release 3.0 of zeromq, replaced by {@link #DEALER}
      */
-    public static final int XREP = 6;
+    public static final int XREQ = DEALER;
+    /**
+     * Flag to specify ROUTER socket (aka XREP).
+     * ROUTER is the socket that creates and consumes request-reply 
+     * routing envelopes. It is the only socket type that lets you route 
+     * messages to specific connections if you know their identities.
+     */
+    public static final int ROUTER = 6;
+    /**
+     * Old alias for ROUTER flag.
+     * Flag to specify the receiving part of a XREQ socket.
+     *
+     * @deprecated  As of release 3.0 of zeromq, replaced by {@link #ROUTER}
+     */
+    public static final int XREP = ROUTER;
     /**
      * Flag to specify the receiving part of a PUSH socket.
      */
