@@ -39,7 +39,7 @@ public class ZFrame {
 	 * @param data
 	 * 			Data to copy into ZFrame object
 	 */
-	protected ZFrame(byte[] data)
+	public ZFrame(byte[] data)
 	{
 		if (data != null) {
 			this.data = (byte[]) data.clone();
@@ -51,7 +51,7 @@ public class ZFrame {
 	 * Copies String into frame data
 	 * @param data
 	 */
-	protected ZFrame(String data) {
+	public ZFrame(String data) {
 		if (data != null) {
 			this.data = data.getBytes();
 		}
