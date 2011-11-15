@@ -3,6 +3,8 @@ package org.zeromq;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -48,7 +50,7 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 	/**
 	 * Class Constructor
 	 */
-	protected ZMsg() {
+	public ZMsg() {
 		frames = new ArrayDeque<ZFrame>();
 	}
 	
@@ -250,7 +252,46 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 			return null;
 		}
 	}
-	
+
+        /**
+         * Dump the message in human readable format. This should only be used
+         * for debugging and tracing, inefficient in handling large messages. 
+         **/
+        public void dump(Appendable out) {
+            try {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                pw.printf("--------------------------------------\n");
+                for (ZFrame frame : frames) {
+                    pw.printf("[%03d] %s\n", frame.getData().length, 
+                            frame.toString());
+                }
+                out.append(sw.getBuffer());
+                sw.close();
+            } catch (IOException e) {
+                throw new RuntimeException( "Message dump exception " 
+                        + super.toString(), e);
+            } 
+        }
+
+    // ********* Convenience Deque methods for common data types *** //
+        
+        public void addFirst (String stringValue) {
+            addFirst(new ZFrame(stringValue));
+        }
+
+        public void addFirst (byte[] data) {
+            addFirst(new ZFrame(data));
+        }
+        
+        public void addLast (String stringValue) {
+            addLast(new ZFrame(stringValue));
+        }
+
+        public void addLast (byte[] data) {
+            addLast(new ZFrame(data));
+        }
+        
 	// ********* Implement Iterable Interface *************** //
 	@Override
 	public Iterator<ZFrame> iterator() {
