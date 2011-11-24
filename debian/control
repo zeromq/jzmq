@@ -2,13 +2,13 @@ Source: jzmq
 Section: libs
 Priority: optional
 Maintainer: Alois Belaska <alois.belaska@gmail.com>
-Build-Depends: debhelper (>= 7), libzmq-dev [amd64 i386]
+Build-Depends: debhelper (>= 7), libzmq-dev [amd64 i386], sun-java6-jdk, libpgm-dev
 Standards-Version: 3.9.1
 Homepage: https://github.com/zeromq/jzmq
 
 Package: jzmq
 Architecture: any
-Depends: libzmq0 (>= 2.0.10), ${shlibs:Depends}, ${misc:Depends}
+Depends: libzmq0 (>= 2.0.10), libpgm, ${shlibs:Depends}, ${misc:Depends}
 Description: The Java ZeroMQ bindings
  The 0MQ lightweight messaging kernel is a library which extends the standard
  socket interfaces with features traditionally provided by specialised
@@ -17,3 +17,4 @@ Description: The Java ZeroMQ bindings
  filtering (subscriptions), seamless access to multiple transport
  protocols and more.
  This package contains the Java Bindings for ZeroMQ.
+
