@@ -29,6 +29,7 @@
 /** Handle to Java's Socket::socketHandle. */
 static jfieldID socket_handle_fid = NULL;
 
+static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags);
 
 static void ensure_socket (JNIEnv *env,
                            jobject obj);
@@ -419,45 +420,6 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     return JNI_TRUE;
 }
 
-zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags) {
-    void *s = get_socket (env, obj, 1);
-
-    int rc = zmq_msg_init (message);
-    int err = zmq_errno();
-    if (rc != 0) {
-        raise_exception (env, err);
-        return NULL;
-    }
-
-#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
-    rc = zmq_recvmsg (s, message, flags);
-#else
-    rc = zmq_recv (s, message, flags);
-#endif
-    err = zmq_errno();
-    if (rc < 0 && err == EAGAIN) {
-        rc = zmq_msg_close (message);
-        err = zmq_errno();
-        if (rc != 0) {
-            raise_exception (env, err);
-            return NULL;
-        }
-        return NULL;
-    }
-
-    if (rc < 0) {
-        raise_exception (env, err);
-        rc = zmq_msg_close (message);
-        err = zmq_errno();
-        if (rc != 0) {
-            raise_exception (env, err);
-            return NULL;
-        }
-        return NULL;
-    }
-    return message;
-}
-
 /**
  * Called by Java's Socket::recv(byte[] buffer, int offset, int len, int flags).
  */
@@ -513,6 +475,50 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv__I (JNIEnv *en
     return data;
 }
 
+
+/**
+ * Issue a read on the socket.
+ */
+static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags)
+{
+    void *s = get_socket (env, obj, 1);
+
+    int rc = zmq_msg_init (message);
+    int err = zmq_errno();
+    if (rc != 0) {
+        raise_exception (env, err);
+        return NULL;
+    }
+
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+    rc = zmq_recvmsg (s, message, flags);
+#else
+    rc = zmq_recv (s, message, flags);
+#endif
+    err = zmq_errno();
+    if (rc < 0 && err == EAGAIN) {
+        rc = zmq_msg_close (message);
+        err = zmq_errno();
+        if (rc != 0) {
+            raise_exception (env, err);
+            return NULL;
+        }
+        return NULL;
+    }
+
+    if (rc < 0) {
+        raise_exception (env, err);
+        rc = zmq_msg_close (message);
+        err = zmq_errno();
+        if (rc != 0) {
+            raise_exception (env, err);
+            return NULL;
+        }
+        return NULL;
+    }
+    
+    return message;
+}
 
 /**
  * Make sure we have a valid pointer to Java's Socket::socketHandle.
