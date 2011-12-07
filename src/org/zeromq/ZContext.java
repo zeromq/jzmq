@@ -88,7 +88,7 @@ public class ZContext {
 		if (context == null)
 			context = ZMQ.context(ioThreads);
 
-		// Create and register socket
+		// Create and registerHandler socket
 		Socket socket = context.socket(type);
 		sockets.add(socket);
 		return socket;
