@@ -2,12 +2,18 @@ package org.zeromq;
 
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static junit.framework.Assert.assertEquals;
+
 /**
  */
 public class ZDispatcherTest {
 
     @Test
-    public void test() {
+    public void singleMessage() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
         ZContext ctx = new ZContext();
 
         ZMQ.Socket output = ctx.createSocket(ZMQ.PAIR);
@@ -16,7 +22,7 @@ public class ZDispatcherTest {
         logger.connect("inproc://zmsg.test");
 
 
-        ZDispatcher zDispatcher = new ZDispatcher(10);
+        ZDispatcher zDispatcher = new ZDispatcher(2);
         zDispatcher.dispatch();
 
         ZDispatcher.SocketHandler outputHandler = new ZDispatcher.SocketHandler() {
@@ -29,7 +35,8 @@ public class ZDispatcherTest {
         zDispatcher.register(logger, new ZDispatcher.SocketHandler() {
             @Override
             public void handleMessage(ZMsg msg) {
-                System.out.println(msg.poll().toString());
+                assertEquals("Hello", msg.poll().toString());
+                latch.countDown();
             }
         });
 
@@ -37,7 +44,8 @@ public class ZDispatcherTest {
         ZFrame frame = new ZFrame("Hello");
         msg.addFirst(frame);
         outputHandler.send(msg);
-        System.out.println();
 
+        latch.await(1, TimeUnit.SECONDS);
+        assertEquals(0, latch.getCount());
     }
 }

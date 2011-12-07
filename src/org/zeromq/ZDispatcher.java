@@ -1,5 +1,6 @@
 package org.zeromq;
 
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,6 +38,7 @@ public class ZDispatcher {
                 public void run() {
                     while (active) {
                         doReceive();
+                        doHandle();
                         doSend();
                     }
                 }
@@ -54,10 +56,24 @@ public class ZDispatcher {
 
     private void doReceive() {
         for (ZMQ.Socket socket : handlers.keySet()) {
-            ZMsg msg = ZMsg.recvMsg(socket, ZMQ.DONTWAIT);
-            if (msg.size() > 0 && msg.getFirst().hasData()) {
+            ZMsg msg;
+            while ((msg = ZMsg.recvMsg(socket, ZMQ.DONTWAIT)) != null && msg.size() > 0 && msg.getFirst().hasData()) {
                 handlers.get(socket).inQueue.add(msg);
             }
+        }
+    }
+
+    private void doHandle() {
+        for (final SocketHandler handler : handlers.values()) {
+            final ArrayList<ZMsg> messages = new ArrayList<ZMsg>(handler.inQueue.size());
+            handler.inQueue.drainTo(messages);
+            handlerExecutor.execute(new Runnable() {
+                public void run() {
+                    for (ZMsg message : messages) {
+                        handler.handleMessage(message);
+                    }
+                }
+            });
         }
     }
 
