@@ -39,6 +39,7 @@ public class ZDispatcher {
         for (SocketHandler socketHandler : handlers.values()) {
             socketHandler.active = false;
         }
+        handlers.clear();
     }
 
 
