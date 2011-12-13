@@ -1,7 +1,7 @@
 package org.zeromq;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import org.zeromq.ZMQ.Socket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -12,14 +12,27 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.junit.Test;
-import org.zeromq.ZMQ.Socket;
-import org.zeromq.ZContext;
-import org.zeromq.ZFrame;
-import org.zeromq.ZMsg;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class ZMsgTest {
+
+	@Test
+    public void testMessageEquals() {
+        ZMsg msg = new ZMsg();
+        ZFrame hello = new ZFrame("Hello");
+        ZFrame world = new ZFrame("World");
+        msg.add(hello);
+        msg.add(world);
+        assertEquals(msg, msg.duplicate());
+
+        ZMsg reverseMsg = new ZMsg();
+        msg.add(hello);
+        msg.addFirst(world);
+        assertFalse(msg.equals(reverseMsg));
+    }
 
 	@Test
 	public void testSingleFrameMessage() {

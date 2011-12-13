@@ -265,6 +265,24 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 		}
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ZMsg zMsg = (ZMsg) o;
+
+        //based on AbstractList
+        Iterator<ZFrame> e1 = frames.iterator();
+        Iterator<ZFrame> e2 = zMsg.frames.iterator();
+        while (e1.hasNext() && e2.hasNext()) {
+            ZFrame o1 = e1.next();
+            ZFrame o2 = e2.next();
+            if (!(o1 == null ? o2 == null : o1.equals(o2)))
+                return false;
+        }
+        return !(e1.hasNext() || e2.hasNext());
+    }
+
         /**
          * Dump the message in human readable format. This should only be used
          * for debugging and tracing, inefficient in handling large messages. 
