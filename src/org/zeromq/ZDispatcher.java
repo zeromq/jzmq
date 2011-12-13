@@ -1,6 +1,5 @@
 package org.zeromq;
 
-import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -11,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  */
 public class ZDispatcher {
-    private ConcurrentMap<ZMQ.Socket, SocketHandler> handlers = new ConcurrentHashMap<ZMQ.Socket, SocketHandler>();
+    private ConcurrentMap<ZMQ.Socket, SocketDispatcher> handlers = new ConcurrentHashMap<ZMQ.Socket, SocketDispatcher>();
     private final ExecutorService handlerExecutor;
 
     public ZDispatcher() {
@@ -22,35 +21,63 @@ public class ZDispatcher {
         this.handlerExecutor = handlerExecutor;
     }
 
-    public void registerHandler(ZMQ.Socket socket, SocketHandler socketHandler) {
-        socketHandler.socket = socket;
-        socketHandler.active = true;
-        handlers.put(socket, socketHandler);
-        handlerExecutor.execute(socketHandler);
+    public void registerHandler(ZMQ.Socket socket, ZMessageHandler messageHandler, ZSender sender) {
+        registerHandler(socket, messageHandler, sender, Executors.newFixedThreadPool(5));
+    }
+
+    public void registerHandler(ZMQ.Socket socket, ZMessageHandler messageHandler, ZSender sender, ExecutorService threadpool) {
+        SocketDispatcher socketDispatcher = new SocketDispatcher(messageHandler, sender, threadpool);
+        socketDispatcher.socket = socket;
+        socketDispatcher.active = true;
+        handlers.put(socket, socketDispatcher);
+        handlerExecutor.execute(socketDispatcher);
     }
 
     public void unregisterHandler(ZMQ.Socket socket) {
-        SocketHandler removedHandler = handlers.remove(socket);
-        removedHandler.active = false;
+        SocketDispatcher removedDispatcher = handlers.remove(socket);
+        removedDispatcher.active = false;
     }
 
     public void shutdown() {
         handlerExecutor.shutdown();
-        for (SocketHandler socketHandler : handlers.values()) {
-            socketHandler.active = false;
+        for (SocketDispatcher socketDispatcher : handlers.values()) {
+            socketDispatcher.active = false;
         }
         handlers.clear();
     }
 
+    public interface ZMessageHandler {
 
-    public static abstract class SocketHandler implements Runnable {
-        private ZMQ.Socket socket;
-        private BlockingQueue<ZMsg> in = new LinkedBlockingQueue<ZMsg>();
-        private BlockingQueue<ZMsg> out = new LinkedBlockingQueue<ZMsg>();
-        private volatile boolean active = false;
+        public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg);
 
-        public boolean send(ZMsg msg) {
+    }
+
+    public final static class ZSender {
+        private final BlockingQueue<ZMsg> out = new LinkedBlockingQueue<ZMsg>();
+
+        public final boolean send(ZMsg msg) {
             return out.add(msg);
+        }
+    }
+
+    private static final class SocketDispatcher implements Runnable {
+        private ZMQ.Socket socket;
+        private volatile boolean active = false;
+        private final ZMessageHandler handler;
+        private final ZSender sender;
+        private final ExecutorService threadpool;
+        private final BlockingQueue<ZMsg> in = new LinkedBlockingQueue<ZMsg>();
+        private static final ThreadLocal<ZMessageBuffer> messageBuffer = new ThreadLocal<ZMessageBuffer>() {
+            @Override
+            protected ZMessageBuffer initialValue() {
+                return new ZMessageBuffer();
+            }
+        };
+
+        public SocketDispatcher(ZMessageHandler handler, ZSender sender, ExecutorService handleThreadpool) {
+            this.handler = handler;
+            this.sender = sender;
+            this.threadpool = handleThreadpool;
         }
 
         public void run() {
@@ -61,8 +88,6 @@ public class ZDispatcher {
             }
         }
 
-        public abstract void handleMessage(ZMsg msg);
-
         private void doReceive() {
             ZMsg msg;
             while (active && (msg = ZMsg.recvMsg(socket, ZMQ.DONTWAIT)) != null && msg.size() > 0 && msg.getFirst().hasData()) {
@@ -71,21 +96,51 @@ public class ZDispatcher {
         }
 
         private void doHandle() {
-            final ArrayList<ZMsg> messageBuffer = new ArrayList<ZMsg>(in.size());
-            in.drainTo(messageBuffer);
-            for (ZMsg message : messageBuffer) {
-                if (active) {
-                    handleMessage(message);
-                }
+
+            if (in.size() > 0) {
+                threadpool.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        ZMessageBuffer buffer = messageBuffer.get();
+                        buffer.drainFrom(in);
+                        for (int i = 0; i <= buffer.lastValidIndex; i++) {
+                            if (active) {
+                                handler.handleMessage(sender, buffer.buffer[i]);
+                            }
+                        }
+                    }
+                });
             }
         }
 
         private void doSend() {
             ZMsg msg = null;
-            while ((msg = out.poll()) != null) {
+            while ((msg = sender.out.poll()) != null) {
                 if (active) {
                     msg.send(socket);
                 }
+            }
+        }
+
+        private static class ZMessageBuffer {
+            private final ZMsg[] buffer = new ZMsg[1024];
+            private int lastValidIndex = 0;
+
+
+            private void drainFrom(BlockingQueue<ZMsg> in) {
+                int lastIndex = -1;
+                ZMsg msg;
+                while ((msg = in.poll()) != null) {
+                    lastIndex++;
+                    if (lastIndex < buffer.length) {
+                        buffer[lastIndex] = msg;
+
+                    } else {
+                        break;
+
+                    }
+                }
+                lastValidIndex = lastIndex;
             }
         }
     }

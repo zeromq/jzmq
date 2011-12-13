@@ -19,35 +19,36 @@ public class ZDispatcherTest {
         final CountDownLatch latch = new CountDownLatch(1);
         ZContext ctx = new ZContext();
 
-        ZMQ.Socket output = ctx.createSocket(ZMQ.PAIR);
-        output.bind("inproc://zmsg.test");
         ZMQ.Socket logger = ctx.createSocket(ZMQ.PAIR);
-        logger.connect("inproc://zmsg.test");
+        logger.bind("inproc://zmsg.test");
+        ZMQ.Socket out = ctx.createSocket(ZMQ.PAIR);
+        out.connect("inproc://zmsg.test");
 
         final String mesgTxt = "Hello";
 
         ZDispatcher dispatcher = new ZDispatcher();
 
-        ZDispatcher.SocketHandler outputHandler = new ZDispatcher.SocketHandler() {
-            @Override
-            public void handleMessage(ZMsg msg) {
+        ZDispatcher.ZSender outSender = new ZDispatcher.ZSender();
+        dispatcher.registerHandler(out, new ZDispatcher.ZMessageHandler() {
+                    @Override
+                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
 
-            }
-        };
-        dispatcher.registerHandler(output, outputHandler);
-        dispatcher.registerHandler(logger, new ZDispatcher.SocketHandler() {
-            @Override
-            public void handleMessage(ZMsg msg) {
+                    }
+                }, outSender);
 
-                assertEquals(mesgTxt, msg.poll().toString());
-                latch.countDown();
-            }
-        });
+        dispatcher.registerHandler(logger, new ZDispatcher.ZMessageHandler() {
+                    @Override
+                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+
+                        assertEquals(mesgTxt, msg.poll().toString());
+                        latch.countDown();
+                    }
+                }, new ZDispatcher.ZSender());
 
         ZMsg msg = new ZMsg();
         ZFrame frame = new ZFrame(mesgTxt);
         msg.addFirst(frame);
-        outputHandler.send(msg);
+        outSender.send(msg);
 
         latch.await(1, TimeUnit.SECONDS);
         assertEquals(0, latch.getCount());
@@ -68,55 +69,109 @@ public class ZDispatcherTest {
         socketTwo.connect("inproc://zmsg.test");
 
         ZDispatcher dispatcher = new ZDispatcher();
-        ZDispatcher.SocketHandler socketHandlerOne = new ZDispatcher.SocketHandler() {
 
-            @Override
-            public void handleMessage(ZMsg msg) {
-                try {
-                    if (guardLock1.tryLock()) {
-                        handlersBarrier.await(1, TimeUnit.SECONDS);
-                    } else {
-                        threadingIssueDetected.set(true);
-                    }
-                } catch (Exception ex) {
-                    threadingIssueDetected.set(true);
-                } finally {
-                    guardLock1.unlock();
-                }
-            }
-        };
-        dispatcher.registerHandler(socketOne, socketHandlerOne);
-        ZDispatcher.SocketHandler socketHandlerTwo = new ZDispatcher.SocketHandler() {
+        ZDispatcher.ZSender senderOne = new ZDispatcher.ZSender();
+        dispatcher.registerHandler(socketOne, new ZDispatcher.ZMessageHandler() {
 
-            @Override
-            public void handleMessage(ZMsg msg) {
-                try {
-                    if (guardLock2.tryLock()) {
-                        handlersBarrier.await(1, TimeUnit.SECONDS);
-                    } else {
-                        threadingIssueDetected.set(true);
+                    @Override
+                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                        try {
+                            if (guardLock1.tryLock()) {
+                                handlersBarrier.await(1, TimeUnit.SECONDS);
+                            } else {
+                                threadingIssueDetected.set(true);
+                            }
+                        } catch (Exception ex) {
+                            threadingIssueDetected.set(true);
+                        } finally {
+                            guardLock1.unlock();
+                        }
                     }
-                } catch (Exception ex) {
-                    threadingIssueDetected.set(true);
-                } finally {
-                    guardLock2.unlock();
-                }
-            }
-        };
-        dispatcher.registerHandler(socketTwo, socketHandlerTwo);
+                }, senderOne);
+
+        ZDispatcher.ZSender senderTwo = new ZDispatcher.ZSender();
+        dispatcher.registerHandler(socketTwo, new ZDispatcher.ZMessageHandler() {
+
+                    @Override
+                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                        try {
+                            if (guardLock2.tryLock()) {
+                                handlersBarrier.await(1, TimeUnit.SECONDS);
+                            } else {
+                                threadingIssueDetected.set(true);
+                            }
+                        } catch (Exception ex) {
+                            threadingIssueDetected.set(true);
+                        } finally {
+                            guardLock2.unlock();
+                        }
+                    }
+                }, senderTwo);
 
         ZMsg msg = new ZMsg();
         ZFrame frame = new ZFrame("Hello");
         msg.addFirst(frame);
 
-        socketHandlerOne.send(msg.duplicate());
-        socketHandlerOne.send(msg.duplicate());
-        socketHandlerTwo.send(msg.duplicate());
-        socketHandlerTwo.send(msg.duplicate());
+        senderOne.send(msg.duplicate());
+        senderOne.send(msg.duplicate());
+        senderTwo.send(msg.duplicate());
+        senderTwo.send(msg.duplicate());
 
         handlersBarrier.await(1, TimeUnit.SECONDS);
         handlersBarrier.await(1, TimeUnit.SECONDS);
 
         assertFalse(threadingIssueDetected.get());
+    }
+
+    @Test
+    public void testNoMessageSentAfterShutdown() throws InterruptedException {
+        final AtomicBoolean shutdownIssueDetected = new AtomicBoolean(false);
+        final CountDownLatch latch = new CountDownLatch(1);
+        ZContext ctx = new ZContext();
+
+        ZMQ.Socket socketOne = ctx.createSocket(ZMQ.PAIR);
+        socketOne.bind("inproc://zmsg.test");
+        ZMQ.Socket socketTwo = ctx.createSocket(ZMQ.PAIR);
+        socketTwo.connect("inproc://zmsg.test");
+
+        final ZDispatcher dispatcher = new ZDispatcher();
+        final CyclicBarrier handlersBarrier = new CyclicBarrier(1, new Runnable() {
+            @Override
+            public void run() {
+                dispatcher.shutdown();
+            }
+        });
+
+        ZDispatcher.ZSender senderOne = new ZDispatcher.ZSender();
+        dispatcher.registerHandler(socketOne, new ZDispatcher.ZMessageHandler() {
+                    @Override
+                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                        try {
+                            handlersBarrier.await(1, TimeUnit.SECONDS);
+                        } catch (Exception e) {
+                        }
+                        latch.countDown();
+                    }
+                }, senderOne);
+        ZDispatcher.ZSender senderTwo = new ZDispatcher.ZSender();
+        dispatcher.registerHandler(socketTwo, new ZDispatcher.ZMessageHandler() {
+
+                    @Override
+                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                        sender.send(msg);
+                        shutdownIssueDetected.set(true);
+                    }
+                }, senderTwo);
+
+        ZMsg msg = new ZMsg();
+        msg.add(new ZFrame("Hello"));
+
+        senderTwo.send(msg);
+
+        senderOne.send(msg);
+        senderOne.send(msg);
+
+        latch.await(1, TimeUnit.SECONDS);
+        assertEquals(0, latch.getCount());
     }
 }
