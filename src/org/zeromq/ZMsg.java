@@ -137,14 +137,24 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 		}
 		return f;
 	}
-	
+
 	/**
-	 * Send message to 0MQ socket, destroys contents after sending.
+     * Send message to 0MQ socket.
+     *
+     * @param socket
+     *              0MQ socket to send ZMsg on.
+     */
+    public void send(Socket socket) {
+        send(socket, false);
+    }
+
+	/**
+	 * Send message to 0MQ socket, destroys contents after sending if destroy param is set to true.
 	 * If the message has no frames, sends nothing but still destroy()s the ZMsg object
 	 * @param socket
 	 * 				0MQ socket to send ZMsg on.
 	 */
-	public void send(Socket socket) {
+	public void send(Socket socket, boolean destroy) {
 		if (socket == null)
 			throw new IllegalArgumentException("socket is null");
 		if (frames.size() == 0)
@@ -154,7 +164,9 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 			ZFrame f = i.next();
 			f.sendAndKeep(socket, (i.hasNext()) ? ZMQ.SNDMORE : 0);
 		}
-		destroy();
+        if (destroy) {
+            destroy();
+        }
 	}
 	
 	
