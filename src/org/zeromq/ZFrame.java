@@ -250,7 +250,12 @@ public class ZFrame {
 
         return true;
     }
-	
+
+    @Override
+    public int hashCode() {
+        return data != null ? Arrays.hashCode(data) : 0;
+    }
+
 	/**
 	 * Returns a human - readable representation of frame's data
 	 * @return

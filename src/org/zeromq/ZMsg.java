@@ -285,6 +285,18 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
         return !(e1.hasNext() || e2.hasNext());
     }
 
+    @Override
+    public int hashCode() {
+        if (frames == null || frames.size() == 0)
+            return 0;
+
+        int result = 1;
+        for (ZFrame frame : frames)
+            result = 31 * result + (frame == null ? 0 : frame.hashCode());
+
+        return result;
+    }
+
         /**
          * Dump the message in human readable format. This should only be used
          * for debugging and tracing, inefficient in handling large messages. 
