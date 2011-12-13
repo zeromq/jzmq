@@ -271,6 +271,8 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
         if (o == null || getClass() != o.getClass()) return false;
         ZMsg zMsg = (ZMsg) o;
 
+        if (frames == null || zMsg.frames == null) return false;
+
         //based on AbstractList
         Iterator<ZFrame> e1 = frames.iterator();
         Iterator<ZFrame> e2 = zMsg.frames.iterator();
