@@ -26,12 +26,11 @@ public class ZDispatcher {
     }
 
     public void registerHandler(ZMQ.Socket socket, ZMessageHandler messageHandler, ZSender sender, ExecutorService threadpool) {
-        SocketDispatcher socketDispatcher = new SocketDispatcher(messageHandler, sender, threadpool);
-        socketDispatcher.socket = socket;
-        socketDispatcher.active = true;
+        SocketDispatcher socketDispatcher = new SocketDispatcher(socket, messageHandler, sender, threadpool);
         if (dispatchers.putIfAbsent(socket, socketDispatcher) != null) {
             throw new IllegalArgumentException("This socket already have a message handler");
         }
+        socketDispatcher.active = true;
         dispatcherExecutor.execute(socketDispatcher);
     }
 
@@ -63,8 +62,8 @@ public class ZDispatcher {
     }
 
     private static final class SocketDispatcher implements Runnable {
-        private ZMQ.Socket socket;
         private volatile boolean active = false;
+        private final ZMQ.Socket socket;
         private final ZMessageHandler handler;
         private final ZSender sender;
         private final ExecutorService threadpool;
@@ -76,7 +75,8 @@ public class ZDispatcher {
             }
         };
 
-        public SocketDispatcher(ZMessageHandler handler, ZSender sender, ExecutorService handleThreadpool) {
+        public SocketDispatcher(ZMQ.Socket socket, ZMessageHandler handler, ZSender sender, ExecutorService handleThreadpool) {
+            this.socket = socket;
             this.handler = handler;
             this.sender = sender;
             this.threadpool = handleThreadpool;
