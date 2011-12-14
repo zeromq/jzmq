@@ -3,6 +3,7 @@ package org.zeromq;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,19 +31,19 @@ public class ZDispatcher {
         if (dispatchers.putIfAbsent(socket, socketDispatcher) != null) {
             throw new IllegalArgumentException("This socket already have a message handler");
         }
-        socketDispatcher.active = true;
+        socketDispatcher.start();
         dispatcherExecutor.execute(socketDispatcher);
     }
 
     public void unregisterHandler(ZMQ.Socket socket) {
         SocketDispatcher removedDispatcher = dispatchers.remove(socket);
-        removedDispatcher.active = false;
+        removedDispatcher.shutdown();
     }
 
     public void shutdown() {
         dispatcherExecutor.shutdown();
         for (SocketDispatcher socketDispatcher : dispatchers.values()) {
-            socketDispatcher.active = false;
+            socketDispatcher.shutdown();
         }
         dispatchers.clear();
     }
@@ -63,6 +64,7 @@ public class ZDispatcher {
 
     private static final class SocketDispatcher implements Runnable {
         private volatile boolean active = false;
+        private final CountDownLatch shutdownLatch = new CountDownLatch(1);
         private final ZMQ.Socket socket;
         private final ZMessageHandler handler;
         private final ZSender sender;
@@ -87,6 +89,20 @@ public class ZDispatcher {
                 doReceive();
                 doHandle();
                 doSend();
+            }
+            shutdownLatch.countDown();
+        }
+
+        public void start() {
+            this.active = true;
+        }
+
+        public void shutdown() {
+            try {
+                this.active = false;
+                this.shutdownLatch.await();
+
+            } catch (InterruptedException e) {
             }
         }
 
