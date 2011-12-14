@@ -124,7 +124,7 @@ public class ZDispatcherTest {
     }
 
     @Test
-    public void testNoMessageAreSentAfterShutdown() throws InterruptedException {
+    public void testNoMessageAreSentAfterShutdown() throws InterruptedException, BrokenBarrierException, TimeoutException {
         final AtomicBoolean shutdownIssueDetected = new AtomicBoolean(false);
         final CountDownLatch latch = new CountDownLatch(1);
         ZContext ctx = new ZContext();
@@ -135,10 +135,12 @@ public class ZDispatcherTest {
         socketTwo.connect("inproc://zmsg.test");
 
         final ZDispatcher dispatcher = new ZDispatcher();
-        final CyclicBarrier handlersBarrier = new CyclicBarrier(1, new Runnable() {
+        final CyclicBarrier handlersBarrier = new CyclicBarrier(2, new Runnable() {
             @Override
             public void run() {
-                dispatcher.shutdown();
+                if (latch.getCount() == 0) {
+                    dispatcher.shutdown();
+                }
             }
         });
 
@@ -146,11 +148,11 @@ public class ZDispatcherTest {
         dispatcher.registerHandler(socketOne, new ZDispatcher.ZMessageHandler() {
                     @Override
                     public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                        latch.countDown();
                         try {
                             handlersBarrier.await(1, TimeUnit.SECONDS);
                         } catch (Exception e) {
                         }
-                        latch.countDown();
                     }
                 }, senderOne);
         ZDispatcher.ZSender senderTwo = new ZDispatcher.ZSender();
@@ -167,11 +169,13 @@ public class ZDispatcherTest {
         msg.add(new ZFrame("Hello"));
 
         senderTwo.send(msg);
+        handlersBarrier.await(1, TimeUnit.SECONDS);
 
         senderOne.send(msg);
         senderOne.send(msg);
 
         latch.await(1, TimeUnit.SECONDS);
         assertEquals(0, latch.getCount());
+        assertFalse(shutdownIssueDetected.get());
     }
 }
