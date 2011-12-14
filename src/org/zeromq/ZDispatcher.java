@@ -7,6 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  */
@@ -76,6 +77,7 @@ public class ZDispatcher {
                 return new ZMessageBuffer();
             }
         };
+        private final AtomicBoolean busy = new AtomicBoolean(false);
 
         public SocketDispatcher(ZMQ.Socket socket, ZMessageHandler handler, ZSender sender, ExecutorService handleThreadpool) {
             this.socket = socket;
@@ -114,13 +116,13 @@ public class ZDispatcher {
         }
 
         private void doHandle() {
-
-            if (in.size() > 0) {
+            if (!in.isEmpty() && busy.compareAndSet(false, true)) {
                 threadpool.submit(new Runnable() {
                     @Override
                     public void run() {
                         ZMessageBuffer messages = SocketDispatcher.this.messages.get();
                         messages.drainFrom(in);
+                        busy.set(false);
                         for (int i = 0; i <= messages.lastValidIndex; i++) {
                             if (active) {
                                 handler.handleMessage(sender, messages.buffer[i]);
