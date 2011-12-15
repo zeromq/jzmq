@@ -1,17 +1,17 @@
 package org.zeromq;
 
+import org.zeromq.ZMQ.Socket;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import org.zeromq.ZMQ.Socket;
 
 /**
  * The ZMsg class provides methods to send and receive multipart messages
@@ -137,14 +137,24 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 		}
 		return f;
 	}
-	
+
 	/**
-	 * Send message to 0MQ socket, destroys contents after sending.
+     * Send message to 0MQ socket.
+     *
+     * @param socket
+     *              0MQ socket to send ZMsg on.
+     */
+    public void send(Socket socket) {
+        send(socket, false);
+    }
+
+	/**
+	 * Send message to 0MQ socket, destroys contents after sending if destroy param is set to true.
 	 * If the message has no frames, sends nothing but still destroy()s the ZMsg object
 	 * @param socket
 	 * 				0MQ socket to send ZMsg on.
 	 */
-	public void send(Socket socket) {
+	public void send(Socket socket, boolean destroy) {
 		if (socket == null)
 			throw new IllegalArgumentException("socket is null");
 		if (frames.size() == 0)
@@ -154,7 +164,9 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 			ZFrame f = i.next();
 			f.sendAndKeep(socket, (i.hasNext()) ? ZMQ.SNDMORE : 0);
 		}
-		destroy();
+        if (destroy) {
+            destroy();
+        }
 	}
 	
 	
@@ -162,18 +174,30 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 	/**
      * Receives message from socket, returns ZMsg object or null if the
      * recv was interrupted. Does a blocking recv, if you want not to block then use
-     * the ZLoop class or ZMQ.Poller to check for socket input before receiving.
+     * the ZLoop class or ZMQ.Poller to check for socket input before receiving or recvMsg with flag ZMQ.DONTWAIT.
      * @param	socket
 	 * @return
 	 */
 	public static ZMsg recvMsg(Socket socket) {
+        return recvMsg(socket, 0);
+    }
+
+    /**
+     * Receives message from socket, returns ZMsg object or null if the
+     * recv was interrupted. Does a blocking recv, if you want not to block then use
+     * the ZLoop class or ZMQ.Poller to check for socket input before receiving.
+     * @param	socket
+     * @param   flag see ZMQ constants
+	 * @return
+	 */
+    public static ZMsg recvMsg(Socket socket, int flag) {
 		if (socket == null)
 			throw new IllegalArgumentException("socket is null");
 
 		ZMsg msg = new ZMsg();
 		
 		while (true) {
-			ZFrame f = ZFrame.recvFrame(socket);
+			ZFrame f = ZFrame.recvFrame(socket, flag);
 			if (f == null) {
 				// If receive failed or was interrupted
 				msg.destroy();
@@ -252,6 +276,38 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 			return null;
 		}
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ZMsg zMsg = (ZMsg) o;
+
+        if (frames == null || zMsg.frames == null) return false;
+
+        //based on AbstractList
+        Iterator<ZFrame> e1 = frames.iterator();
+        Iterator<ZFrame> e2 = zMsg.frames.iterator();
+        while (e1.hasNext() && e2.hasNext()) {
+            ZFrame o1 = e1.next();
+            ZFrame o2 = e2.next();
+            if (!(o1 == null ? o2 == null : o1.equals(o2)))
+                return false;
+        }
+        return !(e1.hasNext() || e2.hasNext());
+    }
+
+    @Override
+    public int hashCode() {
+        if (frames == null || frames.size() == 0)
+            return 0;
+
+        int result = 1;
+        for (ZFrame frame : frames)
+            result = 31 * result + (frame == null ? 0 : frame.hashCode());
+
+        return result;
+    }
 
         /**
          * Dump the message in human readable format. This should only be used
