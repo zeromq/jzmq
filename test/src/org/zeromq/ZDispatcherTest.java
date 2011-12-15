@@ -2,7 +2,13 @@ package org.zeromq;
 
 import org.junit.Test;
 
-import java.util.concurrent.*;
+import java.text.MessageFormat;
+import java.util.UUID;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -52,6 +58,9 @@ public class ZDispatcherTest {
 
         latch.await(1, TimeUnit.SECONDS);
         assertEquals(0, latch.getCount());
+
+        dispatcher.shutdown();
+        ctx.destroy();
     }
 
     @Test
@@ -121,6 +130,9 @@ public class ZDispatcherTest {
         handlersBarrier.await(1, TimeUnit.SECONDS);
 
         assertFalse(threadingIssueDetected.get());
+
+        dispatcher.shutdown();
+        ctx.destroy();
     }
 
     @Test
@@ -177,5 +189,43 @@ public class ZDispatcherTest {
         latch.await(1, TimeUnit.SECONDS);
         assertEquals(0, latch.getCount());
         assertFalse(shutdownIssueDetected.get());
+
+        dispatcher.shutdown();
+        ctx.destroy();
+    }
+
+    @Test
+    public void dispatcherPerformanceTest() throws InterruptedException {
+        final int nMessages = 1000000;
+        final CountDownLatch latch = new CountDownLatch(nMessages);
+        ZContext ctx = new ZContext();
+        ZDispatcher dispatcher = new ZDispatcher();
+
+        ZMQ.Socket in = ctx.createSocket(ZMQ.ROUTER);
+        in.bind("inproc://zmsg.test");
+
+        ZMQ.Socket out = ctx.createSocket(ZMQ.DEALER);
+        out.connect("inproc://zmsg.test");
+
+        dispatcher.registerHandler(in, new ZDispatcher.ZMessageHandler() {
+                    @Override
+                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                        latch.countDown();
+                    }
+                }, new ZDispatcher.ZSender());
+
+
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < nMessages; i++) {
+            ZMsg msg = new ZMsg();
+            msg.addLast(UUID.randomUUID().toString());
+            msg.send(out);
+        }
+        System.out.println(MessageFormat.format("performanceTest message sent:{0}", nMessages));
+        latch.await();
+        System.out.println(MessageFormat.format("performanceTest throughput:{0} messages/seconds", nMessages / ((System.currentTimeMillis() - start) / 1000)));
+
+        dispatcher.shutdown();
+        ctx.destroy();
     }
 }
