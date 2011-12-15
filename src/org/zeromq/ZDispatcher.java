@@ -24,7 +24,7 @@ public class ZDispatcher {
     }
 
     public void registerHandler(ZMQ.Socket socket, ZMessageHandler messageHandler, ZSender sender) {
-        registerHandler(socket, messageHandler, sender, Executors.newFixedThreadPool(5));
+        registerHandler(socket, messageHandler, sender, Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
     }
 
     public void registerHandler(ZMQ.Socket socket, ZMessageHandler messageHandler, ZSender sender, ExecutorService threadpool) {
@@ -65,13 +65,13 @@ public class ZDispatcher {
 
     private static final class SocketDispatcher implements Runnable {
         private volatile boolean active = false;
-        private final static int BUFFER_SIZE = 1024;
         private final CountDownLatch shutdownLatch = new CountDownLatch(1);
         private final ZMQ.Socket socket;
         private final ZMessageHandler handler;
         private final ZSender sender;
         private final ExecutorService threadpool;
         private final BlockingQueue<ZMsg> in = new LinkedBlockingQueue<ZMsg>();
+        private static final int BUFFER_SIZE = 1024;
         private static final ThreadLocal<ZMessageBuffer> messages = new ThreadLocal<ZMessageBuffer>() {
             @Override
             protected ZMessageBuffer initialValue() {
@@ -111,7 +111,8 @@ public class ZDispatcher {
 
         private void doReceive() {
             ZMsg msg;
-            while (active && (msg = ZMsg.recvMsg(socket, ZMQ.DONTWAIT)) != null && msg.size() > 0 && msg.getFirst().hasData()) {
+            int remainingBuffer = BUFFER_SIZE;
+            while (active && remainingBuffer-- > 0 && (msg = ZMsg.recvMsg(socket, ZMQ.DONTWAIT)) != null && msg.size() > 0 && msg.getFirst().hasData()) {
                 in.add(msg);
             }
         }
@@ -135,11 +136,10 @@ public class ZDispatcher {
         }
 
         private void doSend() {
-            ZMsg msg = null;
-            while ((msg = sender.out.poll()) != null) {
-                if (active) {
-                    msg.send(socket);
-                }
+            ZMsg msg;
+            int remainingBuffer = BUFFER_SIZE;
+            while (active && remainingBuffer-- > 0 && (msg = sender.out.poll()) != null) {
+                msg.send(socket);
             }
         }
 
