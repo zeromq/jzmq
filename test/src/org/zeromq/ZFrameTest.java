@@ -1,12 +1,11 @@
 package org.zeromq;
 
-import org.zeromq.ZFrame;
+import org.junit.Test;
 import org.zeromq.ZMQ.Socket;
 
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests ZFrame class
@@ -27,6 +26,13 @@ public class ZFrameTest {
 		assertFalse(f.hasData());
 		assertEquals(0, f.size());
 	}
+
+	@Test
+    public void testZFrameEquals() {
+        ZFrame f = new ZFrame("Hello".getBytes());
+        ZFrame clone = f.duplicate();
+        assertEquals(f, clone);
+    }
 	
 	@Test
 	public void testSending() {

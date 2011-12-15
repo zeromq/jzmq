@@ -3,6 +3,8 @@ package org.zeromq;
 
 import org.zeromq.ZMQ.Socket;
 
+import java.util.Arrays;
+
 /**
  * ZFrame
  * 
@@ -236,7 +238,24 @@ public class ZFrame {
 		if (!hasData()) return false;
 		return new String(this.data).compareTo(str) == 0;
 	}
-	
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ZFrame zFrame = (ZFrame) o;
+
+        if (!Arrays.equals(data, zFrame.data)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return data != null ? Arrays.hashCode(data) : 0;
+    }
+
 	/**
 	 * Returns a human - readable representation of frame's data
 	 * @return
