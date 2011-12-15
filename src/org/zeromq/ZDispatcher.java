@@ -65,6 +65,7 @@ public class ZDispatcher {
 
     private static final class SocketDispatcher implements Runnable {
         private volatile boolean active = false;
+        private final static int BUFFER_SIZE = 1024;
         private final CountDownLatch shutdownLatch = new CountDownLatch(1);
         private final ZMQ.Socket socket;
         private final ZMessageHandler handler;
@@ -143,23 +144,16 @@ public class ZDispatcher {
         }
 
         private static class ZMessageBuffer {
-            private final ZMsg[] buffer = new ZMsg[1024];
+            private final ZMsg[] buffer = new ZMsg[BUFFER_SIZE];
             private int lastValidIndex = 0;
 
             private void drainFrom(BlockingQueue<ZMsg> in) {
                 int lastIndex = -1;
                 ZMsg msg;
-                while ((msg = in.poll()) != null) {
-                    lastIndex++;
-                    if (lastIndex < buffer.length) {
-                        buffer[lastIndex] = msg;
-
-                    } else {
-                        break;
-
-                    }
+                while (++lastIndex < buffer.length && (msg = in.poll()) != null) {
+                    buffer[lastIndex] = msg;
+                    lastValidIndex = lastIndex;
                 }
-                lastValidIndex = lastIndex;
             }
         }
     }
