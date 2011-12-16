@@ -36,20 +36,20 @@ public class ZDispatcherTest {
 
         ZDispatcher.ZSender outSender = new ZDispatcher.ZSender();
         dispatcher.registerHandler(out, new ZDispatcher.ZMessageHandler() {
-                    @Override
-                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+            @Override
+            public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
 
-                    }
-                }, outSender);
+            }
+        }, outSender);
 
         dispatcher.registerHandler(logger, new ZDispatcher.ZMessageHandler() {
-                    @Override
-                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+            @Override
+            public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
 
-                        assertEquals(mesgTxt, msg.poll().toString());
-                        latch.countDown();
-                    }
-                }, new ZDispatcher.ZSender());
+                assertEquals(mesgTxt, msg.poll().toString());
+                latch.countDown();
+            }
+        }, new ZDispatcher.ZSender());
 
         ZMsg msg = new ZMsg();
         ZFrame frame = new ZFrame(mesgTxt);
@@ -82,40 +82,40 @@ public class ZDispatcherTest {
         ZDispatcher.ZSender senderOne = new ZDispatcher.ZSender();
         dispatcher.registerHandler(socketOne, new ZDispatcher.ZMessageHandler() {
 
-                    @Override
-                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
-                        try {
-                            if (guardLock1.tryLock()) {
-                                handlersBarrier.await(1, TimeUnit.SECONDS);
-                            } else {
-                                threadingIssueDetected.set(true);
-                            }
-                        } catch (Exception ex) {
-                            threadingIssueDetected.set(true);
-                        } finally {
-                            guardLock1.unlock();
-                        }
+            @Override
+            public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                try {
+                    if (guardLock1.tryLock()) {
+                        handlersBarrier.await(1, TimeUnit.SECONDS);
+                    } else {
+                        threadingIssueDetected.set(true);
                     }
-                }, senderOne);
+                } catch (Exception ex) {
+                    threadingIssueDetected.set(true);
+                } finally {
+                    guardLock1.unlock();
+                }
+            }
+        }, senderOne);
 
         ZDispatcher.ZSender senderTwo = new ZDispatcher.ZSender();
         dispatcher.registerHandler(socketTwo, new ZDispatcher.ZMessageHandler() {
 
-                    @Override
-                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
-                        try {
-                            if (guardLock2.tryLock()) {
-                                handlersBarrier.await(1, TimeUnit.SECONDS);
-                            } else {
-                                threadingIssueDetected.set(true);
-                            }
-                        } catch (Exception ex) {
-                            threadingIssueDetected.set(true);
-                        } finally {
-                            guardLock2.unlock();
-                        }
+            @Override
+            public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                try {
+                    if (guardLock2.tryLock()) {
+                        handlersBarrier.await(1, TimeUnit.SECONDS);
+                    } else {
+                        threadingIssueDetected.set(true);
                     }
-                }, senderTwo);
+                } catch (Exception ex) {
+                    threadingIssueDetected.set(true);
+                } finally {
+                    guardLock2.unlock();
+                }
+            }
+        }, senderTwo);
 
         ZMsg msg = new ZMsg();
         ZFrame frame = new ZFrame("Hello");
@@ -158,24 +158,24 @@ public class ZDispatcherTest {
 
         ZDispatcher.ZSender senderOne = new ZDispatcher.ZSender();
         dispatcher.registerHandler(socketOne, new ZDispatcher.ZMessageHandler() {
-                    @Override
-                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
-                        latch.countDown();
-                        try {
-                            handlersBarrier.await(1, TimeUnit.SECONDS);
-                        } catch (Exception e) {
-                        }
-                    }
-                }, senderOne);
+            @Override
+            public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                latch.countDown();
+                try {
+                    handlersBarrier.await(1, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                }
+            }
+        }, senderOne);
         ZDispatcher.ZSender senderTwo = new ZDispatcher.ZSender();
         dispatcher.registerHandler(socketTwo, new ZDispatcher.ZMessageHandler() {
 
-                    @Override
-                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
-                        sender.send(msg);
-                        shutdownIssueDetected.set(true);
-                    }
-                }, senderTwo);
+            @Override
+            public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                sender.send(msg);
+                shutdownIssueDetected.set(true);
+            }
+        }, senderTwo);
 
         ZMsg msg = new ZMsg();
         msg.add(new ZFrame("Hello"));
@@ -208,11 +208,11 @@ public class ZDispatcherTest {
         out.connect("inproc://zmsg.test");
 
         dispatcher.registerHandler(in, new ZDispatcher.ZMessageHandler() {
-                    @Override
-                    public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
-                        latch.countDown();
-                    }
-                }, new ZDispatcher.ZSender());
+            @Override
+            public void handleMessage(ZDispatcher.ZSender sender, ZMsg msg) {
+                latch.countDown();
+            }
+        }, new ZDispatcher.ZSender());
 
 
         long start = System.currentTimeMillis();
