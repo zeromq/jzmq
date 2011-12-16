@@ -93,6 +93,7 @@ public class ZDispatcher {
                 doHandle();
                 doSend();
             }
+            threadpool.shutdown();
             shutdownLatch.countDown();
         }
 
