@@ -149,10 +149,10 @@ public class ZDispatcher {
 
         private static class ZMessageBuffer {
             private final ZMsg[] buffer = new ZMsg[BUFFER_SIZE];
-            private int lastValidIndex = 0;
+            private int lastValidIndex;
 
             private void drainFrom(BlockingQueue<ZMsg> in) {
-                int lastIndex = -1;
+                int lastIndex = lastValidIndex = -1;
                 ZMsg msg;
                 while (++lastIndex < buffer.length && (msg = in.poll()) != null) {
                     buffer[lastIndex] = msg;
