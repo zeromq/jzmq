@@ -38,6 +38,9 @@ public class ZDispatcher {
 
     public void unregisterHandler(ZMQ.Socket socket) {
         SocketDispatcher removedDispatcher = dispatchers.remove(socket);
+        if (removedDispatcher == null) {
+            throw new IllegalArgumentException("This socket doesn't have a message handler");
+        }
         removedDispatcher.shutdown();
     }
 
