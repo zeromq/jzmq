@@ -38,6 +38,9 @@ public class ZDispatcher {
 
     public void unregisterHandler(ZMQ.Socket socket) {
         SocketDispatcher removedDispatcher = dispatchers.remove(socket);
+        if (removedDispatcher == null) {
+            throw new IllegalArgumentException("This socket doesn't have a message handler");
+        }
         removedDispatcher.shutdown();
     }
 
@@ -93,6 +96,7 @@ public class ZDispatcher {
                 doHandle();
                 doSend();
             }
+            threadpool.shutdown();
             shutdownLatch.countDown();
         }
 
@@ -145,10 +149,10 @@ public class ZDispatcher {
 
         private static class ZMessageBuffer {
             private final ZMsg[] buffer = new ZMsg[BUFFER_SIZE];
-            private int lastValidIndex = 0;
+            private int lastValidIndex;
 
             private void drainFrom(BlockingQueue<ZMsg> in) {
-                int lastIndex = -1;
+                int lastIndex = lastValidIndex = -1;
                 ZMsg msg;
                 while (++lastIndex < buffer.length && (msg = in.poll()) != null) {
                     buffer[lastIndex] = msg;
