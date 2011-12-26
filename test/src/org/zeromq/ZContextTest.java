@@ -81,14 +81,15 @@ public class ZContextTest {
 		assertEquals(1, ctx.getSockets().size());
 
 		ZContext shadowCtx = ZContext.shadow(ctx);
+		shadowCtx.setMain(false);
 		assertEquals(0, shadowCtx.getSockets().size());
 		@SuppressWarnings("unused")
 		Socket s1 = shadowCtx.createSocket(ZMQ.SUB);
 		assertEquals(1, shadowCtx.getSockets().size());
 		assertEquals(1, ctx.getSockets().size());
 
-		ctx.destroy();
 		shadowCtx.destroy();
+		ctx.destroy();
 	}
 	
 	
