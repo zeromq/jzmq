@@ -186,4 +186,22 @@ public class ZMsgTest {
 			assertTrue(false);
 		}
 	}
+
+    @Test
+    public void testNewStringMessage() {
+        // A single string => frame
+        ZMsg msg = ZMsg.newStringMsg("Foo");
+        assertEquals(1, msg.size());
+        assertTrue(msg.getFirst().streq("Foo"));
+
+        // Multiple strings => frames
+        ZMsg msg2 = ZMsg.newStringMsg("Foo", "Bar", "Baz");
+        assertEquals(3, msg2.size());
+        assertTrue(msg2.getFirst().streq("Foo"));
+        assertTrue(msg2.getLast().streq("Baz"));
+
+        // Empty message (Not very useful)
+        ZMsg msg3 = ZMsg.newStringMsg();
+        assertTrue(msg3.isEmpty());
+    }
 }

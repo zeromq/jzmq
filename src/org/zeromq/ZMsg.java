@@ -277,6 +277,22 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 		}
 	}
 
+    /**
+     * Create a new ZMsg from one or more Strings
+     *
+     * @param strings
+     *      Strings to add as frames.
+     * @return
+     *      ZMsg object
+     */
+    public static ZMsg newStringMsg(String... strings) {
+        ZMsg msg = new ZMsg();
+        for (String data : strings) {
+            msg.addString(data);
+        }
+        return msg;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
