@@ -5,7 +5,7 @@ import org.zeromq.ZMQ.Socket;
 
 /**
  * ZeroMQ Queue Device implementation.
- * 
+ *
  * @author Alois Belaska <alois.belaska@gmail.com>
  */
 public class ZMQQueue implements Runnable {
@@ -16,13 +16,10 @@ public class ZMQQueue implements Runnable {
 
     /**
      * Class constructor.
-     * 
-     * @param context
-     *            a 0MQ context previously created.
-     * @param inSocket
-     *            input socket
-     * @param outSocket
-     *            output socket
+     *
+     * @param context a 0MQ context previously created.
+     * @param inSocket input socket
+     * @param outSocket output socket
      */
     public ZMQQueue(Context context, Socket inSocket, Socket outSocket) {
         this.inSocket = inSocket;
@@ -37,7 +34,7 @@ public class ZMQQueue implements Runnable {
      * Queuing of requests and replies.
      */
     @Override
-	public void run() {
+    public void run() {
         byte[] msg = null;
         boolean more = true;
 

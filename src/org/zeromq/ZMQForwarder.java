@@ -5,7 +5,7 @@ import org.zeromq.ZMQ.Socket;
 
 /**
  * ZeroMQ Forwarder Device implementation.
- * 
+ *
  * @author Alois Belaska <alois.belaska@gmail.com>
  */
 public class ZMQForwarder implements Runnable {
@@ -16,13 +16,10 @@ public class ZMQForwarder implements Runnable {
 
     /**
      * Class constructor.
-     * 
-     * @param context
-     *            a 0MQ context previously created.
-     * @param inSocket
-     *            input socket
-     * @param outSocket
-     *            output socket
+     *
+     * @param context a 0MQ context previously created.
+     * @param inSocket input socket
+     * @param outSocket output socket
      */
     public ZMQForwarder(Context context, Socket inSocket, Socket outSocket) {
         this.inSocket = inSocket;
@@ -36,7 +33,7 @@ public class ZMQForwarder implements Runnable {
      * Forwarding messages.
      */
     @Override
-	public void run() {
+    public void run() {
         byte[] msg = null;
         boolean more = true;
 
