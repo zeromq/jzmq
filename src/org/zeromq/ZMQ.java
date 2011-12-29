@@ -22,17 +22,17 @@ import java.util.LinkedList;
 
 /**
  * ZeroMQ JNI Bindings.
- * 
+ *
  * @author Gonzalo Diethelm
- * 
+ *
  */
 public class ZMQ {
-	
-	static {
-		// if no embedded native library, revert to loading from java.library.path
-		if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
-			System.loadLibrary ("jzmq");
-	}
+
+    static {
+        // if no embedded native library, revert to loading from java.library.path
+        if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
+            System.loadLibrary ("jzmq");
+    }
 
     // Values for flags in Socket's send and recv functions.
     /**
@@ -67,11 +67,11 @@ public class ZMQ {
      */
     public static final int REP = 4;
     /**
-     * Flag to specify a DEALER socket (aka XREQ). 
-     * DEALER is really a combined ventilator / sink 
-     * that does load-balancing on output and fair-queuing on input 
-     * with no other semantics. It is the only socket type that lets 
-     * you shuffle messages out to N nodes and shuffle the replies 
+     * Flag to specify a DEALER socket (aka XREQ).
+     * DEALER is really a combined ventilator / sink
+     * that does load-balancing on output and fair-queuing on input
+     * with no other semantics. It is the only socket type that lets
+     * you shuffle messages out to N nodes and shuffle the replies
      * back, in a raw bidirectional asynch pattern.
      */
     public static final int DEALER = 5;
@@ -84,8 +84,8 @@ public class ZMQ {
     public static final int XREQ = DEALER;
     /**
      * Flag to specify ROUTER socket (aka XREP).
-     * ROUTER is the socket that creates and consumes request-reply 
-     * routing envelopes. It is the only socket type that lets you route 
+     * ROUTER is the socket that creates and consumes request-reply
+     * routing envelopes. It is the only socket type that lets you route
      * messages to specific connections if you know their identities.
      */
     public static final int ROUTER = 6;
@@ -139,8 +139,8 @@ public class ZMQ {
     {
       return version_major ();
     }
-  
-  
+
+
     /**
      * @return Major version number of the ZMQ library.
      */
@@ -148,8 +148,8 @@ public class ZMQ {
     {
       return version_minor ();
     }
-  
-  
+
+
     /**
      * @return Major version number of the ZMQ library.
      */
@@ -157,8 +157,8 @@ public class ZMQ {
     {
       return version_patch ();
     }
-  
-  
+
+
     /**
      * @return Full version number of the ZMQ library used for comparing versions.
      */
@@ -166,13 +166,13 @@ public class ZMQ {
     {
       return version_full ();
     }
-  
-  
+
+
     /**
      * @param major Version major component.
      * @param minor Version minor component.
      * @param patch Version patch component.
-     * 
+     *
      * @return Comparible single int version number.
      */
     public static int makeVersion ( final int major,
@@ -181,8 +181,8 @@ public class ZMQ {
     {
       return make_version ( major, minor, patch );
     }
-  
-  
+
+
     /**
      * @return String version number in the form major.minor.patch.
      */
@@ -193,7 +193,7 @@ public class ZMQ {
                              version_minor (),
                              version_patch () );
     }
-  
+
 
     protected static native int version_full();
     protected static native int version_major();
@@ -212,35 +212,35 @@ public class ZMQ {
     protected static native long EMTHREAD();
     protected static native long EFSM();
     protected static native long ENOCOMPATPROTO();
-    protected static native long ETERM();         
-    
+    protected static native long ETERM();
+
     /**
      * Inner class: Error.
      */
     public enum Error {
-        
+
         ENOTSUP(ENOTSUP()),
-            
+
             EPROTONOSUPPORT(EPROTONOSUPPORT()),
-		
+
             ENOBUFS(ENOBUFS()),
-		
+
             ENETDOWN(ENETDOWN()),
-		
+
             EADDRINUSE(EADDRINUSE()),
 
             EADDRNOTAVAIL(EADDRNOTAVAIL()),
-		
+
             ECONNREFUSED(ECONNREFUSED()),
-		
+
             EINPROGRESS(EINPROGRESS()),
-		
+
             EMTHREAD(EMTHREAD()),
-		
+
             EFSM(EFSM()),
-		
+
             ENOCOMPATPROTO(ENOCOMPATPROTO()),
-		
+
             ETERM(ETERM());
 
         private final long code;
@@ -262,12 +262,11 @@ public class ZMQ {
             throw new IllegalArgumentException("Unknown " + Error.class.getName() + " enum code:" + code);
         }
     }
-	
+
     /**
      * Create a new Context.
-     * 
-     * @param ioThreads
-     *            Number of threads to use, usually 1 is sufficient for most use cases.
+     *
+     * @param ioThreads Number of threads to use, usually 1 is sufficient for most use cases.
      * @return the Context
      */
     public static Context context (int ioThreads) {
@@ -289,9 +288,8 @@ public class ZMQ {
 
         /**
          * Create a new Socket within this context.
-         * 
-         * @param type
-         *            the socket type.
+         *
+         * @param type the socket type.
          * @return the newly created Socket.
          */
         public Socket socket (int type) {
@@ -300,7 +298,7 @@ public class ZMQ {
 
         /**
          * Create a new Poller within this context, with a default size.
-         * 
+         *
          * @return the newly created Poller.
          */
         public Poller poller () {
@@ -309,9 +307,8 @@ public class ZMQ {
 
         /**
          * Create a new Poller within this context, with a specified initial size.
-         * 
-         * @param size
-         *            the poller initial size.
+         *
+         * @param size the poller initial size.
          * @return the newly created Poller.
          */
         public Poller poller (int size) {
@@ -320,9 +317,8 @@ public class ZMQ {
 
         /**
          * Class constructor.
-         * 
-         * @param ioThreads
-         *            size of the threads pool to handle I/O operations.
+         *
+         * @param ioThreads size of the threads pool to handle I/O operations.
          */
         protected Context (int ioThreads) {
             construct (ioThreads);
@@ -338,7 +334,7 @@ public class ZMQ {
         /**
          * Get the underlying context handle. This is private because it is only accessed from JNI,
          * where Java access controls are ignored.
-         * 
+         *
          * @return the internal 0MQ context handle.
          */
         private long getContextHandle () {
@@ -469,7 +465,7 @@ public class ZMQ {
 
         /**
          * @see #setHWM(long)
-         * 
+         *
          * @return the High Water Mark.
          */
         public long getHWM () {
@@ -481,7 +477,7 @@ public class ZMQ {
 
         /**
          * @see #setSwap(long)
-         * 
+         *
          * @return the number of messages to swap at most.
          */
         public long getSwap () {
@@ -493,7 +489,7 @@ public class ZMQ {
 
         /**
          * @see #setAffinity(long)
-         * 
+         *
          * @return the affinity.
          */
         public long getAffinity () {
@@ -502,7 +498,7 @@ public class ZMQ {
 
         /**
          * @see #setIdentity(byte[])
-         * 
+         *
          * @return the Identitiy.
          */
         public byte [] getIdentity () {
@@ -511,7 +507,7 @@ public class ZMQ {
 
         /**
          * @see #setRate(long)
-         * 
+         *
          * @return the Rate.
          */
         public long getRate () {
@@ -520,7 +516,7 @@ public class ZMQ {
 
         /**
          * @see #setRecoveryInterval(long)
-         * 
+         *
          * @return the RecoveryIntervall.
          */
         public long getRecoveryInterval () {
@@ -529,7 +525,7 @@ public class ZMQ {
 
         /**
          * @see #setMulticastLoop(boolean)
-         * 
+         *
          * @return the Multicast Loop.
          */
         public boolean hasMulticastLoop () {
@@ -543,7 +539,7 @@ public class ZMQ {
          * Sets the time-to-live field in every multicast packet sent from this socket.
          * The default is 1 which means that the multicast packets don't leave the local
          * network.
-         * 
+         *
          * @param mcast_hops
          */
         public void setMulticastHops (long mcast_hops) {
@@ -555,21 +551,21 @@ public class ZMQ {
 
         /**
          * @see #setMulticastHops(long)
-         * 
+         *
          * @return the Multicast Hops.
          */
         public long getMulticastHops () {
-			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return 1;
             return getLongSockopt (MULTICAST_HOPS);
         }
         /**
-         * Sets the timeout for receive operation on the socket. If the value is 0, recv 
-         * will return immediately, with a EAGAIN error if there is no message to receive. 
-         * If the value is -1, it will block until a message is available. For all other 
+         * Sets the timeout for receive operation on the socket. If the value is 0, recv
+         * will return immediately, with a EAGAIN error if there is no message to receive.
+         * If the value is -1, it will block until a message is available. For all other
          * values, it will wait for a message for that amount of time before returning with
          * an EAGAIN error.
-         * 
+         *
          * @param timeout
          */
         public void setReceiveTimeOut (long timeout) {
@@ -581,11 +577,11 @@ public class ZMQ {
 
         /**
          * @see #setReceiveTimeOut(long)
-         * 
+         *
          * @return the Receive Timeout
          */
         public long getReceiveTimeOut () {
-			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return -1;
             return getLongSockopt (RCVTIMEO);
         }
@@ -596,7 +592,7 @@ public class ZMQ {
          * If the value is -1, it will block until the message is sent. For all other
          * values, it will try to send the message for that amount of time before
          * returning with an EAGAIN error.
-         * 
+         *
          * @param timeout
          */
         public void setSendTimeOut (long timeout) {
@@ -608,18 +604,18 @@ public class ZMQ {
 
         /**
          * @see #setSendTimeOut(long)
-         * 
+         *
          * @return the Send Timeout.
          */
         public long getSendTimeOut () {
-			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return -1;
             return getLongSockopt (SNDTIMEO);
         }
 
         /**
          * @see #setSendBufferSize(long)
-         * 
+         *
          * @return the kernel send buffer size.
          */
         public long getSendBufferSize () {
@@ -628,7 +624,7 @@ public class ZMQ {
 
         /**
          * @see #setReceiveBufferSize(long)
-         * 
+         *
          * @return the kernel receive buffer size.
          */
         public long getReceiveBufferSize () {
@@ -641,7 +637,7 @@ public class ZMQ {
          * follow. If there are no message parts to follow or if the message currently being read is
          * not a multi-part message a value of zero shall be returned. Otherwise, a value of 1 shall
          * be returned.
-         * 
+         *
          * @return true if there are more messages to receive.
          */
         public boolean hasReceiveMore () {
@@ -656,7 +652,7 @@ public class ZMQ {
          * something has happened within the 0MQ socket. It does not necessarily mean that
          * the messages can be read or written. Check ZMQ_EVENTS option to find out whether
          * the 0MQ socket is readable or writeable.
-         * 
+         *
          * @return the underlying file descriptor.
          * @since 2.1.0
          */
@@ -671,7 +667,7 @@ public class ZMQ {
          * The 'ZMQ_EVENTS' option shall retrieve event flags for the specified socket.
          * If a message can be read from the socket ZMQ_POLLIN flag is set. If message can
          * be written to the socket ZMQ_POLLOUT flag is set.
-         * 
+         *
          * @return the mask of outstanding events.
          * @since 2.1.0
          */
@@ -690,8 +686,7 @@ public class ZMQ {
          * when socket is closed. Positive value means number of milliseconds to keep
          * trying to send the pending messages before discarding them.
          *
-         * @param linger
-         *            the linger period.
+         * @param linger the linger period.
          * @since 2.1.0
          */
         public void setLinger (long linger) {
@@ -765,14 +760,13 @@ public class ZMQ {
          * The 'ZMQ_HWM' option shall set the high water mark for the specified 'socket'. The high
          * water mark is a hard limit on the maximum number of outstanding messages 0MQ shall queue
          * in memory for any single peer that the specified 'socket' is communicating with.
-         * 
+         *
          * If this limit has been reached the socket shall enter an exceptional state and depending
          * on the socket type, 0MQ shall take appropriate action such as blocking or dropping sent
          * messages. Refer to the individual socket descriptions in the man page of zmq_socket[3] for
          * details on the exact action taken for each socket type.
-         * 
-         * @param hwm
-         *            the number of messages to queue.
+         *
+         * @param hwm the number of messages to queue.
          */
         public void setHWM (long hwm) {
             if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
@@ -786,9 +780,8 @@ public class ZMQ {
          * specified 'socket'. A socket which has 'ZMQ_SWAP' set to a non-zero value may exceed its
          * high water mark; in this case outstanding messages shall be offloaded to storage on disk
          * rather than held in memory.
-         * 
-         * @param swap
-         *            The value of 'ZMQ_SWAP' defines the maximum size of the swap space in bytes.
+         *
+         * @param swap The value of 'ZMQ_SWAP' defines the maximum size of the swap space in bytes.
          */
         public void setSwap (long swap) {
             if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0))
@@ -800,19 +793,18 @@ public class ZMQ {
         /**
          * Get the Affinity. The 'ZMQ_AFFINITY' option shall set the I/O thread affinity for newly
          * created connections on the specified 'socket'.
-         * 
+         *
          * Affinity determines which threads from the 0MQ I/O thread pool associated with the
          * socket's _context_ shall handle newly created connections. A value of zero specifies no
          * affinity, meaning that work shall be distributed fairly among all 0MQ I/O threads in the
          * thread pool. For non-zero values, the lowest bit corresponds to thread 1, second lowest
          * bit to thread 2 and so on. For example, a value of 3 specifies that subsequent
          * connections on 'socket' shall be handled exclusively by I/O threads 1 and 2.
-         * 
+         *
          * See also  in the man page of zmq_init[3] for details on allocating the number of I/O threads for a
          * specific _context_.
-         * 
-         * @param affinity
-         *            the affinity.
+         *
+         * @param affinity the affinity.
          */
         public void setAffinity (long affinity) {
             setLongSockopt (AFFINITY, affinity);
@@ -823,16 +815,16 @@ public class ZMQ {
          * identity determines if existing 0MQ infastructure (_message queues_, _forwarding
          * devices_) shall be identified with a specific application and persist across multiple
          * runs of the application.
-         * 
+         *
          * If the socket has no identity, each run of an application is completely separate from
          * other runs. However, with identity set the socket shall re-use any existing 0MQ
          * infrastructure configured by the previous run(s). Thus the application may receive
          * messages that were sent in the meantime, _message queue_ limits shall be shared with
          * previous run(s) and so on.
-         * 
+         *
          * Identity should be at least one byte and at most 255 bytes long. Identities starting with
          * binary zero are reserved for use by 0MQ infrastructure.
-         * 
+         *
          * @param identity
          */
         public void setIdentity (byte [] identity) {
@@ -843,12 +835,12 @@ public class ZMQ {
          * The 'ZMQ_SUBSCRIBE' option shall establish a new message filter on a 'ZMQ_SUB' socket.
          * Newly created 'ZMQ_SUB' sockets shall filter out all incoming messages, therefore you
          * should call this option to establish an initial message filter.
-         * 
+         *
          * An empty 'option_value' of length zero shall subscribe to all incoming messages. A
          * non-empty 'option_value' shall subscribe to all messages beginning with the specified
          * prefix. Mutiple filters may be attached to a single 'ZMQ_SUB' socket, in which case a
          * message shall be accepted if it matches at least one filter.
-         * 
+         *
          * @param topic
          */
         public void subscribe (byte [] topic) {
@@ -861,7 +853,7 @@ public class ZMQ {
          * the 'ZMQ_SUBSCRIBE' option. If the socket has several instances of the same filter
          * attached the 'ZMQ_UNSUBSCRIBE' option shall remove only one instance, leaving the rest in
          * place and functional.
-         * 
+         *
          * @param topic
          */
         public void unsubscribe (byte [] topic) {
@@ -871,7 +863,7 @@ public class ZMQ {
         /**
          * The 'ZMQ_RATE' option shall set the maximum send or receive data rate for multicast
          * transports such as  in the man page of zmq_pgm[7] using the specified 'socket'.
-         * 
+         *
          * @param rate
          */
         public void setRate (long rate) {
@@ -883,11 +875,11 @@ public class ZMQ {
          * using the specified 'socket'. The recovery interval determines the maximum time in
          * seconds that a receiver can be absent from a multicast group before unrecoverable data
          * loss will occur.
-         * 
+         *
          * CAUTION: Excersize care when setting large recovery intervals as the data needed for
          * recovery will be held in memory. For example, a 1 minute recovery interval at a data rate
          * of 1Gbps requires a 7GB in-memory buffer. {Purpose of this Method}
-         * 
+         *
          * @param recovery_ivl
          */
         public void setRecoveryInterval (long recovery_ivl) {
@@ -901,7 +893,7 @@ public class ZMQ {
          * the loopback functionality. Leaving multicast loopback enabled when it is not required
          * can have a negative impact on performance. Where possible, disable 'ZMQ_MCAST_LOOP' in
          * production environments.
-         * 
+         *
          * @param mcast_loop
          */
         public void setMulticastLoop (boolean mcast_loop) {
@@ -916,7 +908,7 @@ public class ZMQ {
          * 'socket' to the specified size in bytes. A value of zero means leave the OS default
          * unchanged. For details please refer to your operating system documentation for the
          * 'SO_SNDBUF' socket option.
-         * 
+         *
          * @param sndbuf
          */
         public void setSendBufferSize (long sndbuf) {
@@ -928,7 +920,7 @@ public class ZMQ {
          * 'socket' to the specified size in bytes. A value of zero means leave the OS default
          * unchanged. For details refer to your operating system documentation for the 'SO_RCVBUF'
          * socket option.
-         * 
+         *
          * @param rcvbuf
          */
         public void setReceiveBufferSize (long rcvbuf) {
@@ -937,64 +929,53 @@ public class ZMQ {
 
         /**
          * Bind to network interface. Start listening for new connections.
-         * 
-         * @param addr
-         *            the endpoint to bind to.
+         *
+         * @param addr the endpoint to bind to.
          */
         public native void bind (String addr);
 
         /**
          * Connect to remote application.
-         * 
-         * @param addr
-         *            the endpoint to connect to.
+         *
+         * @param addr the endpoint to connect to.
          */
         public native void connect (String addr);
 
         /**
          * Send a message.
-         * 
-         * @param msg
-         *            the message to send, as an array of bytes.
-         * @param flags
-         *            the flags to apply to the send operation.
+         *
+         * @param msg the message to send, as an array of bytes.
+         * @param flags the flags to apply to the send operation.
          * @return true if send was successful, false otherwise.
          */
         public native boolean send (byte [] msg, int flags);
 
         /**
          * Receive a message.
-         * 
-         * @param flags
-         *            the flags to apply to the receive operation.
+         *
+         * @param flags the flags to apply to the receive operation.
          * @return the message received, as an array of bytes; null on error.
          */
         public native byte [] recv (int flags);
 
         /**
          * Receive a message in to a specified buffer.
-         * 
-         * @param buffer
-         *            byte[] to copy zmq message payload in to.
-         * @param offset
-         *            offset in buffer to write data
-         * @param len
-         *            max bytes to write to buffer.  
-         *            If len is smaller than the incoming message size, 
+         *
+         * @param buffer byte[] to copy zmq message payload in to.
+         * @param offset offset in buffer to write data
+         * @param len max bytes to write to buffer.
+         *            If len is smaller than the incoming message size,
          *            the message will be truncated.
-         * @param flags
-         *            the flags to apply to the receive operation.
+         * @param flags the flags to apply to the receive operation.
          * @return the number of bytes read, -1 on error
          */
         public native int recv (byte[] buffer, int offset, int len, int flags);
 
         /**
          * Class constructor.
-         * 
-         * @param context
-         *            a 0MQ context previously created.
-         * @param type
-         *            the socket type.
+         *
+         * @param context a 0MQ context previously created.
+         * @param type the socket type.
          */
         protected Socket (Context context, int type) {
             // We keep a local handle to context so that
@@ -1012,46 +993,40 @@ public class ZMQ {
 
         /**
          * Get the socket option value, as a long.
-         * 
-         * @param option
-         *            ID of the option to set.
+         *
+         * @param option ID of the option to set.
          * @return The socket option value (as a long).
          */
         protected native long getLongSockopt (int option);
 
         /**
          * Get the socket option value, as a byte array.
-         * 
-         * @param option
-         *            ID of the option to set.
+         *
+         * @param option ID of the option to set.
          * @return The socket option value (as a byte array).
          */
         protected native byte [] getBytesSockopt (int option);
 
         /**
          * Set the socket option value, given as a long.
-         * 
-         * @param option
-         *            ID of the option to set.
-         * @param optval
-         *            value (as a long) to set the option to.
+         *
+         * @param option ID of the option to set.
+         * @param optval value (as a long) to set the option to.
          */
         protected native void setLongSockopt (int option, long optval);
 
         /**
          * Set the socket option value, given as a byte array.
-         * 
-         * @param option
-         *            ID of the option to set.
-         * @param optval
-         *            value (as a byte array) to set the option to.
+         *
+         * @param option ID of the option to set.
+         * @param optval value (as a byte array) to set the option to.
          */
         protected native void setBytesSockopt (int option, byte [] optval);
 
         /**
          * Get the underlying socket handle. This is private because it is only accessed from JNI,
          * where Java access controls are ignored.
-         * 
+         *
          * @return the internal 0MQ socket handle.
          */
         private long getSocketHandle () {
@@ -1103,9 +1078,8 @@ public class ZMQ {
 
         /**
          * Register a Socket for polling on all events.
-         * 
-         * @param socket
-         *            the Socket we are registering.
+         *
+         * @param socket the Socket we are registering.
          * @return the index identifying this Socket in the poll set.
          */
         public int register (Socket socket) {
@@ -1116,11 +1090,9 @@ public class ZMQ {
          * Register a Socket for polling on the specified events.
          *
          * Automatically grow the internal representation if needed.
-         * 
-         * @param socket
-         *            the Socket we are registering.
-         * @param events
-         *            a mask composed by XORing POLLIN, POLLOUT and POLLERR.
+         *
+         * @param socket the Socket we are registering.
+         * @param events a mask composed by XORing POLLIN, POLLOUT and POLLERR.
          * @return the index identifying this Socket in the poll set.
          */
         public int register (Socket socket, int events) {
@@ -1141,14 +1113,14 @@ public class ZMQ {
                     Socket [] ns = new Socket [nsize];
                     short [] ne = new short [nsize];
                     short [] nr = new short [nsize];
-                    
+
                     // Copy contents of current arrays into new arrays.
                     for (int i = 0; i < this.next; ++i) {
                         ns[i] = this.sockets[i];
                         ne[i] = this.events[i];
                         nr[i] = this.revents[i];
                     }
-                    
+
                     // Swap internal arrays and size to new values.
                     this.size = nsize;
                     this.sockets = ns;
@@ -1167,8 +1139,7 @@ public class ZMQ {
         /**
          * Unregister a Socket for polling on the specified events.
          *
-         * @param socket 
-         *          the Socket to be unregistered
+         * @param socket the Socket to be unregistered
          */
         public void unregister (Socket socket) {
             for (int i = 0; i < this.next; ++i) {
@@ -1176,7 +1147,7 @@ public class ZMQ {
                     this.sockets[i] = null;
                     this.events[i] = 0;
                     this.revents[i] = 0;
-                    
+
                     this.freeSlots.add(i);
                     --this.used;
 
@@ -1187,9 +1158,8 @@ public class ZMQ {
 
         /**
          * Get the socket associated with an index.
-         * 
-         * @param index
-         *            the desired index.
+         *
+         * @param index the desired index.
          * @return the Socket associated with that index (or null).
          */
         public Socket getSocket (int index) {
@@ -1200,7 +1170,7 @@ public class ZMQ {
 
         /**
          * Get the current poll timeout.
-         * 
+         *
          * @return the current poll timeout in microseconds.
          * @deprecated Timeout handling has been moved to the poll() methods.
          */
@@ -1210,9 +1180,8 @@ public class ZMQ {
 
         /**
          * Set the poll timeout.
-         * 
-         * @param timeout
-         *            the desired poll timeout in microseconds.
+         *
+         * @param timeout the desired poll timeout in microseconds.
          * @deprecated Timeout handling has been moved to the poll() methods.
          */
         public void setTimeout (long timeout) {
@@ -1224,7 +1193,7 @@ public class ZMQ {
 
         /**
          * Get the current poll set size.
-         * 
+         *
          * @return the current poll set size.
          */
         public int getSize () {
@@ -1233,7 +1202,7 @@ public class ZMQ {
 
         /**
          * Get the index for the next position in the poll set size.
-         * 
+         *
          * @return the index for the next position in the poll set size.
          */
         public int getNext () {
@@ -1244,7 +1213,7 @@ public class ZMQ {
          * Issue a poll call. If the poller's internal timeout value
          * has been set, use that value as timeout; otherwise, block
          * indefinitely.
-         * 
+         *
          * @return how many objects where signalled by poll ().
          */
         public long poll () {
@@ -1260,14 +1229,13 @@ public class ZMQ {
          * <p>
          * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds<i>,
          * but prior to this the unit was <i>microseconds</i>.
-         * 
-         * @param tout
-         *            the timeout, as per zmq_poll ();
-         *            if -1, it will block indefinitely until an event
-         *            happens; if 0, it will return immediately;
-         *            otherwise, it will wait for at most that many
-         *            milliseconds/microseconds (see above).
-         *            
+         *
+         * @param tout the timeout, as per zmq_poll ();
+         *             if -1, it will block indefinitely until an event
+         *             happens; if 0, it will return immediately;
+         *             otherwise, it will wait for at most that many
+         *             milliseconds/microseconds (see above).
+         *
          * @see http://api.zeromq.org/2-1:zmq-poll
          * @see http://api.zeromq.org/3-0:zmq-poll
          *
@@ -1290,9 +1258,9 @@ public class ZMQ {
 
         /**
          * Check whether the specified element in the poll set was signalled for input.
-         * 
+         *
          * @param index
-         * 
+         *
          * @return true if the element was signalled.
          */
         public boolean pollin (int index) {
@@ -1301,9 +1269,9 @@ public class ZMQ {
 
         /**
          * Check whether the specified element in the poll set was signalled for output.
-         * 
+         *
          * @param index
-         * 
+         *
          * @return true if the element was signalled.
          */
         public boolean pollout (int index) {
@@ -1312,9 +1280,9 @@ public class ZMQ {
 
         /**
          * Check whether the specified element in the poll set was signalled for error.
-         * 
+         *
          * @param index
-         * 
+         *
          * @return true if the element was signalled.
          */
         public boolean pollerr (int index) {
@@ -1323,9 +1291,8 @@ public class ZMQ {
 
         /**
          * Class constructor.
-         * 
-         * @param context
-         *            a 0MQ context previously created.
+         *
+         * @param context a 0MQ context previously created.
          */
         protected Poller (Context context) {
             this(context, SIZE_DEFAULT);
@@ -1333,11 +1300,9 @@ public class ZMQ {
 
         /**
          * Class constructor.
-         * 
-         * @param context
-         *            a 0MQ context previously created.
-         * @param size
-         *            the number of Sockets this poller will contain.
+         *
+         * @param context a 0MQ context previously created.
+         * @param size the number of Sockets this poller will contain.
          */
         protected Poller (Context context, int size) {
             this.context = context;
@@ -1356,15 +1321,11 @@ public class ZMQ {
          * <p>
          * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds<i>,
          * but prior to this the unit was <i>microseconds</i>.
-         * 
-         * @param sockets
-         *            an array of 0MQ Socket objects to poll.
-         * @param events
-         *            an array of short values specifying what to poll for.
-         * @param revents
-         *            an array of short values with the results.
-         * @param timeout
-         *            the maximum timeout in milliseconds/microseconds (see above).
+         *
+         * @param sockets an array of 0MQ Socket objects to poll.
+         * @param events an array of short values specifying what to poll for.
+         * @param revents an array of short values with the results.
+         * @param timeout the maximum timeout in milliseconds/microseconds (see above).
          * @return how many objects where signalled by poll ().
          * @see http://api.zeromq.org/2-1:zmq-poll
          * @see http://api.zeromq.org/3-0:zmq-poll
@@ -1373,11 +1334,9 @@ public class ZMQ {
 
         /**
          * Check whether a specific mask was signalled by latest poll call.
-         * 
-         * @param index
-         *            the index indicating the socket.
-         * @param mask
-         *            a combination of POLLIN, POLLOUT and POLLERR.
+         *
+         * @param index the index indicating the socket.
+         * @param mask a combination of POLLIN, POLLOUT and POLLERR.
          * @return true if specific socket was signalled as specified.
          */
         private boolean poll_mask (int index, int mask) {
