@@ -1,10 +1,10 @@
 package org.zeromq;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -60,5 +60,56 @@ public class ZMQTest
 			assertArrayEquals(rep, repTmp);
 		}		
   }
+
+    @Test
+    public void testXPUBSUB ()
+    {
+        ZMQ.Context context = ZMQ.context(1);
+
+        ZMQ.Socket pub = context.socket(ZMQ.XPUB);
+        pub.bind("inproc://xpub");
+
+        ZMQ.Socket sub = context.socket(ZMQ.SUB);
+        sub.connect("inproc://xpub");
+        ZMQ.Socket xsub = context.socket(ZMQ.XSUB);
+        xsub.connect("inproc://xpub");
+
+        sub.subscribe("".getBytes());
+        byte[] subcr = pub.recv(0);
+        assertArrayEquals(new byte[]{1}, subcr);
+
+        sub.unsubscribe("".getBytes());
+        subcr = pub.recv(0);
+        assertArrayEquals(new byte[]{0}, subcr);
+
+        byte[] subscription = "subs".getBytes();
+
+        // Append subscription
+        byte[] expected = new byte[subscription.length + 1];
+        expected[0] = 1;
+        System.arraycopy(subscription, 0, expected, 1, subscription.length);
+
+        sub.subscribe(subscription);
+        subcr = pub.recv(0);
+        assertArrayEquals(expected, subcr);
+
+        // Verify xsub subscription
+        xsub.send(expected, 0);
+        subcr = pub.recv(1);
+        assertNull(subcr);
+
+        for (int i = 0; i < 10; i++) {
+            byte[] data = ("subscrip" + i).getBytes();
+
+            assertTrue(pub.send(data, 0));
+            // Verify SUB
+            byte[] tmp = sub.recv(0);
+            assertArrayEquals(data, tmp);
+
+            // Verify XSUB
+            tmp = xsub.recv(0);
+            assertArrayEquals(data, tmp);
+        }
+    }
 
 }
