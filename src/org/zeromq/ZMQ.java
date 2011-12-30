@@ -51,11 +51,11 @@ public class ZMQ {
      */
     public static final int PAIR = 0;
     /**
-     * Flag to specify a PUB socket, receiving side must be a SUB.
+     * Flag to specify a PUB socket, receiving side must be a SUB or XSUB.
      */
     public static final int PUB = 1;
     /**
-     * Flag to specify the receiving part of the PUB socket.
+     * Flag to specify the receiving part of the PUB or XPUB socket.
      */
     public static final int SUB = 2;
     /**
@@ -104,6 +104,16 @@ public class ZMQ {
      * Flag to specify a PUSH socket, receiving side must be a PULL.
      */
     public static final int PUSH = 8;
+    /**
+     * Flag to specify a XPUB socket, receiving side must be a SUB or XSUB.
+     * Subscriptions can be received as a message. Subscriptions start with
+     * a '1' byte. Unsubscriptions start with a '0' byte.
+     */
+    public static final int XPUB = 9;
+    /**
+     * Flag to specify the receiving part of the PUB or XPUB socket. Allows
+     */
+    public static final int XSUB = 10;
 
     /**
      * Flag to specify a STREAMER device.
