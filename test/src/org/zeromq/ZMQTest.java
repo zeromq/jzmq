@@ -1,12 +1,10 @@
 package org.zeromq;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
 import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -91,21 +89,14 @@ public class ZMQTest
         expected[0] = 1;
         System.arraycopy(subscription, 0, expected, 1, subscription.length);
 
-        // Verify xsub subscription
-        xsub.send(expected, 0);
-        subcr = pub.recv(0);
-        assertArrayEquals(expected, subcr);
-
         sub.subscribe(subscription);
-        sub.unsubscribe(subscription);
-        
         subcr = pub.recv(0);
         assertArrayEquals(expected, subcr);
 
         // Verify xsub subscription
         xsub.send(expected, 0);
-        subcr = pub.recv(0);
-        assertArrayEquals(expected, subcr);
+        subcr = pub.recv(1);
+        assertNull(subcr);
 
         for (int i = 0; i < 10; i++) {
             byte[] data = ("subscrip" + i).getBytes();
