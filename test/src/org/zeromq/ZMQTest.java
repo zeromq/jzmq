@@ -64,6 +64,11 @@ public class ZMQTest
     @Test
     public void testXPUBSUB ()
     {
+        if (ZMQ.getFullVersion() <  ZMQ.make_version(3, 0, 0)) {
+          // Can only test XPUB on ZMQ >= of 3.0
+          return;
+        }
+
         ZMQ.Context context = ZMQ.context(1);
 
         ZMQ.Socket pub = context.socket(ZMQ.XPUB);
