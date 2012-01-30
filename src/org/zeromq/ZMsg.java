@@ -363,6 +363,24 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
         public void addLast (byte[] data) {
             addLast(new ZFrame(data));
         }
+		  
+	// ********* Convenience Queue methods for common data types *** //
+
+	public void push(String str) {
+		push(new ZFrame(str));
+	}
+
+	public void push(byte[] data) {
+		push(new ZFrame(data));
+	}
+
+	public boolean add (String stringValue) {
+		return add(new ZFrame(stringValue));
+	}
+
+	public boolean add (byte[] data) {
+		return add(new ZFrame(data));
+	}
         
 	// ********* Implement Iterable Interface *************** //
 	@Override
@@ -536,6 +554,19 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame>{
 		} catch (NoSuchElementException e) {
 			return null;
 		}
+	}
+
+	/**
+	 * Pop a ZFrame and return the toString() representation of it.
+	 *
+	 * @return toString version of pop'ed frame, or null if no frame exists.
+	 */
+	public String popString() {
+		ZFrame frame = pop();
+		if(frame == null)
+			return null;
+
+		return frame.toString();
 	}
 
 	@Override
