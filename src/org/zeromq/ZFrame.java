@@ -216,7 +216,7 @@ public class ZFrame {
 	public String strhex() {		
 		String hexChar = "0123456789ABCDEF";
 		
-		StringBuffer b = new StringBuffer();
+		StringBuilder b = new StringBuilder();
 		for (int nbr = 0;nbr<data.length;nbr++) {
 			int b1 = data[nbr] >>> 4 & 0xf;
 			int b2 = data[nbr] & 0xf;
