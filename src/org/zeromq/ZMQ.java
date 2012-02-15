@@ -406,7 +406,7 @@ public class ZMQ {
          * @since 3.0.0
          */
         public long getReconnectIVL () {
-            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 10))
                 return -1;
 
             return getLongSockopt (RECONNECT_IVL);
@@ -432,7 +432,7 @@ public class ZMQ {
          * @since 3.0.0
          */
         public long getReconnectIVLMax () {
-            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 10))
                 return -1;
 
             return getLongSockopt (RECONNECT_IVL_MAX);
@@ -715,7 +715,7 @@ public class ZMQ {
          * @since 3.0.0
          */
         public void setReconnectIVL (long reconnectIVL) {
-            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 10))
                 return;
 
             setLongSockopt (RECONNECT_IVL, reconnectIVL);
@@ -735,7 +735,7 @@ public class ZMQ {
          * @since 3.0.0
          */
         public void setReconnectIVLMax (long reconnectIVLMax) {
-            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(2, 1, 10))
                 return;
 
             setLongSockopt (RECONNECT_IVL_MAX, reconnectIVLMax);
