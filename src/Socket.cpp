@@ -451,7 +451,8 @@ JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Socket_recv___3BIII (JNIEnv *env
     int stored = sz > len ? len : sz;
     env->SetByteArrayRegion (buff, offset, stored, (jbyte*) pd);
 
-    assert(zmq_msg_close(&message) == 0);
+    int rc = zmq_msg_close(&message);
+    assert(rc == 0);
 
     return stored;
 }
@@ -480,7 +481,8 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv__I (JNIEnv *en
 
     env->SetByteArrayRegion (data, 0, sz, (jbyte*) pd);
 
-    assert(zmq_msg_close(&message) == 0);
+    int rc = zmq_msg_close(&message);
+    assert(rc == 0);
 
     return data;
 }
