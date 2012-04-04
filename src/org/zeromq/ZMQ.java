@@ -582,8 +582,8 @@ public class ZMQ {
          * 
          * @param timeout
          */
-        public void setReceiveTimeOut (long timeout) {
-            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+        public void setReceiveTimeOut (int timeout) {
+            if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
                 return;
 
             setLongSockopt (RCVTIMEO, timeout);
@@ -594,10 +594,10 @@ public class ZMQ {
          * 
          * @return the Receive Timeout
          */
-        public long getReceiveTimeOut () {
-			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+        public int getReceiveTimeOut () {
+			if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
                 return -1;
-            return getLongSockopt (RCVTIMEO);
+            return (int) getLongSockopt (RCVTIMEO);
         }
 
         /**
@@ -609,8 +609,8 @@ public class ZMQ {
          * 
          * @param timeout
          */
-        public void setSendTimeOut (long timeout) {
-            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+        public void setSendTimeOut (int timeout) {
+            if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
                 return;
 
             setLongSockopt (SNDTIMEO, timeout);
@@ -621,10 +621,10 @@ public class ZMQ {
          * 
          * @return the Send Timeout.
          */
-        public long getSendTimeOut () {
-			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+        public int getSendTimeOut () {
+			if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
                 return -1;
-            return getLongSockopt (SNDTIMEO);
+            return (int) getLongSockopt (SNDTIMEO);
         }
 
         /**
