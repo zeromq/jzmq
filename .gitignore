@@ -51,3 +51,6 @@ debian/jzmq.substvars
 debian/jzmq/
 debian/tmp/
 .DS_Store
+*.iml
+config/
+build/
