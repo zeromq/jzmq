@@ -106,12 +106,14 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_SNDHWM:
     case ZMQ_RCVHWM:
     case ZMQ_MULTICAST_HOPS:
-    case ZMQ_RCVTIMEO:
-    case ZMQ_SNDTIMEO:
 #else
     case ZMQ_HWM:
     case ZMQ_SWAP:
     case ZMQ_MCAST_LOOP:
+#endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,2,0)
+    case ZMQ_RCVTIMEO:
+    case ZMQ_SNDTIMEO:
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,10)
     case ZMQ_RECONNECT_IVL:
@@ -207,12 +209,14 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_SNDHWM:
     case ZMQ_RCVHWM:
     case ZMQ_MULTICAST_HOPS:
-    case ZMQ_RCVTIMEO:
-    case ZMQ_SNDTIMEO:
 #else
     case ZMQ_HWM:
     case ZMQ_SWAP:
     case ZMQ_MCAST_LOOP:
+#endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,2,0)
+    case ZMQ_RCVTIMEO:
+    case ZMQ_SNDTIMEO:
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,10)
     case ZMQ_RECONNECT_IVL:
@@ -235,10 +239,16 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
             if(
                 (option == ZMQ_LINGER)
+#endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,10)
                 || (option == ZMQ_RECONNECT_IVL)
                 || (option == ZMQ_RECONNECT_IVL_MAX)
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,2,0)
+                || (option == ZMQ_SNDTIMEO)
+                || (option == ZMQ_RCVTIMEO)
+#endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)    
             ) {
                 int ival = (int) optval;
                 size_t optvallen = sizeof(ival);
