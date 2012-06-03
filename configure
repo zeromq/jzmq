@@ -756,6 +756,7 @@ with_sysroot
 enable_libtool_lock
 with_zeromq
 enable_version
+enable_self_contained
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1404,6 +1405,8 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-version        builds with version information embedded
                           [default=yes]
+  --enable-self-contained generates a library that embeds all its external
+                          dependencies [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -15599,6 +15602,13 @@ else
 fi
 
 
+
+# Check whether --enable-self-contained was given.
+if test "${enable_self_contained+set}" = set; then :
+  enableval=$enable_self_contained;
+fi
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for zmq_init in -lzmq" >&5
 $as_echo_n "checking for zmq_init in -lzmq... " >&6; }
 if ${ac_cv_lib_zmq_zmq_init+:} false; then :
@@ -15636,12 +15646,13 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_zmq_zmq_init" >&5
 $as_echo "$ac_cv_lib_zmq_zmq_init" >&6; }
 if test "x$ac_cv_lib_zmq_zmq_init" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBZMQ 1
-_ACEOF
-
-  LIBS="-lzmq $LIBS"
-
+  if test "x$enable_self_contained" = "xyes"; then
+							echo ">>>>>>>>>>>>>>>>>>>>>>>>>>glop";
+							LDFLAGS="$LDFLAGS -Wl,-Bstatic -Wl,-lzmq -Wl,-Bdynamic"
+						else
+							echo ">>>>>>>>>>>>>>>>>>>>>>>>>>paglop";
+							LIBS="-lzmq $LIBS"
+						fi
 else
   as_fn_error $? "cannot link with -lzmq" "$LINENO" 5
 fi
