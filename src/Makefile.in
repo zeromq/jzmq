@@ -293,6 +293,7 @@ JZMQ_CLASS_FILES = \
 	org/zeromq/ZFrame.class \
 	org/zeromq/ZMsg.class
 
+JAVAH_FLAGS = -d . -classpath .
 jar_DATA = $(jarfile)
 dist_noinst_JAVA = $(JZMQ_JAVA_FILES)
 lib_LTLIBRARIES = libjzmq.la
@@ -719,13 +720,12 @@ uninstall-am: uninstall-jarDATA uninstall-libLTLIBRARIES
 	uninstall-libLTLIBRARIES
 
 
-$(jarfile): $(dist_noinst_JAVA)
+$(jarfile):
+	$(JAVAC) -d . $(JZMQ_JAVA_FILES)
 	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
 
-$(JZMQ_H_FILES): org/zeromq/ZMQ.class
+$(JZMQ_H_FILES): $(jarfile)
 	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ
-
-./org/zeromq/ZMQ.class: classdist_noinst.stamp
 
 $(srcdir)/ZMQ.cpp: \
 	$(JZMQ_H_FILES) \
