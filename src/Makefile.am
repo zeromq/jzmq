@@ -57,7 +57,12 @@ nodist_libjzmq_la_SOURCES = \
 	$(JZMQ_HPP_FILES)
 
 libjzmq_la_CXXFLAGS = -Wall
+
+if DISABLE_VERSION
+libjzmq_la_LDFLAGS = -avoid-version
+else
 libjzmq_la_LDFLAGS = -version-info @JLTVER@
+endif
 
 BUILT_SOURCES = \
 	$(JZMQ_H_FILES) \
