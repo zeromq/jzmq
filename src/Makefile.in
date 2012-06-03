@@ -302,7 +302,8 @@ nodist_libjzmq_la_SOURCES = \
 	$(JZMQ_HPP_FILES)
 
 libjzmq_la_CXXFLAGS = -Wall
-libjzmq_la_LDFLAGS = -version-info @JLTVER@
+@DISABLE_VERSION_FALSE@libjzmq_la_LDFLAGS = -version-info @JLTVER@
+@DISABLE_VERSION_TRUE@libjzmq_la_LDFLAGS = -avoid-version
 BUILT_SOURCES = \
 	$(JZMQ_H_FILES) \
 	$(JZMQ_CLASS_FILES)
