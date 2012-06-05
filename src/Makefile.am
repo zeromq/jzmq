@@ -42,7 +42,10 @@ JZMQ_CLASS_FILES = \
 	org/zeromq/ZFrame.class \
 	org/zeromq/ZMsg.class
 
-$(jarfile): $(dist_noinst_JAVA)
+JAVAH_FLAGS = -d . -classpath .
+
+$(jarfile):
+	$(JAVAC) -d . $(JZMQ_JAVA_FILES)
 	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
 
 jar_DATA = $(jarfile)
@@ -57,7 +60,12 @@ nodist_libjzmq_la_SOURCES = \
 	$(JZMQ_HPP_FILES)
 
 libjzmq_la_CXXFLAGS = -Wall
+
+if DISABLE_VERSION
+libjzmq_la_LDFLAGS = -avoid-version
+else
 libjzmq_la_LDFLAGS = -version-info @JLTVER@
+endif
 
 BUILT_SOURCES = \
 	$(JZMQ_H_FILES) \
@@ -68,10 +76,9 @@ CLEANFILES = \
 	$(JZMQ_CLASS_FILES) \
 	$(jarfile)
 
-$(JZMQ_H_FILES): org/zeromq/ZMQ.class
-	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ
 
-./org/zeromq/ZMQ.class: classdist_noinst.stamp
+$(JZMQ_H_FILES): $(jarfile)
+	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ
 
 $(srcdir)/ZMQ.cpp: \
 	$(JZMQ_H_FILES) \
