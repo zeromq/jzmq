@@ -25,7 +25,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Compiling Java classes"
-				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java ..\..\..\src\org\zeromq\ZMQException.java ..\..\..\src\org\zeromq\ZMQForwarder.java ..\..\..\src\org\zeromq\ZMQQueue.java ..\..\..\src\org\zeromq\ZMQStreamer.java ..\..\..\src\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\org\zeromq\App.java&#x0D;&#x0A;"
+				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java ..\..\..\src\org\zeromq\ZMQException.java ..\..\..\src\org\zeromq\ZMQForwarder.java ..\..\..\src\org\zeromq\ZMQQueue.java ..\..\..\src\org\zeromq\ZMQStreamer.java ..\..\..\src\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\org\zeromq\App.java ..\..\..\src\org\zeromq\ZContext.java ..\..\..\src\org\zeromq\ZDispatcher.java ..\..\..\src\org\zeromq\ZFrame.java ..\..\..\src\org\zeromq\ZMsg.java&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -99,7 +99,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Compiling Java classes"
-				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java ..\..\..\src\org\zeromq\ZMQException.java ..\..\..\src\org\zeromq\ZMQForwarder.java ..\..\..\src\org\zeromq\ZMQQueue.java ..\..\..\src\org\zeromq\ZMQStreamer.java ..\..\..\src\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\org\zeromq\App.java&#x0D;&#x0A;"
+				CommandLine="copy ..\config.hpp ..\..\..\src&#x0D;&#x0A;javac ..\..\..\src\org\zeromq\ZMQ.java ..\..\..\src\org\zeromq\ZMQException.java ..\..\..\src\org\zeromq\ZMQForwarder.java ..\..\..\src\org\zeromq\ZMQQueue.java ..\..\..\src\org\zeromq\ZMQStreamer.java ..\..\..\src\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\org\zeromq\App.java ..\..\..\src\org\zeromq\ZContext.java ..\..\..\src\org\zeromq\ZDispatcher.java ..\..\..\src\org\zeromq\ZFrame.java ..\..\..\src\org\zeromq\ZMsg.java&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
