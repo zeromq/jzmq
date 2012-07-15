@@ -78,7 +78,7 @@
 			</activation>
 			<properties>
 				<native.os>Linux</native.os>
-				<native.extension>so</native.extension>
+				<native.path>src/.libs/libjzmq.so</native.path>
 			</properties>
 		</profile>
 
@@ -91,7 +91,7 @@
 			</activation>
 			<properties>
 				<native.os>Windows</native.os>
-				<native.extension>dll</native.extension>
+				<native.path>lib/jzmq.dll</native.path>
 			</properties>
 		</profile>
 
@@ -104,7 +104,7 @@
 			</activation>
 			<properties>
 				<native.os>OS X</native.os>
-				<native.extension>dylib</native.extension>
+				<native.path>src/.libs/libjzmq.dylib</native.path>
 			</properties>
 		</profile>
 	</profiles>
