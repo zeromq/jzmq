@@ -1,0 +1,48 @@
+Depend on JZMQ
+==============
+Add the following to your pom.xml:
+	<dependencies>
+		<dependency>
+			<groupId>org.zeromq</groupId>
+			<artifactId>jzmq</artifactId>
+			<version>${jzmq.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.zeromq</groupId>
+			<artifactId>jzmq</artifactId>
+			<version>${jzmq.version}</version>
+			<classifier>native-${os.arch}-${native.os}</classifier>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<native.os>${os.name}</native.os>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>Windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<native.os>Windows</native.os>
+			</properties>
+		</profile>
+	</profiles>
+
+If you're not supporting Windows, you can remove the <properties> and
+<profiles> elements and replace "${native.os}" with "${os.name}".
+
+Build JZMQ artefacts
+====================
+1. Build native binary. On Linux, this is:
+    ./autogen.sh && ./configure && make
+2. Package with Maven:
+    mvn clean package
+3. Look in the target/ directory for jzmq-[version].jar and
+   jzmq-[version]-native-[arch]-[os].jar.
