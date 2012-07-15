@@ -3,9 +3,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
 	<groupId>org.zeromq</groupId>
 	<artifactId>jzmq</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>jzmq</name>
 
@@ -22,15 +28,25 @@
 	<url>https://zeromq.org/</url>
 
 	<scm>
-		<connection>scm:git://github.com/zeromq/jzmq</connection>
+		<connection>scm:git:git@github.com:zeromq/jzmq.git</connection>
+		<url>git@github.com:zeromq/jzmq.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
 	<licenses>
 		<license>
-			<name>LGPLv3</name>
+			<name>GNU LGPL 3</name>
+			<url>http://www.gnu.org/licenses/lgpl.txt</url>
 		</license>
 	</licenses>
+
+	<developers>
+		<!--<developer>
+			<id>...</id>
+			<name>...</name>
+			<email>...</email>
+		</developer>-->
+	</developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,13 +59,29 @@
 		<maven-javadoc-plugin.version>2.7</maven-javadoc-plugin.version>
 		<maven-shade-plugin.version>1.4</maven-shade-plugin.version>
 		<maven-source-plugin.version>2.1.2</maven-source-plugin.version>
+		<maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
+		<exec-maven-plugin.version>1.1</exec-maven-plugin.version>
 
 		<junit.version>4.8.2</junit.version>
 
-		<native.os>${os.name}</native.os>
+		<native.arch>${os.arch}</native.arch>
 	</properties>
 
 	<profiles>
+		<profile>
+			<id>Linux</id>
+			<activation>
+				<property>
+					<name>os.name</name>
+					<value>Linux</value>
+				</property>
+			</activation>
+			<properties>
+				<native.os>Linux</native.os>
+				<native.extension>so</native.extension>
+			</properties>
+		</profile>
+
 		<profile>
 			<id>Windows</id>
 			<activation>
@@ -59,6 +91,20 @@
 			</activation>
 			<properties>
 				<native.os>Windows</native.os>
+				<native.extension>dll</native.extension>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>Mac</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<native.os>OS X</native.os>
+				<native.extension>dylib</native.extension>
 			</properties>
 		</profile>
 	</profiles>
@@ -76,20 +122,27 @@
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test/src</testSourceDirectory>
 
-		<resources>
-			<resource>
-				<filtering>false</filtering>
-				<targetPath>NATIVE/${os.arch}/${native.os}</targetPath>
-				<directory>${basedir}/src/.libs</directory>
-				<includes>
-					<include>libjzmq.so</include>
-					<include>libjzmq.dylib</include>
-					<include>libjzmq.dll</include>
-				</includes>
-			</resource>
-		</resources>
-
 		<plugins>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven-assembly-plugin.version}</version>
+				<configuration>
+					<descriptors>
+						<!-- Assembly contents are defined in this file -->
+						<descriptor>nativejar.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -125,6 +178,15 @@
 							<Implementation-Version>${buildNumber} ${buildTimestamp}</Implementation-Version>
 						</manifestEntries>
 					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<forkMode>once</forkMode>
+					<argLine>-Djava.library.path=${project.basedir}/src/.libs</argLine>
 				</configuration>
 			</plugin>
 
