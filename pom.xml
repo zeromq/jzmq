@@ -45,7 +45,23 @@
 		<maven-source-plugin.version>2.1.2</maven-source-plugin.version>
 
 		<junit.version>4.8.2</junit.version>
+
+		<native.os>${os.name}</native.os>
 	</properties>
+
+	<profiles>
+		<profile>
+			<id>Windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<native.os>Windows</native.os>
+			</properties>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -63,7 +79,7 @@
 		<resources>
 			<resource>
 				<filtering>false</filtering>
-				<targetPath>NATIVE/${os.arch}/${os.name}</targetPath>
+				<targetPath>NATIVE/${os.arch}/${native.os}</targetPath>
 				<directory>${basedir}/src/.libs</directory>
 				<includes>
 					<include>libjzmq.so</include>

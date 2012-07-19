@@ -23,7 +23,12 @@ public class EmbeddedLibraryTools {
 	}
 	
 	public static String getCurrentPlatformIdentifier() {
-		return System.getProperty("os.arch") + "/" + System.getProperty("os.name");
+		String osName = System.getProperty("os.name");
+		if (osName.toLowerCase().indexOf("windows") > -1) {
+			osName = "Windows";
+		}
+		
+		return System.getProperty("os.arch") + "/" + osName;
 	}
 	
 	public static Collection<String> getEmbeddedLibraryList() {
