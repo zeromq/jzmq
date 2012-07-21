@@ -28,9 +28,9 @@
 	<url>https://zeromq.org/</url>
 
 	<scm>
-		<connection>scm:git:git@github.com:zeromq/jzmq.git</connection>
-		<url>git@github.com:zeromq/jzmq.git</url>
-		<tag>HEAD</tag>
+		<connection>scm:git:git://github.com/zeromq/jzmq.git</connection>
+		<developerConnection>scm:git:[fetch=]git://github.com/zeromq/jzmq.git[push=]ssh://git@github.com/zeromq/jzmq.git</developerConnection>
+		<url>git://github.com/zeromq/jzmq.git</url>
 	</scm>
 
 	<licenses>
@@ -41,11 +41,10 @@
 	</licenses>
 
 	<developers>
-		<!--<developer>
-			<id>...</id>
-			<name>...</name>
-			<email>...</email>
-		</developer>-->
+		<developer>
+			<id>zeromq</id>
+			<name>The ØMQ project</name>
+		</developer>
 	</developers>
 
 	<properties>
@@ -60,7 +59,7 @@
 		<maven-shade-plugin.version>1.4</maven-shade-plugin.version>
 		<maven-source-plugin.version>2.1.2</maven-source-plugin.version>
 		<maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
-		<exec-maven-plugin.version>1.1</exec-maven-plugin.version>
+		<maven-scm-plugin.version>1.7</maven-scm-plugin.version>
 
 		<junit.version>4.8.2</junit.version>
 
@@ -79,6 +78,8 @@
 			<properties>
 				<native.os>Linux</native.os>
 				<native.path>src/.libs/libjzmq.so</native.path>
+				<!-- Use platform-specific path separators here: -->
+				<native.library-path>src/.libs/</native.library-path>
 			</properties>
 		</profile>
 
@@ -92,6 +93,8 @@
 			<properties>
 				<native.os>Windows</native.os>
 				<native.path>lib/jzmq.dll</native.path>
+				<!-- Use platform-specific path separators here: -->
+				<native.library-path>lib</native.library-path>
 			</properties>
 		</profile>
 
@@ -105,6 +108,8 @@
 			<properties>
 				<native.os>OS X</native.os>
 				<native.path>src/.libs/libjzmq.dylib</native.path>
+				<!-- Use platform-specific path separators here: -->
+				<native.library-path>src/.libs/</native.library-path>
 			</properties>
 		</profile>
 	</profiles>
@@ -163,6 +168,12 @@
 					<timestampFormat>{0,date,yyyy-MM-dd HH:mm Z}</timestampFormat>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>${maven-scm-plugin.version}</version>
+			</plugin>
       
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -186,7 +197,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<forkMode>once</forkMode>
-					<argLine>-Djava.library.path=${project.basedir}/src/.libs</argLine>
+					<argLine>-Djava.library.path=${native.library-path}</argLine>
 				</configuration>
 			</plugin>
 
