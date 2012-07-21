@@ -31,6 +31,7 @@
 		<connection>scm:git:git://github.com/zeromq/jzmq.git</connection>
 		<developerConnection>scm:git:[fetch=]git://github.com/zeromq/jzmq.git[push=]ssh://git@github.com/zeromq/jzmq.git</developerConnection>
 		<url>git://github.com/zeromq/jzmq.git</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<licenses>
@@ -65,6 +66,8 @@
 		<junit.version>4.8.2</junit.version>
 
 		<native.arch>${os.arch}</native.arch>
+		<native.path.resolved>${native.path}</native.path.resolved>
+		<native.library-path.resolved>${native.library-path}</native.library-path.resolved>
 	</properties>
 
 	<profiles>
@@ -111,6 +114,14 @@
 				<native.path>src/.libs/libjzmq.dylib</native.path>
 				<!-- Use platform-specific path separators here: -->
 				<native.library-path>src/.libs/</native.library-path>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>release</id>
+			<properties>
+				<native.path.resolved>..${file.separator}..${file.separator}${native.path}</native.path.resolved>
+				<native.library-path.resolved>..${file.separator}..${file.separator}${native.library-path}</native.library-path.resolved>
 			</properties>
 		</profile>
 	</profiles>
@@ -175,6 +186,7 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>${maven-release-plugin.version}</version>
 				<configuration>
+					<releaseProfiles>release</releaseProfiles>
 					<tagNameFormat>v@{project.version}</tagNameFormat>
 				</configuration>
 			</plugin>
@@ -207,7 +219,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<forkMode>once</forkMode>
-					<argLine>-Djava.library.path=${native.library-path}</argLine>
+					<argLine>-Djava.library.path=${native.library-path.resolved}</argLine>
 				</configuration>
 			</plugin>
 

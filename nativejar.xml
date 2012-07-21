@@ -8,7 +8,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<files>
 		<file>
-			<source>${native.path}</source>
+			<source>${native.path.resolved}</source>
 			<outputDirectory>NATIVE/${native.arch}/${native.os}</outputDirectory>
 			<fileMode>0644</fileMode>
 		</file>
