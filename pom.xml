@@ -29,7 +29,7 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/zeromq/jzmq.git</connection>
-		<developerConnection>scm:git:[fetch=]git://github.com/zeromq/jzmq.git[push=]ssh://git@github.com/zeromq/jzmq.git</developerConnection>
+		<developerConnection>scm:git:ssh://git@github.com/zeromq/jzmq.git</developerConnection>
 		<url>git://github.com/zeromq/jzmq.git</url>
 		<tag>HEAD</tag>
 	</scm>

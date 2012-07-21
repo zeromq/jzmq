@@ -38,7 +38,7 @@ Add the following to your pom.xml:
 If you're not supporting Windows, you can remove the <properties> and
 <profiles> elements and replace "${native.os}" with "${os.name}".
 
-Build JZMQ artefacts
+Build JZMQ artifacts
 ====================
 1. Build native binary. On Linux, this is:
     ./autogen.sh && ./configure && make
