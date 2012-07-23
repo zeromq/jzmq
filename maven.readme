@@ -67,7 +67,7 @@ Release
 4. Do a dry run:
     mvn release:prepare -DdryRun
 5. If all goes well, it's time to release. Since this alters git repository
-   state and pushes to github, it's best to create another branch:
+   state, it's best to create another branch:
     git checkout -b release-[version]
 6. Do the release, accepting the default values when prompted:
     mvn release:clean release:prepare release:perform
@@ -79,10 +79,10 @@ Release
     git checkout master
     git merge release-[version]
     git commit -m "merge completed release branch [version]"
+10. Push to github:
+    git push
 
 If anything goes wrong during step 6, you can roll back with the following
 commands:
     git tag -d v[version]
     git branch -D release-[version]
-    git push origin --delete release-[version]
-    git push origin :refs/tags/v[version]
