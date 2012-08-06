@@ -1,5 +1,8 @@
 package org.zeromq;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 
@@ -8,7 +11,7 @@ import org.zeromq.ZMQ.Socket;
  * 
  * @author Alois Belaska <alois.belaska@gmail.com>
  */
-public class ZMQQueue implements Runnable {
+public class ZMQQueue implements Runnable, Closeable {
 
     private final ZMQ.Poller poller;
     private final ZMQ.Socket inSocket;
@@ -83,5 +86,14 @@ public class ZMQQueue implements Runnable {
                 throw e;
             }
         }
+    }
+
+    /**
+	* Unregisters input and output sockets.
+	*/
+    @Override
+    public void close() throws IOException {
+    	poller.unregister(this.inSocket);
+    	poller.unregister(this.outSocket);
     }
 }
