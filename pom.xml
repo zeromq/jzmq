@@ -80,7 +80,7 @@
 				</property>
 			</activation>
 			<properties>
-				<native.os>Linux</native.os>
+				<native.os>${os.name}</native.os>
 				<native.path>src/.libs/libjzmq.so</native.path>
 				<!-- Use platform-specific path separators here: -->
 				<native.library-path>src/.libs/</native.library-path>
@@ -110,7 +110,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.os>OS X</native.os>
+				<native.os>${os.name}</native.os>
 				<native.path>src/.libs/libjzmq.dylib</native.path>
 				<!-- Use platform-specific path separators here: -->
 				<native.library-path>src/.libs/</native.library-path>
