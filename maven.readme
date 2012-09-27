@@ -1,0 +1,88 @@
+Depend on JZMQ
+==============
+Add the following to your pom.xml:
+	<dependencies>
+		<dependency>
+			<groupId>org.zeromq</groupId>
+			<artifactId>jzmq</artifactId>
+			<version>${jzmq.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.zeromq</groupId>
+			<artifactId>jzmq</artifactId>
+			<version>${jzmq.version}</version>
+			<classifier>native-${os.arch}-${native.os}</classifier>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<native.os>${os.name}</native.os>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>Windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<native.os>Windows</native.os>
+			</properties>
+		</profile>
+	</profiles>
+
+If you're not supporting Windows, you can remove the <properties> and
+<profiles> elements and replace "${native.os}" with "${os.name}".
+
+Build JZMQ artifacts
+====================
+1. Build native binary. On Linux, this is:
+    ./autogen.sh && ./configure && make
+2. Package with Maven:
+    mvn clean package
+3. Look in the target/ directory for jzmq-[version].jar and
+   jzmq-[version]-native-[arch]-[os].jar.
+
+Deploy snapshots
+================
+1. Check that the correct version is set in pom.xml. The version should end in
+   "-SNAPSHOT".
+2. Build as above.
+3. Deploy with Maven:
+    mvn deploy
+4. You can deploy individual native JARs like so:
+    mvn deploy:deploy-file -Durl=https://oss.sonatype.org/content/repositories/snapshots/ -DrepositoryId=sonatype-nexus-snapshots -DpomFile=pom.xml -Dclassifier=native-[arch]-[os] -Dfile=target/jzmq-[version]-native-[arch]-[os].jar
+
+Release
+=======
+1. Check that the correct version is set in pom.xml. The version should end in
+   "-SNAPSHOT".
+2. Build as above.
+3. Clean up:
+    mvn release:clean
+4. Do a dry run:
+    mvn release:prepare -DdryRun
+5. If all goes well, it's time to release. Since this alters git repository
+   state, it's best to create another branch:
+    git checkout -b release-[version]
+6. Do the release, accepting the default values when prompted:
+    mvn release:clean release:prepare release:perform
+7. You can deploy individual native JARs like so:
+    mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dclassifier=native-[arch]-[os] -Dfile=target/jzmq-[version]-native-[arch]-[os].jar
+8. Move the artifacts out of staging as instructed at
+   https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+9. Once everything's done, merge the release branch back into master:
+    git checkout master
+    git merge release-[version]
+    git commit -m "merge completed release branch [version]"
+10. Push to github:
+    git push
+
+If anything goes wrong during step 6, you can roll back with the following
+commands:
+    git tag -d v[version]
+    git branch -D release-[version]
