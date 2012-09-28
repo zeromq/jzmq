@@ -378,6 +378,38 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_bind (JNIEnv *env,
 }
 
 /**
+ * Called by Java's Socket::unbind(String addr).
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_unbind (JNIEnv *env,
+                                                               jobject obj,
+                                                               jstring addr)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+    void *s = get_socket (env, obj, 1);
+
+    if (addr == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    const char *c_addr = env->GetStringUTFChars (addr, NULL);
+    if (c_addr == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    int rc = zmq_unbind (s, c_addr);
+    int err = zmq_errno();
+    env->ReleaseStringUTFChars (addr, c_addr);
+
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
+#endif
+}
+
+/**
  * Called by Java's Socket::connect(String addr).
  */
 JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_connect (JNIEnv *env,
@@ -405,6 +437,38 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_connect (JNIEnv *env,
         raise_exception (env, err);
         return;
     }
+}
+
+/**
+ * Called by Java's Socket::disconnect(String addr).
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_disconnect (JNIEnv *env,
+                                                                   jobject obj,
+                                                                   jstring addr)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+    void *s = get_socket (env, obj, 1);
+
+    if (addr == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    const char *c_addr = env->GetStringUTFChars (addr, NULL);
+    if (c_addr == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    int rc = zmq_disconnect (s, c_addr);
+    int err = zmq_errno();
+    env->ReleaseStringUTFChars (addr, c_addr);
+
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
+#endif
 }
 
 /**

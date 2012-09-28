@@ -1055,12 +1055,28 @@ public class ZMQ {
         public native void bind (String addr);
 
         /**
+         * Unbind from network interface. Stop listening for connections.
+         * 
+         * @param addr
+         *            the endpoint to unbind from.
+         */
+        public native void unbind (String addr);
+
+        /**
          * Connect to remote application.
          * 
          * @param addr
          *            the endpoint to connect to.
          */
         public native void connect (String addr);
+
+        /**
+         * Disconnect from a remote application.
+         * 
+         * @param addr
+         *            the endpoint to disconnect from.
+         */
+        public native void disconnect (String addr);
 
         /**
          * Send a message.
