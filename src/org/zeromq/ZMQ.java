@@ -511,6 +511,54 @@ public class ZMQ {
         }
 
         /**
+         * @see #setTCPKeepAlive(long)
+         * 
+         * @return the keep alive setting.
+         */
+        public long getTCPKeepAliveSetting () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 2, 0))
+                return -1;
+
+            return getLongSockopt (KEEPALIVE);
+        }
+        
+        /**
+         * @see #setTCPKeepAliveIdle(long)
+         * 
+         * @return the keep alive idle value.
+         */
+        public long getTCPKeepAliveIdle () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 2, 0))
+                return -1;
+
+            return getLongSockopt (KEEPALIVEIDLE);
+        }
+		
+        /**
+         * @see #setTCPKeepAliveInterval(long)
+         * 
+         * @return the keep alive interval.
+         */
+        public long getTCPKeepAliveInterval () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 2, 0))
+                return -1;
+
+            return getLongSockopt (KEEPALIVEINTVL);
+        }
+
+        /**
+         * @see #setTCPKeepAliveCount(long)
+         * 
+         * @return the keep alive count.
+         */
+        public long getTCPKeepAliveCount () {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 2, 0))
+                return -1;
+
+            return getLongSockopt (KEEPALIVECNT);
+        }
+
+        /**
          * @see #setIdentity(byte[])
          * 
          * @return the Identitiy.
@@ -829,6 +877,59 @@ public class ZMQ {
         }
 
         /**
+         * Override SO_KEEPALIVE socket option (where supported by OS) to enable keep-alive 
+         * packets for a socket connection. 
+         * Possible values are -1, 0, 1.
+         * The default value -1 will skip all overrides and do the OS default.
+         * 
+         * @param optVal
+         *            The value of 'ZMQ_TCP_KEEPALIVE' to turn TCP keepalives on (1) or off (0).
+         */
+        public void setTCPKeepAlive (long optVal) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0))
+                setLongSockopt (KEEPALIVE, optVal);
+        }
+        
+        /**
+         * Override TCP_KEEPCNT socket option (where supported by OS). 
+         * The default value -1 will skip all overrides and do the OS default.
+         * 
+         * @param optVal
+         *            The value of 'ZMQ_TCP_KEEPALIVE_CNT' defines the number of keepalives 
+         *            before death.
+         */
+        public void setTCPKeepAliveCount (long optVal) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0))
+                setLongSockopt (KEEPALIVECNT, optVal);
+        }
+        
+        /**
+		 * Override TCP_KEEPINTVL socket option (where supported by OS). 
+		 * The default value -1 will skip all overrides and do the OS default.
+         * 
+         * @param optVal
+         *            The value of 'ZMQ_TCP_KEEPALIVE_INTVL' defines the interval between 
+         *            keepalives in ms.
+         */
+        public void setTCPKeepAliveInterval (long optVal) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0))
+                setLongSockopt (KEEPALIVEINTVL, optVal);
+        }
+        
+        /**
+         * Override TCP_KEEPCNT (or TCP_KEEPALIVE on some OS) socket option (where supported by OS). 
+         * The default value -1 will skip all overrides and do the OS default.
+         * 
+         * @param optVal
+         *            The value of 'ZMQ_TCP_KEEPALIVE_IDLE' defines the interval between the last
+         *            data packet sent over the socket and the first keepalive probe in ms.
+         */
+        public void setTCPKeepAliveIdle (long optVal) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0))
+                setLongSockopt (KEEPALIVEIDLE, optVal);
+        }
+
+        /**
          * The 'ZMQ_IDENTITY' option shall set the identity of the specified 'socket'. Socket
          * identity determines if existing 0MQ infastructure (_message queues_, _forwarding
          * devices_) shall be identified with a specific application and persist across multiple
@@ -1098,6 +1199,10 @@ public class ZMQ {
         private static final int MULTICAST_HOPS = 25;
         private static final int RCVTIMEO = 27;
         private static final int SNDTIMEO = 28;
+        private static final int KEEPALIVE = 34;
+        private static final int KEEPALIVECNT = 35;
+        private static final int KEEPALIVEIDLE = 36;
+        private static final int KEEPALIVEINTVL = 37;
     }
 
     /**
