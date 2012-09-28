@@ -125,6 +125,12 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_EVENTS:
     case ZMQ_LINGER:
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+    case ZMQ_TCP_KEEPALIVE:
+    case ZMQ_TCP_KEEPALIVE_IDLE:
+    case ZMQ_TCP_KEEPALIVE_CNT:
+    case ZMQ_TCP_KEEPALIVE_INTVL:
+#endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
     case ZMQ_RECOVERY_IVL:
@@ -136,12 +142,26 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
             jlong ret = 0;
             int rc = 0;
             int err = 0;
-
-            uint64_t optval = 0;
-            size_t optvallen = sizeof(optval);
-            rc = zmq_getsockopt (s, option, &optval, &optvallen);
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+            if(
+                   (option == ZMQ_TCP_KEEPALIVE)
+                || (option == ZMQ_TCP_KEEPALIVE_IDLE)
+                || (option == ZMQ_TCP_KEEPALIVE_CNT)
+                || (option == ZMQ_TCP_KEEPALIVE_INTVL)
+            ) {
+                int optval = 0;
+                size_t optvallen = sizeof(optval);
+                rc = zmq_getsockopt (s, option, &optval, &optvallen);
+                ret = (jlong) optval;
+            } else
+#endif
+            {
+                uint64_t optval = 0; 
+                size_t optvallen = sizeof(optval);
+                rc = zmq_getsockopt (s, option, &optval, &optvallen);
+                ret = (jlong) optval;
+            }
             err = zmq_errno();
-            ret = (jlong) optval;
 
             if (rc != 0) {
                 raise_exception (env, err);
@@ -225,6 +245,12 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
     case ZMQ_LINGER:
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+    case ZMQ_TCP_KEEPALIVE:
+    case ZMQ_TCP_KEEPALIVE_IDLE:
+    case ZMQ_TCP_KEEPALIVE_CNT:
+    case ZMQ_TCP_KEEPALIVE_INTVL:
+#endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
     case ZMQ_RECOVERY_IVL:
@@ -234,7 +260,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
             void *s = get_socket (env, obj, 1);
             int rc = 0;
             int err = 0;
-            uint64_t optval = (uint64_t) value;
 
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
             if(
@@ -248,14 +273,27 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_SNDTIMEO)
                 || (option == ZMQ_RCVTIMEO)
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+                || (option == ZMQ_TCP_KEEPALIVE)
+                || (option == ZMQ_TCP_KEEPALIVE_IDLE)
+                || (option == ZMQ_TCP_KEEPALIVE_CNT)
+                || (option == ZMQ_TCP_KEEPALIVE_INTVL)
+#endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+                || (option == ZMQ_SNDBUF)
+                || (option == ZMQ_RCVBUF)
+                || (option == ZMQ_SNDHWM)
+                || (option == ZMQ_RCVHWM)
+#endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)    
             ) {
-                int ival = (int) optval;
+                int ival = (int) value;
                 size_t optvallen = sizeof(ival);
                 rc = zmq_setsockopt (s, option, &ival, optvallen);
             } else
 #endif
             {
+                uint64_t optval = (uint64_t) value;
                 size_t optvallen = sizeof(optval);
                 rc = zmq_setsockopt (s, option, &optval, optvallen);
             }
@@ -346,6 +384,38 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_bind (JNIEnv *env,
 }
 
 /**
+ * Called by Java's Socket::unbind(String addr).
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_unbind (JNIEnv *env,
+                                                               jobject obj,
+                                                               jstring addr)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+    void *s = get_socket (env, obj, 1);
+
+    if (addr == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    const char *c_addr = env->GetStringUTFChars (addr, NULL);
+    if (c_addr == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    int rc = zmq_unbind (s, c_addr);
+    int err = zmq_errno();
+    env->ReleaseStringUTFChars (addr, c_addr);
+
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
+#endif
+}
+
+/**
  * Called by Java's Socket::connect(String addr).
  */
 JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_connect (JNIEnv *env,
@@ -373,6 +443,38 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_connect (JNIEnv *env,
         raise_exception (env, err);
         return;
     }
+}
+
+/**
+ * Called by Java's Socket::disconnect(String addr).
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_disconnect (JNIEnv *env,
+                                                                   jobject obj,
+                                                                   jstring addr)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+    void *s = get_socket (env, obj, 1);
+
+    if (addr == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    const char *c_addr = env->GetStringUTFChars (addr, NULL);
+    if (c_addr == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    int rc = zmq_disconnect (s, c_addr);
+    int err = zmq_errno();
+    env->ReleaseStringUTFChars (addr, c_addr);
+
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
+#endif
 }
 
 /**
