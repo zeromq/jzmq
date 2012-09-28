@@ -279,6 +279,10 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_TCP_KEEPALIVE_CNT)
                 || (option == ZMQ_TCP_KEEPALIVE_INTVL)
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+                || (option == ZMQ_SNDBUF)
+                || (option == ZMQ_RCVBUF)
+#endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)    
             ) {
                 int ival = (int) value;
