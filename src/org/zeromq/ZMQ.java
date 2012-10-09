@@ -285,6 +285,17 @@ public class ZMQ {
     }
 
     /**
+     * Create a new Context from an existing zmq context, e.g. for sharing contexts between independent libraries
+     *
+     * @param contextAddress
+     *            A pointer to the existing context
+     * @return the Context
+     */
+    public static Context context (long contextAddress) {
+        return new Context (contextAddress);
+    }
+
+    /**
      * Inner class: Context.
      */
     public static class Context {
@@ -337,6 +348,19 @@ public class ZMQ {
         protected Context (int ioThreads) {
             construct (ioThreads);
         }
+
+        /**
+         * Class constructor.
+         *
+         * @param cContextAddr
+         *           the address of a prexisting zmq context
+         */
+        protected Context (long contextAddress) {
+            initialize (contextAddress);
+        }
+
+        /** Initialize the JNI interfaece with pre-existing zmq context **/
+        protected native void initialize (long contextAddress);
 
         /** Initialize the JNI interface */
         protected native void construct (int ioThreads);
