@@ -62,6 +62,27 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
 }
 
 /**
+ * Called to initialize a Java Context with a pre-existing zmq context
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_initialize (JNIEnv *env,
+                                                                    jobject obj,
+                                                                    jlong ctx_addr)
+{
+    void *c = get_context (env, obj, 0);
+    if (c)
+        return;
+
+    c = (void *) ctx_addr;
+    put_context (env, obj, c);
+
+    if (c == NULL) {
+        raise_exception (env, 1);
+        return;
+    }
+}
+
+
+/**
  * Called to destroy a Java Context object.
  */
 JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_finalize (JNIEnv *env,
