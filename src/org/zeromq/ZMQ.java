@@ -1116,6 +1116,9 @@ public class ZMQ {
                     bind(String.format("%s:%s", addr, port));
                     return port;
                 } catch (ZMQException e) {
+                    if (e.getErrorCode() != ZMQ.EADDRINUSE) {
+                        throw e;
+                    }
                     continue;
                 }
             }
