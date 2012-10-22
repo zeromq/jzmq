@@ -19,6 +19,7 @@
 package org.zeromq;
 
 import java.util.LinkedList;
+import java.util.Random;
 
 /**
  * ZeroMQ JNI Bindings.
@@ -1053,6 +1054,77 @@ public class ZMQ {
          *            the endpoint to bind to.
          */
         public native void bind (String addr);
+
+        /**
+         * Bind to network interface to a random port. Start listening for new
+         * connections.
+         *
+         * @param addr
+         *            the endpoint to bind to.
+         */
+        public int bindToRandomPort(String addr) {
+            return bindToRandomPort(addr, 2000, 20000, 100);
+        }
+
+        /**
+         * Bind to network interface to a random port. Start listening for new
+         * connections.
+         *
+         * @param addr
+         *            the endpoint to bind to.
+         * @param min_port
+         *            The minimum port in the range of ports to try.
+         */
+        public int bindToRandomPort(String addr, int min_port) {
+            return bindToRandomPort(addr, min_port, 20000, 100);
+        }
+
+        /**
+         * Bind to network interface to a random port. Start listening for new
+         * connections.
+         *
+         * @param addr
+         *            the endpoint to bind to.
+         * @param min_port
+         *            The minimum port in the range of ports to try.
+         * @param max_port
+         *            The maximum port in the range of ports to try.
+         */
+        public int bindToRandomPort(String addr, int min_port, int max_port) {
+            return bindToRandomPort(addr, min_port, max_port, 100);
+        }
+
+        /**
+         * Bind to network interface to a random port. Start listening for new
+         * connections.
+         *
+         * @param addr
+         *            the endpoint to bind to.
+         * @param min_port
+         *            The minimum port in the range of ports to try.
+         * @param max_port
+         *            The maximum port in the range of ports to try.
+         * @param max_tries
+         *            The number of attempt to bind.
+         */
+        public int bindToRandomPort(String addr, int min_port, int max_port,
+                int max_tries) {
+            int port;
+            Random rand = new Random();
+            for (int i = 0; i < max_tries; i++) {
+                port = rand.nextInt(max_port - min_port + 1) - min_port;
+                try {
+                    bind(String.format("%s:%s", addr, port));
+                    return port;
+                } catch (ZMQException e) {
+                    if (e.getErrorCode() != ZMQ.EADDRINUSE()) {
+                        throw e;
+                    }
+                    continue;
+                }
+            }
+            throw new ZMQException("Could not bind socket to random port.", (int) ZMQ.EADDRINUSE());
+        }
 
         /**
          * Unbind from network interface. Stop listening for connections.
