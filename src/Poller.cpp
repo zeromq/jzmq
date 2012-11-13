@@ -28,6 +28,8 @@
 
 static void *fetch_socket (JNIEnv *env,
                            jobject socket);
+static int fetch_socket_fd (JNIEnv *env,
+                           jobject socket);
 
 
 JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
@@ -70,16 +72,26 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
                 jobject s_0mq = env->GetObjectArrayElement (socket_0mq, i);
                 if (!s_0mq)
                     continue;
-                void *s = fetch_socket (env, s_0mq);
-                if (s == NULL) {
+                void *s = NULL; 
+                int fd = fetch_socket_fd (env, s_0mq);
+                if (fd < 0) {
                     raise_exception (env, EINVAL);
                     continue;
+                } else if (fd == 0) {
+                    s = fetch_socket (env, s_0mq);
+                    if ( s == NULL ) {
+                        raise_exception (env, EINVAL);
+                        continue;
+                    }
                 }
+
                 pitem [pc].socket = s;
-                pitem [pc].fd = 0;
+                pitem [pc].fd = fd;
                 pitem [pc].events = e_0mq [i];
                 pitem [pc].revents = 0;
                 ++pc;
+
+                env->DeleteLocalRef (s_0mq);
             }
             env->ReleaseShortArrayElements(event_0mq, e_0mq, 0);
         }
@@ -93,7 +105,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
     }
 
     //  Set 0MQ results.
-    if (ls_0mq > 0) {
+    if (rc > 0 && ls_0mq > 0) {
         jshort *r_0mq = env->GetShortArrayElements (revent_0mq, 0);
         if (r_0mq) {
             for (int i = 0; i < ls_0mq; ++i) {
@@ -102,6 +114,8 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
                     continue;
                 r_0mq [i] = pitem [pc].revents;
                 ++pc;
+
+                env->DeleteLocalRef (s_0mq);
             }
             env->ReleaseShortArrayElements(revent_0mq, r_0mq, 0);
         }
@@ -135,4 +149,38 @@ static void *fetch_socket (JNIEnv *env,
     }
   
     return s;
+}
+
+/**
+ * Get the file descriptor id of java.net.Socket.
+ * returns 0 if socket is not a SelectableChannel
+ * returns the file descriptor id or -1 on an error
+ */
+static int fetch_socket_fd (JNIEnv *env, jobject socket){
+
+    static jclass channel_cls = NULL;
+    jclass cls;
+    jfieldID fid;
+    if (channel_cls == NULL) {
+        cls = env->FindClass ("java/nio/channels/SelectableChannel");
+        assert (cls);
+        channel_cls = (jclass) env->NewGlobalRef (cls);
+        env->DeleteLocalRef (cls);
+        assert (channel_cls);
+    }
+    if (!env->IsInstanceOf (socket, channel_cls)) 
+        return 0;
+
+    cls = env->GetObjectClass (socket);
+    assert (cls);
+
+    fid = env->GetFieldID (cls, "fdVal", "I");
+    env->DeleteLocalRef (cls);
+    if (fid == NULL)
+        return -1;
+
+    /* return the descriptor */
+    int fd = env->GetIntField (socket, fid);
+
+    return fd;
 }

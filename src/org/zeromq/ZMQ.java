@@ -18,6 +18,7 @@
 */
 package org.zeromq;
 
+import java.nio.channels.SelectableChannel;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -1316,6 +1317,17 @@ public class ZMQ {
         }
 
         /**
+         * Register a Channel for polling on all events.
+         * 
+         * @param channel
+         *            the Channel we are registering.
+         * @return the index identifying this Channel in the poll set.
+         */
+        public int register (SelectableChannel channel) {
+            return register (channel, POLLIN | POLLOUT | POLLERR);
+        }
+        
+        /**
          * Register a Socket for polling on the specified events.
          *
          * Automatically grow the internal representation if needed.
@@ -1327,6 +1339,36 @@ public class ZMQ {
          * @return the index identifying this Socket in the poll set.
          */
         public int register (Socket socket, int events) {
+            return registerInternal (socket, events);
+        }
+        
+        /**
+         * Register a Channel for polling on the specified events.
+         *
+         * Automatically grow the internal representation if needed.
+         * 
+         * @param socket
+         *            the Channel we are registering.
+         * @param events
+         *            a mask composed by XORing POLLIN, POLLOUT and POLLERR.
+         * @return the index identifying this Channel in the poll set.
+         */
+        public int register (SelectableChannel channel, int events) {
+            return registerInternal (channel, events);
+        }
+        
+        /**
+         * Register a Socket for polling on the specified events.
+         *
+         * Automatically grow the internal representation if needed.
+         * 
+         * @param socket
+         *            the Socket we are registering.
+         * @param events
+         *            a mask composed by XORing POLLIN, POLLOUT and POLLERR.
+         * @return the index identifying this Socket in the poll set.
+         */
+        private int registerInternal (Object socket, int events) {
             int pos = -1;
 
             if (! this.freeSlots.isEmpty()) {
@@ -1341,7 +1383,7 @@ public class ZMQ {
                     int nsize = this.size + SIZE_INCREMENT;
 
                     // Create new internal arrays.
-                    Socket [] ns = new Socket [nsize];
+                    Object [] ns = new Object [nsize];
                     short [] ne = new short [nsize];
                     short [] nr = new short [nsize];
                     
@@ -1374,6 +1416,26 @@ public class ZMQ {
          *          the Socket to be unregistered
          */
         public void unregister (Socket socket) {
+            unregisterInternal (socket);
+        }
+        
+        /**
+         * Unregister a Channel for polling on the specified events.
+         *
+         * @param socket 
+         *          the Channel to be unregistered
+         */
+        public void unregister (SelectableChannel channel) {
+            unregisterInternal (channel);
+        }
+        
+        /**
+         * Unregister a Socket for polling on the specified events.
+         *
+         * @param socket 
+         *          the Socket to be unregistered
+         */
+        private void unregisterInternal (Object socket) {
             for (int i = 0; i < this.next; ++i) {
                 if (this.sockets[i] == socket) {
                     this.sockets[i] = null;
@@ -1398,7 +1460,7 @@ public class ZMQ {
         public Socket getSocket (int index) {
             if (index < 0 || index >= this.next)
                 return null;
-            return this.sockets [index];
+            return (Socket) this.sockets [index];
         }
 
         /**
@@ -1547,7 +1609,7 @@ public class ZMQ {
             this.size = size;
             this.next = 0;
 
-            this.sockets = new Socket [this.size];
+            this.sockets = new Object [this.size];
             this.events = new short [this.size];
             this.revents = new short [this.size];
 
@@ -1572,7 +1634,7 @@ public class ZMQ {
          * @see http://api.zeromq.org/2-1:zmq-poll
          * @see http://api.zeromq.org/3-0:zmq-poll
          */
-        private native long run_poll (int count, Socket [] sockets, short [] events, short [] revents, long timeout);
+        private native long run_poll (int count, Object [] sockets, short [] events, short [] revents, long timeout);
 
         /**
          * Check whether a specific mask was signalled by latest poll call.
@@ -1589,13 +1651,13 @@ public class ZMQ {
             }
             return (this.revents [index] & mask) > 0;
         }
-
+        
         private Context context = null;
         private long timeout = -2; // mark as uninitialized
         private int size = 0;
         private int next = 0;
         private int used = 0;
-        private Socket [] sockets = null;
+        private Object [] sockets = null;
         private short [] events = null;
         private short [] revents = null;
         // When socket is removed from polling, store free slots here
