@@ -1163,6 +1163,47 @@ public class ZMQ {
         public native boolean send (byte [] msg, int flags);
 
         /**
+         * Send a String.
+         * 
+         * @param msg
+         *            the message to send, as a String.
+         * @return true if send was successful, false otherwise.
+         */
+
+        public boolean send (String msg)
+        {
+            return send (msg.getBytes (), 0);
+        }
+
+        /**
+         * Send a String.
+         * 
+         * @param msg
+         *            the message to send, as a String.
+         * @return true if send was successful, false otherwise.
+         */
+
+        public boolean sendMore (String msg)
+        {
+            return send (msg.getBytes (), SNDMORE);
+        }
+
+        /**
+         * Send a String.
+         * 
+         * @param msg
+         *            the message to send, as a String.
+         * @param flags
+         *            the flags to apply to the send operation.
+         * @return true if send was successful, false otherwise.
+         */
+
+        public boolean send (String msg, int flags)
+        {
+            return send (msg.getBytes (), flags);
+        }
+        
+        /**
          * Receive a message.
          * 
          * @param flags
@@ -1188,6 +1229,35 @@ public class ZMQ {
          */
         public native int recv (byte[] buffer, int offset, int len, int flags);
 
+        /**
+         * Receive a message as a String.
+         * 
+         * @return the message received, as a String; null on error.
+         */
+
+        public String recvStr ()
+        {
+            return recvStr (0);
+        }
+        
+        /**
+         * Receive a message as a String.
+         * 
+         * @param flags
+         *            the flags to apply to the receive operation.
+         * @return the message received, as a String; null on error.
+         */
+
+        public String recvStr (int flags)
+        {
+            byte [] data = recv (flags);
+            
+            if (data == null)
+                return null;
+            
+            return new String (data);
+        }
+        
         /**
          * Class constructor.
          * 
@@ -1292,6 +1362,8 @@ public class ZMQ {
         private static final int KEEPALIVECNT = 35;
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
+
+
     }
 
     /**
