@@ -1113,7 +1113,7 @@ public class ZMQ {
             int port;
             Random rand = new Random();
             for (int i = 0; i < max_tries; i++) {
-                port = rand.nextInt(max_port - min_port + 1) - min_port;
+                port = rand.nextInt(max_port - min_port + 1) + min_port;
                 try {
                     bind(String.format("%s:%s", addr, port));
                     return port;
