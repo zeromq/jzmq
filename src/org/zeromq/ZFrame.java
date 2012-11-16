@@ -108,8 +108,10 @@ public class ZFrame {
 	 * 			0MQ socket to send on
 	 * @param flags
 	 * 			Valid send() method flags, defined in org.zeromq.ZMQ class
+	 * @return
+	 * 			True if success, else False
 	 */
-	private void send(Socket socket, int flags) {
+	private boolean send(Socket socket, int flags) {
 		if (socket == null) {
 			throw new IllegalArgumentException("socket parameter must be set");
 		}
@@ -119,7 +121,7 @@ public class ZFrame {
 		
 		// Note the jzmq Socket.cpp JNI class does a memcpy of the byte data before calling
 		// the 0MQ send function, so don't have to clone the message data again here.
-		socket.send(data, flags);
+		return socket.send(data, flags);
 	}
 	
 	/**
@@ -129,9 +131,11 @@ public class ZFrame {
 	 * 			0MQ socket to send frame
 	 * @param flags
 	 * 			Valid send() method flags, defined in org.zeromq.ZMQ class	
+	 * @return
+	 * 			True if success, else False
 	 */
-	public void sendAndKeep(Socket socket, int flags) {
-		send(socket, flags);
+	public boolean sendAndKeep(Socket socket, int flags) {
+		return send(socket, flags);
 	}
 	
 	/**
@@ -140,9 +144,11 @@ public class ZFrame {
 	 * Uses default behaviour of Socket.send() method, with no flags set
 	 * @param socket	
 	 * 			0MQ socket to send frame
+	 * @return
+	 * 			True if success, else False
 	 */
-	public void sendAndKeep(Socket socket) {
-		sendAndKeep(socket, 0);		
+	public boolean sendAndKeep(Socket socket) {
+		return sendAndKeep(socket, 0);		
 	}
 
 	/**
@@ -152,10 +158,14 @@ public class ZFrame {
 	 * 			0MQ socket to send frame
 	 * @param flags
 	 * 			Valid send() method flags, defined in org.zeromq.ZMQ class	
+	 * @return
+	 * 			True if success, else False
 	 */
-	public void sendAndDestroy(Socket socket, int flags) {
-		send(socket, flags);
-		destroy();
+	public boolean sendAndDestroy(Socket socket, int flags) {
+		boolean ret = send(socket, flags);
+		if (ret)
+		    destroy ();
+		return ret;
 	}
 
 	/**
@@ -164,9 +174,11 @@ public class ZFrame {
 	 * Uses default behaviour of Socket.send() method, with no flags set
 	 * @param socket
 	 * 			0MQ socket to send frame
+	 * @return
+	 * 			True if success, else False
 	 */
-	public void sendAndDestroy(Socket socket) {
-		sendAndDestroy(socket, 0);
+	public boolean sendAndDestroy(Socket socket) {
+		return sendAndDestroy(socket, 0);
 	}
 	
 	/**
