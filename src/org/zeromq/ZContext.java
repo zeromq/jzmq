@@ -105,7 +105,13 @@ public class ZContext {
 			return;
 		
 		if (sockets.contains(s)) {
-			s.setLinger(linger);
+			try {
+				s.setLinger(linger);
+			} catch (ZMQException e) {
+				if (e.getErrorCode() != ZMQ.ETERM()) {
+					throw e;
+				}
+			}
 			s.close();
 			sockets.remove(s);
 		}
@@ -121,7 +127,7 @@ public class ZContext {
 	public static ZContext shadow(ZContext ctx) {
 		ZContext shadow = new ZContext();
 		shadow.setContext(ctx.getContext());
-        shadow.setMain (false);
+		shadow.setMain (false);
 		return shadow;
 	}
 	

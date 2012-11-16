@@ -45,7 +45,13 @@ public class ZThread
         public void run () 
         {
             if (attachedRunnable != null) {
-                attachedRunnable.run (args, ctx, pipe);
+                try {
+                    attachedRunnable.run (args, ctx, pipe);
+                } catch (ZMQException e) {
+                    if (e.getErrorCode() != ZMQ.ETERM()) {
+                        throw e;
+                    }
+                }
                 ctx.destroy ();
             } else
                 detachedRunnable.run (args);
@@ -74,7 +80,6 @@ public class ZThread
         Socket pipe = ctx.createSocket (ZMQ.PAIR);
         
         if (pipe != null) {
-            pipe.setHWM (1);
             pipe.bind (String.format ("inproc://zctx-pipe-%d", pipe.hashCode ()));
         } else {
             return null;
