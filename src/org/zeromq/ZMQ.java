@@ -1156,11 +1156,27 @@ public class ZMQ {
          * 
          * @param msg
          *            the message to send, as an array of bytes.
+         * @param offset
+         *            the offset of the message to send.
          * @param flags
          *            the flags to apply to the send operation.
          * @return true if send was successful, false otherwise.
          */
-        public native boolean send (byte [] msg, int flags);
+        public native boolean send(byte [] msg, int offset, int flags);
+
+        /**
+         * Send a message.
+         * 
+         * @param msg
+         *            the message to send, as an array of bytes.
+         * @param flags
+         *            the flags to apply to the send operation.
+         * @return true if send was successful, false otherwise.
+         */
+        public boolean send(byte [] msg, int flags)
+        {
+            return send(msg, 0, flags);
+        }
 
         /**
          * Send a String.
