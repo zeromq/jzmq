@@ -124,6 +124,19 @@
 				<native.library-path.resolved>..${file.separator}..${file.separator}${native.library-path}</native.library-path.resolved>
 			</properties>
 		</profile>
+		<profile>
+			<id>deploy-local-maven</id>
+            <distributionManagement>
+                <repository>
+                    <id>maven.releases</id>
+                    <url>${env.RELEASE_REPO}</url>
+                </repository>
+                <snapshotRepository>
+                    <id>maven.snapshots</id>
+                    <url>${env.SNAPSHOT_REPO}</url>
+                </snapshotRepository>
+            </distributionManagement>
+		</profile>
 	</profiles>
 
 	<dependencies>
