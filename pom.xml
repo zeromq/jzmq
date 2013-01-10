@@ -11,7 +11,7 @@
 
 	<groupId>org.zeromq</groupId>
 	<artifactId>jzmq</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>2.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>jzmq</name>
 
@@ -123,6 +123,19 @@
 				<native.path.resolved>..${file.separator}..${file.separator}${native.path}</native.path.resolved>
 				<native.library-path.resolved>..${file.separator}..${file.separator}${native.library-path}</native.library-path.resolved>
 			</properties>
+		</profile>
+		<profile>
+			<id>deploy-local-maven</id>
+            <distributionManagement>
+                <repository>
+                    <id>maven.releases</id>
+                    <url>${env.RELEASE_REPO}</url>
+                </repository>
+                <snapshotRepository>
+                    <id>maven.snapshots</id>
+                    <url>${env.SNAPSHOT_REPO}</url>
+                </snapshotRepository>
+            </distributionManagement>
 		</profile>
 	</profiles>
 
