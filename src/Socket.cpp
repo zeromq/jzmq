@@ -478,16 +478,22 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_disconnect (JNIEnv *env,
 }
 
 /**
- * Called by Java's Socket::send(byte [] msg, int flags).
+ * Called by Java's Socket::send(byte [] msg, int offset, int flags).
  */
 JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
                                                                  jobject obj,
                                                                  jbyteArray msg,
+                                                                 jint offset,
                                                                  jint flags)
 {
     void *s = get_socket (env, obj, 1);
 
-    jsize size = env->GetArrayLength (msg); 
+    jsize size = env->GetArrayLength (msg) - offset; 
+    if (size <= 0) {
+        raise_exception(env, EINVAL);
+        return JNI_FALSE;
+    }
+
     zmq_msg_t message;
     int rc = zmq_msg_init_size (&message, size);
     int err = zmq_errno();
@@ -502,7 +508,7 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
         return JNI_FALSE;
     }
 
-    memcpy (zmq_msg_data (&message), data, size);
+    memcpy (zmq_msg_data (&message), data + offset, size);
     env->ReleaseByteArrayElements (msg, data, 0);
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     rc = zmq_sendmsg (s, &message, flags);

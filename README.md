@@ -20,7 +20,7 @@ $ rpmbuild -tb jzmq-X.Y.Z.tar.gz
 
 Where X.Y.Z is replaced with the version that you've downloaded.
 
-If your zmq installation is not found by configure you can add this information manually e.g. `--with-zeromq=/usr/local/lib`.
+If your zmq installation is not found by configure you can add this information manually e.g. `--with-zeromq=/usr/local`.
 
 You may want to take a look at http://www.zeromq.org/docs:tuning-zeromq for additional hints.
 

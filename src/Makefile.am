@@ -9,7 +9,8 @@ JZMQ_JAVA_FILES = \
 	org/zeromq/ZMQStreamer.java \
 	org/zeromq/ZContext.java \
 	org/zeromq/ZFrame.java \
-	org/zeromq/ZMsg.java
+	org/zeromq/ZMsg.java \
+	org/zeromq/EmbeddedLibraryTools.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \
