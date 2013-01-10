@@ -39,6 +39,7 @@ This package contains Java Bindings for ZeroMQ related development libraries and
 %prep
 %setup -q
 
+./autogen.sh
 %build
 %configure
 
