@@ -489,7 +489,7 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     void *s = get_socket (env, obj, 1);
 
     jsize size = env->GetArrayLength (msg) - offset; 
-    if (size <= 0) {
+    if (size < 0) {
         raise_exception(env, EINVAL);
         return JNI_FALSE;
     }
