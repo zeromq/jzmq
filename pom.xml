@@ -66,6 +66,8 @@
 		<junit.version>4.8.2</junit.version>
 
 		<native.arch>${os.arch}</native.arch>
+		<native.distro></native.distro>
+		<native.zmq.version></native.zmq.version>
 		<native.path.resolved>${native.path}</native.path.resolved>
 		<native.library-path.resolved>${native.library-path}</native.library-path.resolved>
 	</properties>
@@ -114,6 +116,28 @@
 				<native.path>src/.libs/libjzmq.dylib</native.path>
 				<!-- Use platform-specific path separators here: -->
 				<native.library-path>src/.libs/</native.library-path>
+			</properties>
+		</profile>
+		<profile>
+			<id>os-distro</id>
+			<activation>
+				<property>
+					<name>os.distro</name>
+				</property>
+			</activation>
+			<properties>
+                <native.distro>-${os.distro}</native.distro>
+			</properties>
+		</profile>
+		<profile>
+			<id>zmq-version</id>
+			<activation>
+				<property>
+					<name>zmq.version</name>
+				</property>
+			</activation>
+			<properties>
+                <native.zmq.version>-${zmq.version}</native.zmq.version>
 			</properties>
 		</profile>
 
@@ -203,6 +227,7 @@
 					<pushChanges>false</pushChanges>
 					<releaseProfiles>release</releaseProfiles>
 					<tagNameFormat>v@{project.version}</tagNameFormat>
+					<arguments>-Dos.distro=${os.distro} -Dzmq.version=${zmq.version}</arguments>
 				</configuration>
 			</plugin>
 
