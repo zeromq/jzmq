@@ -117,4 +117,21 @@ public class ZMQTest
         }
     }
 
+    /**
+     * Test method for various set/get options.
+     */
+    @Test
+    public void testSetOption ()
+    {
+        ZMQ.Context context = ZMQ.context(1);
+
+        ZMQ.Socket sock = context.socket(ZMQ.REQ);
+
+        sock.setIPv4Only (false);
+        assertEquals (false, sock.getIPv4Only ());
+
+        sock.setIPv4Only (true);
+        assertEquals (true, sock.getIPv4Only ());
+    }
+
 }
