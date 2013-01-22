@@ -696,6 +696,15 @@ public class ZMQ {
         }
 
         /**
+         * @see #setIPv4only(long)
+         *
+         * @return the IPv4 only socket.
+         */
+        public boolean getIPv4Only () {
+            return getLongSockopt (IPV4ONLY) == 1;
+        }
+
+        /**
          * The 'ZMQ_RCVMORE' option shall return a boolean value indicating if the multi-part
          * message currently being read from the specified 'socket' has more message parts to
          * follow. If there are no message parts to follow or if the message currently being read is
@@ -1049,6 +1058,18 @@ public class ZMQ {
         }
 
         /**
+         * The 'ZMQ_IPV4ONLY' option shall set the underlying native socket type.
+         * A value of true will use IPv4 sockets,
+         * while the value of false will use IPv6 sockets. An IPv6 socket lets
+         * applications connect to and accept connections from both IPv4 and IPv6 hosts.
+         *
+         * @param v4only
+         */
+        public void setIPv4Only (boolean v4only) {
+            setLongSockopt (IPV4ONLY, v4only ? 1L: 0L);
+        }
+
+        /**
          * Bind to network interface. Start listening for new connections.
          * 
          * @param addr
@@ -1374,6 +1395,7 @@ public class ZMQ {
         private static final int MULTICAST_HOPS = 25;
         private static final int RCVTIMEO = 27;
         private static final int SNDTIMEO = 28;
+        private static final int IPV4ONLY = 31;
         private static final int KEEPALIVE = 34;
         private static final int KEEPALIVECNT = 35;
         private static final int KEEPALIVEIDLE = 36;

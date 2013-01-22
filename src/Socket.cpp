@@ -130,6 +130,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
     case ZMQ_TCP_KEEPALIVE_IDLE:
     case ZMQ_TCP_KEEPALIVE_CNT:
     case ZMQ_TCP_KEEPALIVE_INTVL:
+    case ZMQ_IPV4ONLY:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
@@ -148,6 +149,7 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *
                 || (option == ZMQ_TCP_KEEPALIVE_IDLE)
                 || (option == ZMQ_TCP_KEEPALIVE_CNT)
                 || (option == ZMQ_TCP_KEEPALIVE_INTVL)
+                || (option == ZMQ_IPV4ONLY)
             ) {
                 int optval = 0;
                 size_t optvallen = sizeof(optval);
@@ -250,6 +252,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_TCP_KEEPALIVE_IDLE:
     case ZMQ_TCP_KEEPALIVE_CNT:
     case ZMQ_TCP_KEEPALIVE_INTVL:
+    case ZMQ_IPV4ONLY:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
@@ -278,6 +281,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_TCP_KEEPALIVE_IDLE)
                 || (option == ZMQ_TCP_KEEPALIVE_CNT)
                 || (option == ZMQ_TCP_KEEPALIVE_INTVL)
+                || (option == ZMQ_IPV4ONLY)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
                 || (option == ZMQ_SNDBUF)
