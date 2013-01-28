@@ -51,9 +51,9 @@ public class ZMQTest
 
     sock.close();
     sock = context.socket(ZMQ.DEALER);
-    
+
     // Check that exception different of EADDRINUSE is not catched
-    
+
     // Invalid protocol
     try {
     	sock.bindToRandomPort("noprotocol://127.0.0.1");
@@ -153,11 +153,13 @@ public class ZMQTest
 
         ZMQ.Socket sock = context.socket(ZMQ.REQ);
 
-        sock.setIPv4Only (false);
-        assertEquals (false, sock.getIPv4Only ());
+        if (ZMQ.getFullVersion() >= ZMQ.makeVersion(3, 2, 0)) {
+            sock.setIPv4Only (false);
+            assertEquals (false, sock.getIPv4Only ());
 
-        sock.setIPv4Only (true);
-        assertEquals (true, sock.getIPv4Only ());
+            sock.setIPv4Only (true);
+            assertEquals (true, sock.getIPv4Only ());
+        }
     }
 
 }
