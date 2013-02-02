@@ -205,7 +205,31 @@ public class ZMQ {
                              version_minor (),
                              version_patch () );
     }
-  
+
+    /**
+     * Starts the built-in ØMQ proxy in the current application thread.
+     * The proxy connects a frontend socket to a backend socket. Conceptually, data flows from frontend to backend.
+     * Depending on the socket types, replies may flow in the opposite direction. The direction is conceptual only;
+     * the proxy is fully symmetric and there is no technical difference between frontend and backend.
+     *
+     * Before calling ZMQ.proxy() you must set any socket options, and connect or bind both frontend and backend sockets.
+     * The two conventional proxy models are:
+     *
+     * ZMQ.proxy() runs in the current thread and returns only if/when the current context is closed.
+     * @param frontend ZMQ.Socket
+     * @param backend ZMQ.Socket
+     * @param capture If the capture socket is not NULL, the proxy shall send all messages, received on both
+     *                frontend and backend, to the capture socket. The capture socket should be a
+     *                ZMQ_PUB, ZMQ_DEALER, ZMQ_PUSH, or ZMQ_PAIR socket.
+     * @since 3.2.2
+     */
+    public static void proxy (Socket frontend, Socket backend, Socket capture)
+    {
+        if (ZMQ.version_full() < ZMQ.make_version(3, 2, 2))
+            throw new UnsupportedOperationException ();
+
+        run_proxy (frontend, backend, capture);
+    }
 
     protected static native int version_full();
     protected static native int version_major();
@@ -224,8 +248,10 @@ public class ZMQ {
     protected static native long EMTHREAD();
     protected static native long EFSM();
     protected static native long ENOCOMPATPROTO();
-    protected static native long ETERM();         
-    
+    protected static native long ETERM();
+
+    private static native void run_proxy (Socket frontend, Socket backend, Socket capture);
+
     /**
      * Inner class: Error.
      */

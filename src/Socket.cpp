@@ -33,7 +33,7 @@ static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flag
 
 static void ensure_socket (JNIEnv *env,
                            jobject obj);
-static void *get_socket (JNIEnv *env,
+void *get_socket (JNIEnv *env,
                          jobject obj,
                          int do_assert);
 static void put_socket (JNIEnv *env,
@@ -672,7 +672,7 @@ static void ensure_socket (JNIEnv *env,
 /**
  * Get the value of Java's Socket::socketHandle.
  */
-static void *get_socket (JNIEnv *env,
+void *get_socket (JNIEnv *env,
                          jobject obj,
                          int do_assert)
 {

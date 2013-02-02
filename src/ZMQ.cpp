@@ -25,6 +25,9 @@
 #include "util.hpp"
 #include "org_zeromq_ZMQ.h"
 
+extern void *get_socket (JNIEnv *env,
+                         jobject obj,
+                         int do_assert);
 /**
  * Called by Java's ZMQ::version_full().
  */
@@ -179,4 +182,24 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ETERM (JNIEnv *env,
                                                    jclass cls)
 {
     return ETERM;
+}
+
+/**
+ * Called by Java's ZMQ::proxy().
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_run_1proxy (JNIEnv *env,
+                                                   jclass cls,
+                                                   jobject frontend_,
+                                                   jobject backend_,
+                                                   jobject capture_)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,2)
+    void *frontend = get_socket (env, frontend_, true);
+    void *backend = get_socket (env, backend_, true);
+    void *capture = NULL;
+    if (capture_ != NULL)
+        capture = get_socket (env, capture_, true);
+
+    zmq_proxy (frontend, backend, capture);
+#endif
 }
