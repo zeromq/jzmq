@@ -47,8 +47,8 @@ public class ZMQQueue implements Runnable, Closeable {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 // wait while there are either requests or replies to process
-                if (poller.poll(250000) < 1) {
-                    continue;
+                if (poller.poll(-1) < 0) {
+                    break;
                 }
 
                 // process a request

@@ -42,7 +42,8 @@ JZMQ_CLASS_FILES = \
 	org/zeromq/ZMQStreamer.class \
 	org/zeromq/ZContext.class \
 	org/zeromq/ZFrame.class \
-	org/zeromq/ZMsg.class
+	org/zeromq/ZMsg.class \
+	org/zeromq/ZThread.class
 
 JAVAH_FLAGS = -d . -classpath .
 

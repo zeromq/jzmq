@@ -33,7 +33,7 @@ static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flag
 
 static void ensure_socket (JNIEnv *env,
                            jobject obj);
-static void *get_socket (JNIEnv *env,
+void *get_socket (JNIEnv *env,
                          jobject obj,
                          int do_assert);
 static void put_socket (JNIEnv *env,
@@ -253,6 +253,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_TCP_KEEPALIVE_CNT:
     case ZMQ_TCP_KEEPALIVE_INTVL:
     case ZMQ_IPV4ONLY:
+    case ZMQ_ROUTER_MANDATORY:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
@@ -282,6 +283,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_TCP_KEEPALIVE_CNT)
                 || (option == ZMQ_TCP_KEEPALIVE_INTVL)
                 || (option == ZMQ_IPV4ONLY)
+                || (option == ZMQ_ROUTER_MANDATORY)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
                 || (option == ZMQ_SNDBUF)
@@ -303,7 +305,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
             }
             err = zmq_errno();
 
-            if (rc != 0) {
+            if (rc != 0 && err != ETERM) {
                 raise_exception (env, err);
             }
             return;
@@ -520,7 +522,7 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     rc = zmq_send (s, &message, flags);
 #endif
     err = zmq_errno();
-        
+
     if (rc < 0 && err == EAGAIN) {
         rc = zmq_msg_close (&message);
         err = zmq_errno();
@@ -672,7 +674,7 @@ static void ensure_socket (JNIEnv *env,
 /**
  * Get the value of Java's Socket::socketHandle.
  */
-static void *get_socket (JNIEnv *env,
+void *get_socket (JNIEnv *env,
                          jobject obj,
                          int do_assert)
 {
