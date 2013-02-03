@@ -161,6 +161,9 @@ public class ZMQTest
             sock.setIPv4Only (true);
             assertEquals (true, sock.getIPv4Only ());
         }
+        sock.close ();
+
+        context.term ();
     }
 
     static class Client extends Thread {
@@ -283,4 +286,33 @@ public class ZMQTest
 
         ctx.term();
     }
+
+    /**
+     * Test method for Router Mandatory
+     */
+    @Test
+    public void testRouterMandatory ()
+    {
+        if (ZMQ.getFullVersion() < ZMQ.makeVersion(3, 2, 0))
+            return;
+
+        ZMQ.Context context = ZMQ.context(1);
+
+        ZMQ.Socket sock = context.socket(ZMQ.ROUTER);
+        boolean ret = sock.sendMore ("UNREACHABLE");
+        assertEquals (true, ret);
+        sock.send ("END");
+
+        sock.setRouterMandatory (true);
+        try {
+            sock.sendMore ("UNREACHABLE");
+            assertFalse (true);
+        } catch (ZMQException e) {
+            assertEquals (ZMQ.EHOSTUNREACH (), e.getErrorCode ());
+        }
+
+        sock.close ();
+        context.term ();
+    }
+
 }

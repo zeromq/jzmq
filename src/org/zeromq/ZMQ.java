@@ -245,6 +245,7 @@ public class ZMQ {
     protected static native long EADDRNOTAVAIL();
     protected static native long ECONNREFUSED();
     protected static native long EINPROGRESS();
+    protected static native long EHOSTUNREACH();
     protected static native long EMTHREAD();
     protected static native long EFSM();
     protected static native long ENOCOMPATPROTO();
@@ -272,6 +273,8 @@ public class ZMQ {
             ECONNREFUSED(ECONNREFUSED()),
 		
             EINPROGRESS(EINPROGRESS()),
+
+            EHOSTUNREACH(EHOSTUNREACH()),
 		
             EMTHREAD(EMTHREAD()),
 		
@@ -656,7 +659,7 @@ public class ZMQ {
          * values, it will wait for a message for that amount of time before returning with
          * an EAGAIN error.
          * 
-         * @param timeout
+         * @param timeout Timeout for receive operation in milliseconds. Default -1 (infinite)
          */
         public void setReceiveTimeOut (int timeout) {
             if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
@@ -668,7 +671,7 @@ public class ZMQ {
         /**
          * @see #setReceiveTimeOut(long)
          * 
-         * @return the Receive Timeout
+         * @return the Receive Timeout in milliseconds
          */
         public int getReceiveTimeOut () {
 			if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
@@ -682,8 +685,8 @@ public class ZMQ {
          * If the value is -1, it will block until the message is sent. For all other
          * values, it will try to send the message for that amount of time before
          * returning with an EAGAIN error.
-         * 
-         * @param timeout
+         *
+         * @param timeout Timeout for send operation in milliseconds. Default -1 (infinite)
          */
         public void setSendTimeOut (int timeout) {
             if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
@@ -695,7 +698,7 @@ public class ZMQ {
         /**
          * @see #setSendTimeOut(long)
          * 
-         * @return the Send Timeout.
+         * @return the Send Timeout. in milliseconds
          */
         public int getSendTimeOut () {
 			if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
@@ -1085,14 +1088,22 @@ public class ZMQ {
 
         /**
          * The 'ZMQ_IPV4ONLY' option shall set the underlying native socket type.
-         * A value of true will use IPv4 sockets,
-         * while the value of false will use IPv6 sockets. An IPv6 socket lets
-         * applications connect to and accept connections from both IPv4 and IPv6 hosts.
+         * An IPv6 socket lets applications connect to and accept connections from both IPv4 and IPv6 hosts.
          *
-         * @param v4only
+         * @param v4only A value of true will use IPv4 sockets, while the value of false will use IPv6 sockets
          */
         public void setIPv4Only (boolean v4only) {
             setLongSockopt (IPV4ONLY, v4only ? 1L: 0L);
+        }
+
+        /**
+         * Sets the ROUTER socket behavior when an unroutable message is encountered.
+         *
+         * @param mandatory A value of false is the default and discards the message silently when it cannot be routed.
+         *                  A value of true returns an EHOSTUNREACH error code if the message cannot be routed.
+         */
+        public void setRouterMandatory (boolean mandatory) {
+            setLongSockopt (ROUTER_MANDATORY, mandatory ? 1L : 0L);
         }
 
         /**
@@ -1422,6 +1433,7 @@ public class ZMQ {
         private static final int RCVTIMEO = 27;
         private static final int SNDTIMEO = 28;
         private static final int IPV4ONLY = 31;
+        private static final int ROUTER_MANDATORY = 33;
         private static final int KEEPALIVE = 34;
         private static final int KEEPALIVECNT = 35;
         private static final int KEEPALIVEIDLE = 36;

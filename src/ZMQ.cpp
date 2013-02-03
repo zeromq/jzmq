@@ -149,6 +149,15 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EINPROGRESS (JNIEnv *env,
 }
 
 /**
+ * Called by Java's ZMQ::EHOSTUNREACH().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EHOSTUNREACH (JNIEnv *env,
+                                                         jclass cls)
+{
+    return EHOSTUNREACH;
+}
+
+/**
  * Called by Java's ZMQ::EMTHREAD().
  */
 JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_EMTHREAD (JNIEnv *env,
