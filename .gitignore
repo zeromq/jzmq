@@ -2,8 +2,10 @@ src/zmq.jar
 src/Zmq.jar
 perf/zmq-perf.jar
 Makefile
+aclocal.m4
 autom4te.cache
 autoscan.log
+configure
 config.log
 config.status
 configure.scan
