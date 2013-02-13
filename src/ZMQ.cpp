@@ -194,6 +194,15 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ETERM (JNIEnv *env,
 }
 
 /**
+ * Called by Java's ZMQ::ENOTSOCK().
+ */
+JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_ENOTSOCK (JNIEnv *env,
+                                                      jclass cls)
+{
+    return ENOTSOCK;
+}
+
+/**
  * Called by Java's ZMQ::proxy().
  */
 JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_run_1proxy (JNIEnv *env,
