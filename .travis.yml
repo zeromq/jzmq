@@ -1,0 +1,16 @@
+before_install:
+ - sudo add-apt-repository ppa:chris-lea/zeromq -y
+ - sudo apt-get update -y
+ - sudo apt-get install libzmq-dev libpgm-dev make build-essential uuid-dev unzip pkg-config libtool automake -y
+ - ./autogen.sh
+ - ./configure
+ - make
+ - sudo make install
+install: mvn install --quiet -DskipTests=true -Dgpg.skip=true
+language: java
+
+script: mvn test
+
+jdk:
+ - openjdk6
+ - openjdk7
