@@ -2,6 +2,8 @@ This is the Java language binding for 0MQ.
 
 [![Build Status](https://travis-ci.org/zeromq/jzmq.png?branch=master)](https://travis-ci.org/zeromq/jzmq)
 
+The latest [javadocs](http://zeromq.github.com/jzmq/javadocs/).
+
 To build you need to have the zeromq library already installed and run:
 
 ```bash
