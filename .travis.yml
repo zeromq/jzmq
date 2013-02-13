@@ -6,7 +6,7 @@ before_install:
  - ./configure
  - make
  - sudo make install
-
+install: mvn install --quiet -DskipTests=true -Dgpg.skip=true
 language: java
 
 script: mvn test
