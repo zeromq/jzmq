@@ -29,12 +29,12 @@ import java.util.Random;
  * 
  */
 public class ZMQ {
-	
-	static {
-		// if no embedded native library, revert to loading from java.library.path
-		if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
-			System.loadLibrary ("jzmq");
-	}
+    
+    static {
+        // if no embedded native library, revert to loading from java.library.path
+        if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
+            System.loadLibrary ("jzmq");
+    }
 
     // Values for flags in Socket's send and recv functions.
     /**
@@ -49,7 +49,7 @@ public class ZMQ {
 
     // Socket types, used when creating a Socket.
     /**
-     * Flag to specify a exclusive pair of sockets.
+     * Flag to specify a exclusive pair of items.
      */
     public static final int PAIR = 0;
     /**
@@ -194,7 +194,6 @@ public class ZMQ {
       return make_version ( major, minor, patch );
     }
   
-  
     /**
      * @return String version number in the form major.minor.patch.
      */
@@ -231,6 +230,29 @@ public class ZMQ {
         run_proxy (frontend, backend, capture);
     }
 
+    /**
+     * Poll on polling items until timeout
+     * @param items polling items
+     * @param timeout timeout in millisecond
+     * @return number of events
+     */
+    public static int poll(PollItem[] items, long timeout) {
+
+        return poll(items, items.length, timeout);
+    }
+
+    /**
+     * Poll on polling items until timeout
+     * @param items polling items
+     * @param count active item count
+     * @param timeout timeout in millisecond
+     * @return number of events
+     */
+    public static int poll(PollItem[] items, int count, long timeout) {
+
+        return Poller.run_poll(items, count, timeout);
+    }
+
     protected static native int version_full();
     protected static native int version_major();
     protected static native int version_minor();
@@ -262,27 +284,27 @@ public class ZMQ {
         ENOTSUP(ENOTSUP()),
             
             EPROTONOSUPPORT(EPROTONOSUPPORT()),
-		
+        
             ENOBUFS(ENOBUFS()),
-		
+        
             ENETDOWN(ENETDOWN()),
-		
+        
             EADDRINUSE(EADDRINUSE()),
 
             EADDRNOTAVAIL(EADDRNOTAVAIL()),
-		
+        
             ECONNREFUSED(ECONNREFUSED()),
-		
+        
             EINPROGRESS(EINPROGRESS()),
 
             EHOSTUNREACH(EHOSTUNREACH()),
-		
+        
             EMTHREAD(EMTHREAD()),
-		
+        
             EFSM(EFSM()),
-		
+        
             ENOCOMPATPROTO(ENOCOMPATPROTO()),
-		
+        
             ETERM(ETERM()),
 
             ENOTSOCK(ENOTSOCK());
@@ -306,7 +328,7 @@ public class ZMQ {
             throw new IllegalArgumentException("Unknown " + Error.class.getName() + " enum code:" + code);
         }
     }
-	
+    
     /**
      * Create a new Context.
      * 
@@ -346,6 +368,7 @@ public class ZMQ {
          * Create a new Poller within this context, with a default size.
          * 
          * @return the newly created Poller.
+         * @deprecated use Poller constructor
          */
         public Poller poller () {
             return new Poller (this);
@@ -357,6 +380,7 @@ public class ZMQ {
          * @param size
          *            the poller initial size.
          * @return the newly created Poller.
+         * @deprecated use Poller constructor
          */
         public Poller poller (int size) {
             return new Poller (this, size);
@@ -567,7 +591,7 @@ public class ZMQ {
 
             return getLongSockopt (KEEPALIVEIDLE);
         }
-		
+        
         /**
          * @see #setTCPKeepAliveInterval(long)
          * 
@@ -651,7 +675,7 @@ public class ZMQ {
          * @return the Multicast Hops.
          */
         public long getMulticastHops () {
-			if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return 1;
             return getLongSockopt (MULTICAST_HOPS);
         }
@@ -677,7 +701,7 @@ public class ZMQ {
          * @return the Receive Timeout in milliseconds
          */
         public int getReceiveTimeOut () {
-			if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
                 return -1;
             return (int) getLongSockopt (RCVTIMEO);
         }
@@ -704,7 +728,7 @@ public class ZMQ {
          * @return the Send Timeout. in milliseconds
          */
         public int getSendTimeOut () {
-			if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
+            if (ZMQ.version_full() < ZMQ.make_version(2, 2, 0))
                 return -1;
             return (int) getLongSockopt (SNDTIMEO);
         }
@@ -947,8 +971,8 @@ public class ZMQ {
         }
         
         /**
-		 * Override TCP_KEEPINTVL socket option (where supported by OS). 
-		 * The default value -1 will skip all overrides and do the OS default.
+         * Override TCP_KEEPINTVL socket option (where supported by OS). 
+         * The default value -1 will skip all overrides and do the OS default.
          * 
          * @param optVal
          *            The value of 'ZMQ_TCP_KEEPALIVE_INTVL' defines the interval between 
@@ -1307,11 +1331,20 @@ public class ZMQ {
         public native int recv (byte[] buffer, int offset, int len, int flags);
 
         /**
+         * Receive a message.
+         *
+         * @return the message received, as an array of bytes; null on error.
+         */
+        public final byte[] recv ()
+        {
+            return recv (0);
+        }
+
+        /**
          * Receive a message as a String.
          * 
          * @return the message received, as a String; null on error.
          */
-
         public String recvStr ()
         {
             return recvStr (0);
@@ -1442,7 +1475,74 @@ public class ZMQ {
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
 
+    }
 
+    public static class PollItem
+    {
+        private Socket socket;
+        private SelectableChannel channel;
+        private int events;
+        private int revents;
+
+        public PollItem(Socket socket, int events)
+        {
+            this.socket = socket;
+            this.events = events;
+            this.revents = 0;
+        }
+
+        public PollItem(SelectableChannel channel, int events)
+        {
+            this.channel = channel;
+            this.events = events;
+            this.revents = 0;
+        }
+
+        public SelectableChannel getRawSocket()
+        {
+            return channel;
+        }
+
+        public Socket getSocket()
+        {
+            return socket;
+        }
+
+        public boolean isError()
+        {
+            return (revents & Poller.POLLERR) > 0;
+        }
+
+        public int readyOps()
+        {
+            return revents;
+        }
+
+        public boolean isReadable()
+        {
+            return (revents & Poller.POLLIN) > 0;
+        }
+
+        public boolean isWritable()
+        {
+            return (revents & Poller.POLLOUT) > 0;
+        }
+
+        @Override
+        public boolean equals (Object obj)
+        {
+            if (!(obj instanceof PollItem))
+                return false;
+
+            PollItem target = (PollItem) obj;
+            if (socket != null && socket == target.socket)
+                return true;
+
+            if (channel != null && channel == target.channel)
+                return true;
+
+            return false;
+        }
     }
 
     /**
@@ -1490,7 +1590,7 @@ public class ZMQ {
          * @return the index identifying this Socket in the poll set.
          */
         public int register (Socket socket, int events) {
-            return registerInternal (socket, events);
+            return registerInternal (new PollItem (socket, events));
         }
         
         /**
@@ -1505,7 +1605,20 @@ public class ZMQ {
          * @return the index identifying this Channel in the poll set.
          */
         public int register (SelectableChannel channel, int events) {
-            return registerInternal (channel, events);
+            return registerInternal (new PollItem (channel, events));
+        }
+
+        /**
+         * Register a Channel for polling on the specified events.
+         *
+         * Automatically grow the internal representation if needed.
+         *
+         * @param item
+         *            the PollItem we are registering.
+         * @return the index identifying this Channel in the poll set.
+         */
+        public int register (PollItem item) {
+            return registerInternal (item);
         }
         
         /**
@@ -1513,13 +1626,13 @@ public class ZMQ {
          *
          * Automatically grow the internal representation if needed.
          * 
-         * @param socket
-         *            the Socket we are registering.
+         * @param item
+         *            the PollItem we are registering.
          * @param events
          *            a mask composed by XORing POLLIN, POLLOUT and POLLERR.
          * @return the index identifying this Socket in the poll set.
          */
-        private int registerInternal (Object socket, int events) {
+        private int registerInternal (PollItem item) {
             int pos = -1;
 
             if (! this.freeSlots.isEmpty()) {
@@ -1534,28 +1647,23 @@ public class ZMQ {
                     int nsize = this.size + SIZE_INCREMENT;
 
                     // Create new internal arrays.
-                    Object [] ns = new Object [nsize];
+                    PollItem [] ns = new PollItem [nsize];
                     short [] ne = new short [nsize];
                     short [] nr = new short [nsize];
                     
                     // Copy contents of current arrays into new arrays.
                     for (int i = 0; i < this.next; ++i) {
-                        ns[i] = this.sockets[i];
-                        ne[i] = this.events[i];
-                        nr[i] = this.revents[i];
+                        ns[i] = this.items[i];
                     }
                     
                     // Swap internal arrays and size to new values.
                     this.size = nsize;
-                    this.sockets = ns;
-                    this.events = ne;
-                    this.revents = nr;
+                    this.items = ns;
                 }
                 pos = this.next++;
             }
 
-            this.sockets[pos] = socket;
-            this.events[pos] = (short) events;
+            this.items[pos] = item;
             this.used++;
             return pos;
         }
@@ -1588,11 +1696,10 @@ public class ZMQ {
          */
         private void unregisterInternal (Object socket) {
             for (int i = 0; i < this.next; ++i) {
-                if (this.sockets[i] == socket) {
-                    this.sockets[i] = null;
-                    this.events[i] = 0;
-                    this.revents[i] = 0;
-                    
+                PollItem item = this.items[i];
+                if (item.socket == socket || item.channel == socket) {
+                    this.items[i] = null;
+
                     this.freeSlots.add(i);
                     --this.used;
 
@@ -1611,7 +1718,21 @@ public class ZMQ {
         public Socket getSocket (int index) {
             if (index < 0 || index >= this.next)
                 return null;
-            return (Socket) this.sockets [index];
+            return this.items[index].socket;
+        }
+
+        /**
+         * Get the PollItem associated with an index.
+         *
+         * @param index
+         *            the desired index.
+         * @return the PollItem associated with that index (or null).
+         */
+        public PollItem getItem (int index)
+        {
+            if (index < 0 || index >= this.next)
+                return null;
+            return this.items[index];
         }
 
         /**
@@ -1689,19 +1810,15 @@ public class ZMQ {
          *
          * @return how many objects where signalled by poll ()
          */
-        public long poll (long tout) {
+        public int poll (long tout) {
             if (tout < -1) {
                 return 0;
             }
-
             if (this.size <= 0 || this.next <= 0) {
                 return 0;
             }
 
-            for (int i = 0; i < this.next; ++i) {
-                this.revents [i] = 0;
-            }
-            return run_poll (this.used, this.sockets, this.events, this.revents, tout);
+            return run_poll (this.items, this.used, tout);
         }
 
         /**
@@ -1738,6 +1855,14 @@ public class ZMQ {
         }
 
         /**
+         * Constructor
+         * @param size the number of Sockets this poller will contain.
+         */
+        public Poller (int size)
+        {
+            this (null, size);
+        }
+        /**
          * Class constructor.
          * 
          * @param context
@@ -1760,32 +1885,26 @@ public class ZMQ {
             this.size = size;
             this.next = 0;
 
-            this.sockets = new Object [this.size];
-            this.events = new short [this.size];
-            this.revents = new short [this.size];
+            this.items = new PollItem [this.size];
 
             freeSlots = new LinkedList<Integer>();
         }
 
         /**
-         * Issue a poll call on the specified 0MQ sockets.
+         * Issue a poll call on the specified 0MQ items.
          * <p>
          * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds<i>,
          * but prior to this the unit was <i>microseconds</i>.
          * 
-         * @param sockets
-         *            an array of 0MQ Socket objects to poll.
-         * @param events
-         *            an array of short values specifying what to poll for.
-         * @param revents
-         *            an array of short values with the results.
+         * @param items
+         *            an array of PollItem to poll.
          * @param timeout
          *            the maximum timeout in milliseconds/microseconds (see above).
          * @return how many objects where signalled by poll ().
          * @see http://api.zeromq.org/2-1:zmq-poll
          * @see http://api.zeromq.org/3-0:zmq-poll
          */
-        private native long run_poll (int count, Object [] sockets, short [] events, short [] revents, long timeout);
+        protected native static int run_poll (PollItem[] items, int count, long timeout);
 
         /**
          * Check whether a specific mask was signalled by latest poll call.
@@ -1800,7 +1919,7 @@ public class ZMQ {
             if (mask <= 0 || index < 0 || index >= this.next) {
                 return false;
             }
-            return (this.revents [index] & mask) > 0;
+            return (this.items[index].revents & mask) > 0;
         }
         
         private Context context = null;
@@ -1808,9 +1927,7 @@ public class ZMQ {
         private int size = 0;
         private int next = 0;
         private int used = 0;
-        private Object [] sockets = null;
-        private short [] events = null;
-        private short [] revents = null;
+        private PollItem [] items = null;
         // When socket is removed from polling, store free slots here
         private LinkedList<Integer> freeSlots = null;
 
