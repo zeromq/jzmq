@@ -1,9 +1,11 @@
 package org.zeromq;
 
-
 import org.zeromq.ZMQ.Socket;
 
 import java.util.Arrays;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * ZFrame
@@ -20,6 +22,10 @@ import java.util.Arrays;
  * 
  */
 public class ZFrame {
+
+	public static final int MORE  =   ZMQ.SNDMORE;
+	public static final int REUSE =   128;	 // no effect at java
+	public static final int DONTWAIT = ZMQ.DONTWAIT;
 
 	private boolean more;
 	
@@ -103,7 +109,7 @@ public class ZFrame {
 	}
 	
 	/**
-	 * Internal method to call org.zeromq.Socket send() method.
+	 * Method to call org.zeromq.Socket send() method.
 	 * @param socket
 	 * 			0MQ socket to send on
 	 * @param flags
@@ -111,7 +117,7 @@ public class ZFrame {
 	 * @return
 	 * 			True if success, else False
 	 */
-	private boolean send(Socket socket, int flags) {
+	public boolean send(Socket socket, int flags) {
 		if (socket == null) {
 			throw new IllegalArgumentException("socket parameter must be set");
 		}
@@ -164,7 +170,7 @@ public class ZFrame {
 	public boolean sendAndDestroy(Socket socket, int flags) {
 		boolean ret = send(socket, flags);
 		if (ret)
-		    destroy ();
+			destroy ();
 		return ret;
 	}
 
@@ -220,6 +226,15 @@ public class ZFrame {
 	public void reset(byte[] data) {
 		this.data = data;
 	}
+
+	/**
+	 * Sets new contents for frame
+	 * @param data
+	 * 			String contents for frame
+	 */
+	public void reset(String data) {
+		reset(data.getBytes());
+	}
 	
 	/**
 	 * Returns frame data as a printable hex string
@@ -251,22 +266,22 @@ public class ZFrame {
 		return new String(this.data).compareTo(str) == 0;
 	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 
-        ZFrame zFrame = (ZFrame) o;
+		ZFrame zFrame = (ZFrame) o;
 
-        if (!Arrays.equals(data, zFrame.data)) return false;
+		if (!Arrays.equals(data, zFrame.data)) return false;
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public int hashCode() {
-        return data != null ? Arrays.hashCode(data) : 0;
-    }
+	@Override
+	public int hashCode() {
+		return data != null ? Arrays.hashCode(data) : 0;
+	}
 
 	/**
 	 * Returns a human - readable representation of frame's data
@@ -304,36 +319,75 @@ public class ZFrame {
 		return data;
 	}
 	
-    /**
-     * Receives single frame from socket, returns the received frame object, or null if the recv
-     * was interrupted. Does a blocking recv, if you want to not block then use
-     * recvFrame(socket, ZMQ.DONTWAIT);
-     * 
-     * @param	socket
-     * 				Socket to read from
-     * @return  
-     * 				received frame, else null
-     */
+	/**
+	 * Receives single frame from socket, returns the received frame object, or null if the recv
+	 * was interrupted. Does a blocking recv, if you want to not block then use
+	 * recvFrame(socket, ZMQ.DONTWAIT);
+	 * 
+	 * @param	socket
+	 * 				Socket to read from
+	 * @return  
+	 * 				received frame, else null
+	 */
 	public static ZFrame recvFrame(Socket socket) {
 		ZFrame f = new ZFrame();
 		f.recv(socket, 0);
 		return f;
 	}
 	
-    /**
-     * Receive a new frame off the socket, Returns newly-allocated frame, or
-     * null if there was no input waiting, or if the read was interrupted.
-     * @param	socket
-     * 				Socket to read from
-     * @param	flags
-     * 				Pass flags to 0MQ socket.recv call
-     * @return  
-     * 				received frame, else null
-     */	
+	/**
+	 * Receive a new frame off the socket, Returns newly-allocated frame, or
+	 * null if there was no input waiting, or if the read was interrupted.
+	 * @param	socket
+	 * 				Socket to read from
+	 * @param	flags
+	 * 				Pass flags to 0MQ socket.recv call
+	 * @return  
+	 * 				received frame, else null
+	 */	
 	public static ZFrame recvFrame(Socket socket, int flags) {
 		ZFrame f = new ZFrame();
 		f.recv(socket, flags);
 		return f;
 	}
 	
+	public void print(String prefix) {
+		
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		
+		if (prefix != null)
+			pw.printf ( "%s", prefix);
+		byte []data = getData();
+		int size = size();
+
+		boolean is_bin = false;
+		int char_nbr;
+		for (char_nbr = 0; char_nbr < size; char_nbr++)
+			if (data [char_nbr] < 9 || data [char_nbr] > 127)
+				is_bin = true;
+
+		pw.printf ( "[%03d] ", size);
+		int max_size = is_bin? 35: 70;
+		String elipsis = "";
+		if (size > max_size) {
+			size = max_size;
+			elipsis = "...";
+		}
+		for (char_nbr = 0; char_nbr < size; char_nbr++) {
+			if (is_bin)
+				pw.printf ("%02X", data [char_nbr]);
+			else
+				pw.printf ("%c", data [char_nbr]);
+		}
+		pw.printf ("%s\n", elipsis);
+		pw.flush();
+		pw.close();
+		try {
+			sw.close();
+		} catch (IOException e) {
+		}
+		
+		System.out.print(sw.toString());
+	}
 }
