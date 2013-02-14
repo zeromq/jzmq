@@ -492,7 +492,7 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
                                                                  jint offset,
                                                                  jint flags)
 {
-    void *s = get_socket (env, obj, 1);
+    void *s = get_socket (env, obj, 0);
 
     jsize size = env->GetArrayLength (msg) - offset; 
     if (size < 0) {
