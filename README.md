@@ -1,4 +1,4 @@
-This is the Java language binding for 0MQ.
+This is the Java language binding for ØMQ.
 
 [![Build Status](https://travis-ci.org/zeromq/jzmq.png?branch=master)](https://travis-ci.org/zeromq/jzmq)
 
@@ -28,7 +28,7 @@ If your zmq installation is not found by configure you can add this information 
 
 You may want to take a look at http://www.zeromq.org/docs:tuning-zeromq for additional hints.
 
-For more information, refer to the 0MQ website at http://www.zeromq.org/.
+For more information, refer to the ØMQ website at http://www.zeromq.org/.
 
 On Mac OS X you may need to compile and make install pkg-config if configure fails with "syntax error near unexpected token newline".   
 See http://stackoverflow.com/questions/3522248/how-do-i-compile-jzmq-for-zeromq-on-osx for details.   
@@ -39,4 +39,4 @@ Copying
 
 Free use of this software is granted under the terms of the GNU Lesser General
 Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER`
-included with the Java binding for 0MQ.
+included with the Java binding for ØMQ.
