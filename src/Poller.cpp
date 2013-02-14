@@ -31,32 +31,30 @@ static void *fetch_socket (JNIEnv *env,
 static int fetch_socket_fd (JNIEnv *env,
                            jobject socket);
 
+static jfieldID field_channel = NULL;
+static jfieldID field_socket = NULL;
+static jfieldID field_events = NULL;
+static jfieldID field_revents = NULL;
 
-JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
-                                                                   jobject obj,
-                                                                   jint count,
+JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
+                                                                   jclass cls,
                                                                    jobjectArray socket_0mq,
-                                                                   jshortArray event_0mq,
-                                                                   jshortArray revent_0mq,
+                                                                   jint count,
                                                                    jlong timeout)
 {
     int ls = (int) count;
-    if (ls <= 0)
+    if (ls <= 0) {
         return 0;
+    }
     
     int ls_0mq = 0;
-    int le_0mq = 0;
-    int lr_0mq = 0;
 
     if (socket_0mq)
         ls_0mq = env->GetArrayLength (socket_0mq);
-    if (event_0mq)
-        le_0mq = env->GetArrayLength (event_0mq);
-    if (revent_0mq)
-        lr_0mq = env->GetArrayLength (revent_0mq);
 
-    if (ls > ls_0mq || ls > le_0mq || ls > ls_0mq)
+    if (ls > ls_0mq) {
         return 0;
+    }
 
     zmq_pollitem_t *pitem = new zmq_pollitem_t [ls];
     short pc = 0;
@@ -65,36 +63,27 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
     // Add 0MQ sockets.  Array containing them can be "sparse": there
     // may be null elements.  The count argument has the real number
     // of valid sockets in the array.
-    if (ls_0mq > 0) {
-        jshort *e_0mq = env->GetShortArrayElements (event_0mq, 0);
-        if (e_0mq != NULL) {
-            for (int i = 0; i < ls_0mq; ++i) {
-                jobject s_0mq = env->GetObjectArrayElement (socket_0mq, i);
-                if (!s_0mq)
-                    continue;
-                void *s = NULL; 
-                int fd = fetch_socket_fd (env, s_0mq);
-                if (fd < 0) {
-                    raise_exception (env, EINVAL);
-                    continue;
-                } else if (fd == 0) {
-                    s = fetch_socket (env, s_0mq);
-                    if ( s == NULL ) {
-                        raise_exception (env, EINVAL);
-                        continue;
-                    }
-                }
+    for (int i = 0; i < ls; ++i) {
+        jobject s_0mq = env->GetObjectArrayElement (socket_0mq, i);
+        if (!s_0mq)
+            continue;
+        void *s = fetch_socket (env, s_0mq);
+        int fd = (s == NULL) ? fetch_socket_fd (env, s_0mq) : 0;
 
-                pitem [pc].socket = s;
-                pitem [pc].fd = fd;
-                pitem [pc].events = e_0mq [i];
-                pitem [pc].revents = 0;
-                ++pc;
-
-                env->DeleteLocalRef (s_0mq);
-            }
-            env->ReleaseShortArrayElements(event_0mq, e_0mq, 0);
+        if (s == NULL && fd < 0) {
+            raise_exception (env, EINVAL);
+            continue;
         }
+
+        env->SetIntField (s_0mq, field_revents, 0);
+
+        pitem [pc].socket = s;
+        pitem [pc].fd = fd;
+        pitem [pc].events = env->GetIntField (s_0mq, field_events);
+        pitem [pc].revents = 0;
+        ++pc;
+
+        env->DeleteLocalRef (s_0mq);
     }
 
     // Count of non-null sockets must be equal to passed-in arg.
@@ -105,19 +94,11 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
     }
 
     //  Set 0MQ results.
-    if (rc > 0 && ls_0mq > 0) {
-        jshort *r_0mq = env->GetShortArrayElements (revent_0mq, 0);
-        if (r_0mq) {
-            for (int i = 0; i < ls_0mq; ++i) {
-                jobject s_0mq = env->GetObjectArrayElement (socket_0mq, i);
-                if (!s_0mq)
-                    continue;
-                r_0mq [i] = pitem [pc].revents;
-                ++pc;
-
-                env->DeleteLocalRef (s_0mq);
-            }
-            env->ReleaseShortArrayElements(revent_0mq, r_0mq, 0);
+    if (rc > 0 && ls > 0) {
+        for (int i = 0; i < ls; ++i) {
+            jobject s_0mq = env->GetObjectArrayElement (socket_0mq, i);
+            env->SetIntField (s_0mq, field_revents, pitem [i].revents);
+            env->DeleteLocalRef (s_0mq);
         }
     }
 
@@ -125,14 +106,26 @@ JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
     return rc;
 }
 
-  
 /**
  * Get the value of socketHandle for the specified Java Socket.
  */
-static void *fetch_socket (JNIEnv *env,
-                           jobject socket)
-{
+static void* fetch_socket (JNIEnv *env, jobject item){
+
     static jmethodID get_socket_handle_mid = NULL;
+
+    jclass cls;
+    if (field_socket == NULL) {
+        cls = env->GetObjectClass (item);
+        assert (cls);
+        field_channel = env->GetFieldID (cls, "channel", "Ljava/nio/channels/SelectableChannel;");
+        field_socket = env->GetFieldID (cls, "socket", "Lorg/zeromq/ZMQ$Socket;");
+        field_events = env->GetFieldID (cls, "events", "I");
+        field_revents = env->GetFieldID (cls, "revents", "I");
+        env->DeleteLocalRef (cls);
+    }
+    jobject socket = env->GetObjectField (item, field_socket);
+    if (socket == NULL)
+        return NULL;
 
     if (get_socket_handle_mid == NULL) {
         jclass cls = env->GetObjectClass (socket);
@@ -150,28 +143,20 @@ static void *fetch_socket (JNIEnv *env,
   
     return s;
 }
-
 /**
  * Get the file descriptor id of java.net.Socket.
  * returns 0 if socket is not a SelectableChannel
  * returns the file descriptor id or -1 on an error
  */
-static int fetch_socket_fd (JNIEnv *env, jobject socket){
+static int fetch_socket_fd (JNIEnv *env, jobject item){
 
-    static jclass channel_cls = NULL;
     jclass cls;
     jfieldID fid;
-    if (channel_cls == NULL) {
-        cls = env->FindClass ("java/nio/channels/SelectableChannel");
-        assert (cls);
-        channel_cls = (jclass) env->NewGlobalRef (cls);
-        env->DeleteLocalRef (cls);
-        assert (channel_cls);
-    }
-    if (!env->IsInstanceOf (socket, channel_cls)) 
-        return 0;
+    jobject channel = env->GetObjectField (item, field_channel);
+    if (channel == NULL)
+        return -1;
 
-    cls = env->GetObjectClass (socket);
+    cls = env->GetObjectClass (channel);
     assert (cls);
 
     fid = env->GetFieldID (cls, "fdVal", "I");
@@ -180,7 +165,7 @@ static int fetch_socket_fd (JNIEnv *env, jobject socket){
         return -1;
 
     /* return the descriptor */
-    int fd = env->GetIntField (socket, fid);
+    int fd = env->GetIntField (channel, fid);
 
     return fd;
 }
