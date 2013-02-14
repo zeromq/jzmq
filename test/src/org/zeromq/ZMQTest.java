@@ -315,4 +315,26 @@ public class ZMQTest
         context.term ();
     }
 
+    @Test
+    public void testWritingToClosedSocket()
+    {
+        ZMQ.Context context = ZMQ.context(1);
+        ZMQ.Socket sock = null;
+        try {
+            sock = context.socket(ZMQ.REQ);
+            sock.connect("ipc:///tmp/hai");
+            sock.close();
+            sock.send("PING".getBytes(), 0);
+        } catch(ZMQException e) {
+            assertEquals(ZMQ.ENOTSOCK(), e.getErrorCode());
+        }
+        finally {
+            try {
+                sock.close ();
+            } catch (Exception ignore) {}
+            try {
+                context.term ();
+            } catch (Exception ignore) {}
+        }
+    }
 }

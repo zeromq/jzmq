@@ -250,6 +250,7 @@ public class ZMQ {
     protected static native long EFSM();
     protected static native long ENOCOMPATPROTO();
     protected static native long ETERM();
+    protected static native long ENOTSOCK();
 
     private static native void run_proxy (Socket frontend, Socket backend, Socket capture);
 
@@ -282,7 +283,9 @@ public class ZMQ {
 		
             ENOCOMPATPROTO(ENOCOMPATPROTO()),
 		
-            ETERM(ETERM());
+            ETERM(ETERM()),
+
+            ENOTSOCK(ENOTSOCK());
 
         private final long code;
 
