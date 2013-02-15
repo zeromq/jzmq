@@ -33,8 +33,7 @@ static jfieldID ctx_handle_fid = NULL;
 static void ensure_context (JNIEnv *env,
                             jobject obj);
 static void *get_context (JNIEnv *env,
-                          jobject obj,
-                          int do_assert);
+                          jobject obj);
 static void put_context (JNIEnv *env,
                          jobject obj,
                          void *s);
@@ -47,7 +46,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
                                                                    jobject obj,
                                                                    jint io_threads)
 {
-    void *c = get_context (env, obj, 0);
+    void *c = get_context (env, obj);
     if (c)
         return;
 
@@ -67,7 +66,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
 JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_finalize (JNIEnv *env,
                                                                   jobject obj)
 {
-    void *c = get_context (env, obj, 0);
+    void *c = get_context (env, obj);
     if (! c)
         return;
 
@@ -102,14 +101,10 @@ static void ensure_context (JNIEnv *env,
  * Get the value of Java's Context::contextHandle.
  */
 static void *get_context (JNIEnv *env,
-                          jobject obj,
-                          int do_assert)
+                          jobject obj)
 {
     ensure_context (env, obj);
     void *s = (void*) env->GetLongField (obj, ctx_handle_fid);
-
-    if (do_assert)
-        assert (s);
 
     return s;
 }
