@@ -11,6 +11,7 @@ JZMQ_JAVA_FILES = \
 	org/zeromq/ZFrame.java \
 	org/zeromq/ZMsg.java \
 	org/zeromq/ZThread.java \
+	org/zeromq/ZLoop.java \
 	org/zeromq/EmbeddedLibraryTools.java
 
 JZMQ_CPP_FILES = \
@@ -43,7 +44,8 @@ JZMQ_CLASS_FILES = \
 	org/zeromq/ZContext.class \
 	org/zeromq/ZFrame.class \
 	org/zeromq/ZMsg.class \
-	org/zeromq/ZThread.class
+	org/zeromq/ZThread.class \
+	org/zeromq/ZLoop.class
 
 JAVAH_FLAGS = -d . -classpath .
 
