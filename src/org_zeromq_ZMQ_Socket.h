@@ -135,6 +135,14 @@ JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Socket_recv___3BIII
 
 /*
  * Class:     org_zeromq_ZMQ_Socket
+ * Method:    recvZeroCopy
+ * Signature: (Ljava/nio/ByteBuffer;II)I
+ */
+JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy
+  (JNIEnv *, jobject, jobject, jint, jint);
+
+/*
+ * Class:     org_zeromq_ZMQ_Socket
  * Method:    construct
  * Signature: (Lorg/zeromq/ZMQ/Context;I)V
  */

@@ -584,6 +584,21 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     return JNI_TRUE;
 }
 
+JNIEXPORT jint JNICALL
+Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
+                                              jobject obj,
+                                              jobject buffer,
+                                              jint length,
+                                              jint flags)
+{
+    void* sock = get_socket (env, obj, 0);
+    jbyte* buf = 0;
+    int ret = 0;
+    buf = (jbyte*) env->GetDirectBufferAddress(buffer);
+    ret = zmq_recv(sock, buf, length, flags);
+    return ret;
+}
+
 /**
  * Called by Java's Socket::recv(byte[] buffer, int offset, int len, int flags).
  */

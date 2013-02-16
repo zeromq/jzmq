@@ -1201,7 +1201,6 @@ public class ZMQ {
          */
         public native boolean send(byte[] msg, int offset, int len, int flags);
 
-        
         /**
          * Perform a zero copy send. The buffer must be allocated using ByteBuffer.allocateDirect
          * 
@@ -1279,6 +1278,16 @@ public class ZMQ {
          * @return the number of bytes read, -1 on error
          */
         public native int recv(byte[] buffer, int offset, int len, int flags);
+
+        /**
+         * Zero copy recv
+         * 
+         * @param buffer
+         * @param len
+         * @param flags
+         * @return bytes read, -1 on error
+         */
+        public native int recvZeroCopy(ByteBuffer buffer, int len, int flags);
 
         /**
          * Receive a message.
