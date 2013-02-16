@@ -18,6 +18,7 @@
  */
 package org.zeromq;
 
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.util.LinkedList;
 import java.util.Random;
@@ -1186,7 +1187,30 @@ public class ZMQ {
          * @param flags the flags to apply to the send operation.
          * @return true if send was successful, false otherwise.
          */
-        public native boolean send(byte[] msg, int offset, int flags);
+        public boolean send(byte[] msg, int offset, int flags) {
+            return send(msg, offset, msg.length, flags);
+        }
+
+        /**
+         * 
+         * @param msg
+         * @param offset
+         * @param len
+         * @param flags
+         * @return
+         */
+        public native boolean send(byte[] msg, int offset, int len, int flags);
+
+        
+        /**
+         * Perform a zero copy send. The buffer must be allocated using ByteBuffer.allocateDirect
+         * 
+         * @param buffer
+         * @param len
+         * @param flags
+         * @return
+         */
+        public native boolean sendZeroCopy(ByteBuffer buffer, int len, int flags);
 
         /**
          * Send a message.
@@ -1196,7 +1220,7 @@ public class ZMQ {
          * @return true if send was successful, false otherwise.
          */
         public boolean send(byte[] msg, int flags) {
-            return send(msg, 0, flags);
+            return send(msg, 0, msg.length, flags);
         }
 
         /**
@@ -1207,7 +1231,8 @@ public class ZMQ {
          */
 
         public boolean send(String msg) {
-            return send(msg.getBytes(), 0);
+            byte[] b = msg.getBytes();
+            return send(b, 0, b.length, 0);
         }
 
         /**
@@ -1218,7 +1243,8 @@ public class ZMQ {
          */
 
         public boolean sendMore(String msg) {
-            return send(msg.getBytes(), SNDMORE);
+            byte[] b = msg.getBytes();
+            return send(b, 0, b.length, SNDMORE);
         }
 
         /**
@@ -1230,7 +1256,8 @@ public class ZMQ {
          */
 
         public boolean send(String msg, int flags) {
-            return send(msg.getBytes(), flags);
+            byte[] b = msg.getBytes();
+            return send(b, 0, b.length, flags);
         }
 
         /**
