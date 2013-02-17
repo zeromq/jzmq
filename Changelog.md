@@ -1,5 +1,7 @@
 # Changelog
 
+## v2.1.1 - February 16, 2013
+
 * Add zero copy API to send and recv
 * Remove asserts from get_context JNI
 * Add ZLoop support
