@@ -491,18 +491,11 @@ Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
 {
     jbyte* buf = 0;
     int rc = 0;
-    int err = 0;
-    
     void *sock = get_socket (env, obj, 0);
-
     buf = (jbyte*) env->GetDirectBufferAddress(buffer);
-
-    zmq_msg_t msg;
-    zmq_msg_init_data (&msg, buf, length, NULL, NULL);
-    rc = zmq_send (sock, &msg, length, flags);
-
-    if (rc < 0) {
-        err = zmq_errno();
+    rc = zmq_send (sock, buf, length, flags);
+    if (rc == -1) {
+        int err = zmq_errno();
         raise_exception (env, err);
         return JNI_FALSE;
     }
@@ -597,7 +590,6 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
     void* sock = get_socket (env, obj, 0);
     jbyte* buf = 0;
     int rc = 0;
-
     buf = (jbyte*) env->GetDirectBufferAddress(buffer);
     rc = zmq_recv(sock, buf, length, flags);
     setByteBufferPosition(env, buffer, rc);
@@ -677,9 +669,8 @@ static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flag
     void *s = get_socket (env, obj, 1);
 
     int rc = zmq_msg_init (message);
-    int err = zmq_errno();
     if (rc != 0) {
-        raise_exception (env, err);
+        raise_exception (env, zmq_errno());
         return NULL;
     }
 
@@ -688,7 +679,7 @@ static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flag
 #else
     rc = zmq_recv (s, message, flags);
 #endif
-    err = zmq_errno();
+    int err = zmq_errno();
     if (rc < 0 && err == EAGAIN) {
         rc = zmq_msg_close (message);
         err = zmq_errno();
