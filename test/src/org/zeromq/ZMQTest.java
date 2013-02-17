@@ -335,66 +335,69 @@ public class ZMQTest {
 
     @Test
     public void testZeroCopyRecv() {
-        ZMQ.Context context = ZMQ.context(1);
+        if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0)) {
+            ZMQ.Context context = ZMQ.context(1);
 
-        ByteBuffer response = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
-        ZMQ.Socket push = null;
-        ZMQ.Socket pull = null;
-        try {
-            push = context.socket(ZMQ.PUSH);
-            pull = context.socket(ZMQ.PULL);
-            pull.bind("tcp://*:45324");
-            push.connect("tcp://localhost:45324");
+            ByteBuffer response = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
+            ZMQ.Socket push = null;
+            ZMQ.Socket pull = null;
+            try {
+                push = context.socket(ZMQ.PUSH);
+                pull = context.socket(ZMQ.PULL);
+                pull.bind("tcp://*:45324");
+                push.connect("tcp://localhost:45324");
 
-            push.send("PING");
-            int rc = pull.recvZeroCopy(response, 16, 0);
-            response.flip();
-            byte[] b = new byte[rc];
-            response.get(b);
-            assertEquals("PING", new String(b));
-        } finally {
-            try {
-                push.close();
-            } catch (Exception ignore) {
-            }
-            try {
-                pull.close();
-            } catch (Exception ignore) {
-            }
-            try {
-                context.term();
-            } catch (Exception ignore) {
+                push.send("PING");
+                int rc = pull.recvZeroCopy(response, 16, 0);
+                response.flip();
+                byte[] b = new byte[rc];
+                response.get(b);
+                assertEquals("PING", new String(b));
+            } finally {
+                try {
+                    push.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    pull.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    context.term();
+                } catch (Exception ignore) {
+                }
             }
         }
     }
 
     @Test
     public void testZeroCopySend() throws InterruptedException {
-        ZMQ.Context context = ZMQ.context(1);
-
-        ByteBuffer bb = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
-        ZMQ.Socket push = null;
-        ZMQ.Socket pull = null;
-        try {
-            push = context.socket(ZMQ.PUSH);
-            pull = context.socket(ZMQ.PULL);
-            pull.bind("tcp://*:45324");
-            push.connect("tcp://localhost:45324");
-            bb.put("PING".getBytes());
-            push.sendZeroCopy(bb, bb.position(), 0);
-            assertEquals("PING", new String(pull.recv()));
-        } finally {
+        if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0)) {
+            ZMQ.Context context = ZMQ.context(1);
+            ByteBuffer bb = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
+            ZMQ.Socket push = null;
+            ZMQ.Socket pull = null;
             try {
-                push.close();
-            } catch (Exception ignore) {
-            }
-            try {
-                pull.close();
-            } catch (Exception ignore) {
-            }
-            try {
-                context.term();
-            } catch (Exception ignore) {
+                push = context.socket(ZMQ.PUSH);
+                pull = context.socket(ZMQ.PULL);
+                pull.bind("tcp://*:45324");
+                push.connect("tcp://localhost:45324");
+                bb.put("PING".getBytes());
+                push.sendZeroCopy(bb, bb.position(), 0);
+                assertEquals("PING", new String(pull.recv()));
+            } finally {
+                try {
+                    push.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    pull.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    context.term();
+                } catch (Exception ignore) {
+                }
             }
         }
     }
