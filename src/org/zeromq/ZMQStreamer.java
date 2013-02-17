@@ -13,12 +13,9 @@ public class ZMQStreamer extends ZMQForwarder {
     /**
      * Class constructor.
      * 
-     * @param context
-     *            a 0MQ context previously created.
-     * @param inSocket
-     *            input socket
-     * @param outSocket
-     *            output socket
+     * @param context a 0MQ context previously created.
+     * @param inSocket input socket
+     * @param outSocket output socket
      */
     public ZMQStreamer(Context context, Socket inSocket, Socket outSocket) {
         super(context, inSocket, outSocket);

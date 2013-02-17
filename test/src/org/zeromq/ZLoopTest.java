@@ -15,7 +15,7 @@
         
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package org.zeromq;
 
 import org.junit.After;
@@ -34,8 +34,7 @@ public class ZLoopTest {
     private Socket output;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         ctx = new ZContext();
         assert (ctx != null);
 
@@ -44,14 +43,13 @@ public class ZLoopTest {
         output.bind("inproc://zloop.test");
         input = ctx.createSocket(ZMQ.PAIR);
         assert (input != null);
-        input.connect( "inproc://zloop.test");
+        input.connect("inproc://zloop.test");
 
         received = "FAILED";
     }
 
     @After
-    public void tearDown()
-    {
+    public void tearDown() {
         ctx.destroy();
     }
 
@@ -76,16 +74,16 @@ public class ZLoopTest {
             @Override
             public int handle(ZLoop loop, PollItem item, Object arg) {
                 received = ((Socket) arg).recvStr(0);
-                //  Just end the reactor
+                // Just end the reactor
                 return -1;
             }
         };
 
-        //  After 10 msecs, send a ping message to output
+        // After 10 msecs, send a ping message to output
         loop.addTimer(10, 1, timerEvent, input);
 
-        //  When we get the ping message, end the reactor
-        PollItem pollInput = new PollItem( output, Poller.POLLIN );
+        // When we get the ping message, end the reactor
+        PollItem pollInput = new PollItem(output, Poller.POLLIN);
         rc = loop.addPoller(pollInput, socketEvent, output);
         Assert.assertEquals(0, rc);
         loop.start();
@@ -126,17 +124,17 @@ public class ZLoopTest {
             @Override
             public int handle(ZLoop loop, PollItem item, Object arg) {
                 received = ((Socket) arg).recvStr(0);
-                //  Just end the reactor
+                // Just end the reactor
                 return -1;
             }
         };
 
-        //  After 10 msecs, fire a timer that registers 
-        //  another timer that sends the ping message
+        // After 10 msecs, fire a timer that registers
+        // another timer that sends the ping message
         loop.addTimer(10, 1, timerEvent, input);
 
-        //  When we get the ping message, end the reactor
-        PollItem pollInput = new PollItem( output, Poller.POLLIN );
+        // When we get the ping message, end the reactor
+        PollItem pollInput = new PollItem(output, Poller.POLLIN);
         rc = loop.addPoller(pollInput, socketEvent, output);
         Assert.assertEquals(0, rc);
 
@@ -174,25 +172,25 @@ public class ZLoopTest {
                         final long now2 = System.currentTimeMillis();
                         Assert.assertTrue(now2 >= now + 10);
                         received = ((Socket) arg).recvStr(0);
-                        //  Just end the reactor
+                        // Just end the reactor
                         return -1;
                     }
                 };
-                //  After 10 msec fire a timer that ends the reactor
+                // After 10 msec fire a timer that ends the reactor
                 loop.addTimer(10, 1, timerEvent2, arg);
                 return 0;
             }
         };
 
-        //  Fire a timer that sends the ping message 
+        // Fire a timer that sends the ping message
         loop.addTimer(0, 1, timerEvent, input);
 
-        //  When we get the ping message, end the reactor
-        PollItem pollInput = new PollItem( output, Poller.POLLIN );
+        // When we get the ping message, end the reactor
+        PollItem pollInput = new PollItem(output, Poller.POLLIN);
         rc = loop.addPoller(pollInput, socketEvent, output);
         Assert.assertEquals(0, rc);
 
-        loop.start ();
+        loop.start();
 
         loop.removePoller(pollInput);
         Assert.assertEquals("PING", received);
@@ -209,7 +207,7 @@ public class ZLoopTest {
 
             @Override
             public int handle(ZLoop loop, PollItem item, Object arg) {
-                ((Socket)arg).send("PING", 0);
+                ((Socket) arg).send("PING", 0);
                 return 0;
             }
         };
@@ -218,28 +216,28 @@ public class ZLoopTest {
 
             @Override
             public int handle(ZLoop loop, PollItem item, Object arg) {
-                //  After 10 msecs, fire an event that ends the reactor
+                // After 10 msecs, fire an event that ends the reactor
                 ZLoop.IZLoopHandler shutdownEvent = new ZLoop.IZLoopHandler() {
                     @Override
                     public int handle(ZLoop loop, PollItem item, Object arg) {
                         received = ((Socket) arg).recvStr(0);
-                        //  Just end the reactor
+                        // Just end the reactor
                         return -1;
                     }
                 };
-                loop.addTimer (10, 1, shutdownEvent, arg);
+                loop.addTimer(10, 1, shutdownEvent, arg);
                 return 0;
             }
         };
 
-        //  Fire event that sends a ping message to output
-        loop.addTimer (0, 1, timerEvent, input);
+        // Fire event that sends a ping message to output
+        loop.addTimer(0, 1, timerEvent, input);
 
-        //  When we get the ping message, end the reactor
-        PollItem pollInput = new PollItem( output, Poller.POLLIN );
-        rc = loop.addPoller (pollInput, socketEvent, output);
+        // When we get the ping message, end the reactor
+        PollItem pollInput = new PollItem(output, Poller.POLLIN);
+        rc = loop.addPoller(pollInput, socketEvent, output);
         Assert.assertEquals(0, rc);
-        loop.start ();
+        loop.start();
 
         loop.removePoller(pollInput);
         Assert.assertEquals("PING", received);

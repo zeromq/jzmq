@@ -20,12 +20,9 @@ public class ZMQQueue implements Runnable, Closeable {
     /**
      * Class constructor.
      * 
-     * @param context
-     *            a 0MQ context previously created.
-     * @param inSocket
-     *            input socket
-     * @param outSocket
-     *            output socket
+     * @param context a 0MQ context previously created.
+     * @param inSocket input socket
+     * @param outSocket output socket
      */
     public ZMQQueue(Context context, Socket inSocket, Socket outSocket) {
         this.inSocket = inSocket;
@@ -40,7 +37,7 @@ public class ZMQQueue implements Runnable, Closeable {
      * Queuing of requests and replies.
      */
     @Override
-	public void run() {
+    public void run() {
         byte[] msg = null;
         boolean more = true;
 
@@ -89,11 +86,11 @@ public class ZMQQueue implements Runnable, Closeable {
     }
 
     /**
-	* Unregisters input and output sockets.
-	*/
+     * Unregisters input and output sockets.
+     */
     @Override
     public void close() throws IOException {
-    	poller.unregister(this.inSocket);
-    	poller.unregister(this.outSocket);
+        poller.unregister(this.inSocket);
+        poller.unregister(this.outSocket);
     }
 }
