@@ -482,10 +482,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_disconnect (JNIEnv *env,
 #endif
 }
 
-void noop_free (void *data, void *hint) {
-  //ByteBuffer will be deallocated when finalize is called. i.e. Garbage collected
-}
-
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
                                               jobject obj,
@@ -502,7 +498,7 @@ Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
     buf = (jbyte*) env->GetDirectBufferAddress(buffer);
 
     zmq_msg_t msg;
-    zmq_msg_init_data (&msg, buf, length, noop_free, NULL);
+    zmq_msg_init_data (&msg, buf, length, NULL, NULL);
     rc = zmq_send (sock, &msg, length, flags);
 
     if (rc < 0) {
@@ -584,6 +580,13 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
     return JNI_TRUE;
 }
 
+inline void setByteBufferPosition(JNIEnv *env, jobject buffer, jint position) {
+	jclass cls = env->GetObjectClass(buffer);
+	jmethodID positionHandle = env->GetMethodID(cls, "position", "(I)Ljava/nio/Buffer;");
+	env->DeleteLocalRef(cls);
+	env->CallVoidMethod(buffer, positionHandle, position);
+}
+
 JNIEXPORT jint JNICALL
 Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
                                               jobject obj,
@@ -593,11 +596,20 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
 {
     void* sock = get_socket (env, obj, 0);
     jbyte* buf = 0;
-    int ret = 0;
+    int rc = 0;
+
     buf = (jbyte*) env->GetDirectBufferAddress(buffer);
-    ret = zmq_recv(sock, buf, length, flags);
-    return ret;
-}
+    rc = zmq_recv(sock, buf, length, flags);
+    setByteBufferPosition(env, buffer, rc);
+    if(rc == -1) {
+        int err = zmq_errno();
+        if(err == EAGAIN) {
+            raise_exception (env, err);
+            return 0;
+        }
+    }
+    return rc;
+} 
 
 /**
  * Called by Java's Socket::recv(byte[] buffer, int offset, int len, int flags).

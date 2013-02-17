@@ -1,5 +1,8 @@
 package org.zeromq;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import org.junit.Test;
 
 import org.zeromq.ZMQ.Context;
@@ -7,93 +10,84 @@ import org.zeromq.ZMQ.Socket;
 
 import static org.junit.Assert.*;
 
-
 /**
  * @author Cliff Evans
  */
-public class ZMQTest
-{
+public class ZMQTest {
 
-  /**
-   * Test method for {@link org.zeromq.ZMQ#makeVersion(int, int, int)}.
-   */
-  @Test
-  public void testMakeVersion ()
-  {
-    assertEquals ( ZMQ.getFullVersion (),
-                   ZMQ.makeVersion ( ZMQ.getMajorVersion (),
-                                     ZMQ.getMinorVersion (),
-                                     ZMQ.getPatchVersion () ) );
-  }
-
-  /**
-   * Test method for {@link org.zeromq.ZMQ#getVersionString()}.
-   */
-  @Test
-  public void testGetVersion ()
-  {
-    assertEquals ( ZMQ.getMajorVersion () + "." + ZMQ.getMinorVersion () + "." + ZMQ.getPatchVersion (),
-                   ZMQ.getVersionString () );
-  }
-
-  /**
-   * Test method for {@link org.zeromq.ZMQ.Socket#bindToRandomPort(String)}.
-   */
-  @Test
-  public void testBindToRandomPort()
-  {
-    ZMQ.Context context = ZMQ.context(1);
-    ZMQ.Socket sock = context.socket(ZMQ.DEALER);
-
-    // Check that bindToRandomport generate valid port number
-    for (int i=0; i < 100; i++) {
-    	sock.bindToRandomPort("tcp://127.0.0.1");
+    /**
+     * Test method for {@link org.zeromq.ZMQ#makeVersion(int, int, int)}.
+     */
+    @Test
+    public void testMakeVersion() {
+        assertEquals(ZMQ.getFullVersion(),
+                ZMQ.makeVersion(ZMQ.getMajorVersion(), ZMQ.getMinorVersion(), ZMQ.getPatchVersion()));
     }
 
-    sock.close();
-    sock = context.socket(ZMQ.DEALER);
-
-    // Check that exception different of EADDRINUSE is not catched
-
-    // Invalid protocol
-    try {
-    	sock.bindToRandomPort("noprotocol://127.0.0.1");
-    } catch (ZMQException e) {
-    	assertEquals(e.getErrorCode(), ZMQ.EPROTONOSUPPORT());
+    /**
+     * Test method for {@link org.zeromq.ZMQ#getVersionString()}.
+     */
+    @Test
+    public void testGetVersion() {
+        assertEquals(ZMQ.getMajorVersion() + "." + ZMQ.getMinorVersion() + "." + ZMQ.getPatchVersion(),
+                ZMQ.getVersionString());
     }
-  }
 
-  @Test
-  public void testReqRep ()
-  {
-	  	ZMQ.Context context = ZMQ.context(1);
+    /**
+     * Test method for {@link org.zeromq.ZMQ.Socket#bindToRandomPort(String)}.
+     */
+    @Test
+    public void testBindToRandomPort() {
+        ZMQ.Context context = ZMQ.context(1);
+        ZMQ.Socket sock = context.socket(ZMQ.DEALER);
 
-		ZMQ.Socket in = context.socket(ZMQ.REQ);
-		in.bind("inproc://reqrep");
+        // Check that bindToRandomport generate valid port number
+        for (int i = 0; i < 100; i++) {
+            sock.bindToRandomPort("tcp://127.0.0.1");
+        }
 
-		ZMQ.Socket out = context.socket(ZMQ.REP);
-		out.connect("inproc://reqrep");
+        sock.close();
+        sock = context.socket(ZMQ.DEALER);
 
-		for (int i = 0; i < 10; i++) {
-			byte[] req = ("request" + i).getBytes();
-			byte[] rep = ("reply" + i).getBytes();
+        // Check that exception different of EADDRINUSE is not catched
 
-			assertTrue(in.send(req, 0));
-			byte[] reqTmp = out.recv(0);
-			assertArrayEquals(req, reqTmp);
-
-			assertTrue(out.send(rep, 0));
-			byte[] repTmp = in.recv(0);
-			assertArrayEquals(rep, repTmp);
-		}
-  }
+        // Invalid protocol
+        try {
+            sock.bindToRandomPort("noprotocol://127.0.0.1");
+        } catch (ZMQException e) {
+            assertEquals(e.getErrorCode(), ZMQ.EPROTONOSUPPORT());
+        }
+    }
 
     @Test
-    public void testXPUBSUB ()
-    {
-        if (ZMQ.getFullVersion() <  ZMQ.make_version(3, 0, 0)) {
-          // Can only test XPUB on ZMQ >= of 3.0
-          return;
+    public void testReqRep() {
+        ZMQ.Context context = ZMQ.context(1);
+
+        ZMQ.Socket in = context.socket(ZMQ.REQ);
+        in.bind("inproc://reqrep");
+
+        ZMQ.Socket out = context.socket(ZMQ.REP);
+        out.connect("inproc://reqrep");
+
+        for (int i = 0; i < 10; i++) {
+            byte[] req = ("request" + i).getBytes();
+            byte[] rep = ("reply" + i).getBytes();
+
+            assertTrue(in.send(req, 0));
+            byte[] reqTmp = out.recv(0);
+            assertArrayEquals(req, reqTmp);
+
+            assertTrue(out.send(rep, 0));
+            byte[] repTmp = in.recv(0);
+            assertArrayEquals(rep, repTmp);
+        }
+    }
+
+    @Test
+    public void testXPUBSUB() {
+        if (ZMQ.getFullVersion() < ZMQ.make_version(3, 0, 0)) {
+            // Can only test XPUB on ZMQ >= of 3.0
+            return;
         }
 
         ZMQ.Context context = ZMQ.context(1);
@@ -108,11 +102,11 @@ public class ZMQTest
 
         sub.subscribe("".getBytes());
         byte[] subcr = pub.recv(0);
-        assertArrayEquals(new byte[]{1}, subcr);
+        assertArrayEquals(new byte[] { 1 }, subcr);
 
         sub.unsubscribe("".getBytes());
         subcr = pub.recv(0);
-        assertArrayEquals(new byte[]{0}, subcr);
+        assertArrayEquals(new byte[] { 0 }, subcr);
 
         byte[] subscription = "subs".getBytes();
 
@@ -148,38 +142,38 @@ public class ZMQTest
      * Test method for various set/get options.
      */
     @Test
-    public void testSetOption ()
-    {
+    public void testSetOption() {
         ZMQ.Context context = ZMQ.context(1);
 
         ZMQ.Socket sock = context.socket(ZMQ.REQ);
 
         if (ZMQ.getFullVersion() >= ZMQ.makeVersion(3, 2, 0)) {
-            sock.setIPv4Only (false);
-            assertEquals (false, sock.getIPv4Only ());
+            sock.setIPv4Only(false);
+            assertEquals(false, sock.getIPv4Only());
 
-            sock.setIPv4Only (true);
-            assertEquals (true, sock.getIPv4Only ());
+            sock.setIPv4Only(true);
+            assertEquals(true, sock.getIPv4Only());
         }
-        sock.close ();
+        sock.close();
 
-        context.term ();
+        context.term();
     }
 
     static class Client extends Thread {
 
         private Socket s = null;
         private String name = null;
-        public Client (Context ctx, String name_) {
+
+        public Client(Context ctx, String name_) {
             s = ctx.socket(ZMQ.REQ);
             name = name_;
 
-            s.setIdentity(name.getBytes ());
+            s.setIdentity(name.getBytes());
         }
 
         @Override
-        public void run () {
-            s.connect( "tcp://127.0.0.1:6660");
+        public void run() {
+            s.connect("tcp://127.0.0.1:6660");
             s.send("hello", 0);
             String msg = s.recvStr(0);
             s.send("world", 0);
@@ -193,17 +187,18 @@ public class ZMQTest
 
         private Socket s = null;
         private String name = null;
+
         public Dealer(Context ctx, String name_) {
             s = ctx.socket(ZMQ.DEALER);
             name = name_;
 
-            s.setIdentity(name.getBytes ());
+            s.setIdentity(name.getBytes());
         }
 
         @Override
-        public void run () {
+        public void run() {
 
-            s.connect( "tcp://127.0.0.1:6661");
+            s.connect("tcp://127.0.0.1:6661");
             int count = 0;
             while (count < 2) {
                 String msg = s.recvStr(0);
@@ -231,9 +226,11 @@ public class ZMQTest
             s.close();
         }
     }
+
     static class Main extends Thread {
 
         Context ctx;
+
         Main(Context ctx_) {
             ctx = ctx_;
         }
@@ -242,15 +239,14 @@ public class ZMQTest
         public void run() {
             Socket frontend = ctx.socket(ZMQ.ROUTER);
 
-            assertNotNull (frontend);
-            frontend.bind ("tcp://127.0.0.1:6660");
-
+            assertNotNull(frontend);
+            frontend.bind("tcp://127.0.0.1:6660");
 
             Socket backend = ctx.socket(ZMQ.DEALER);
-            assertNotNull (backend);
-            backend.bind ("tcp://127.0.0.1:6661");
+            assertNotNull(backend);
+            backend.bind("tcp://127.0.0.1:6661");
 
-            ZMQ.proxy (frontend, backend, null);
+            ZMQ.proxy(frontend, backend, null);
 
             frontend.close();
             backend.close();
@@ -259,15 +255,15 @@ public class ZMQTest
     }
 
     @Test
-    public void testProxy ()  throws Exception {
+    public void testProxy() throws Exception {
 
-        if (ZMQ.getFullVersion() <  ZMQ.make_version(3, 2, 2)) {
+        if (ZMQ.getFullVersion() < ZMQ.make_version(3, 2, 2)) {
             // Can only test zmq_proxy on ZMQ >= of 3.2.2
             return;
         }
 
-        Context ctx = ZMQ.context (1);
-        assert (ctx!= null);
+        Context ctx = ZMQ.context(1);
+        assert (ctx != null);
 
         Main mt = new Main(ctx);
         mt.start();
@@ -291,33 +287,31 @@ public class ZMQTest
      * Test method for Router Mandatory
      */
     @Test
-    public void testRouterMandatory ()
-    {
+    public void testRouterMandatory() {
         if (ZMQ.getFullVersion() < ZMQ.makeVersion(3, 2, 0))
             return;
 
         ZMQ.Context context = ZMQ.context(1);
 
         ZMQ.Socket sock = context.socket(ZMQ.ROUTER);
-        boolean ret = sock.sendMore ("UNREACHABLE");
-        assertEquals (true, ret);
-        sock.send ("END");
+        boolean ret = sock.sendMore("UNREACHABLE");
+        assertEquals(true, ret);
+        sock.send("END");
 
-        sock.setRouterMandatory (true);
+        sock.setRouterMandatory(true);
         try {
-            sock.sendMore ("UNREACHABLE");
-            assertFalse (true);
+            sock.sendMore("UNREACHABLE");
+            assertFalse(true);
         } catch (ZMQException e) {
-            assertEquals (ZMQ.EHOSTUNREACH (), e.getErrorCode ());
+            assertEquals(ZMQ.EHOSTUNREACH(), e.getErrorCode());
         }
 
-        sock.close ();
-        context.term ();
+        sock.close();
+        context.term();
     }
 
     @Test
-    public void testWritingToClosedSocket()
-    {
+    public void testWritingToClosedSocket() {
         ZMQ.Context context = ZMQ.context(1);
         ZMQ.Socket sock = null;
         try {
@@ -325,16 +319,53 @@ public class ZMQTest
             sock.connect("ipc:///tmp/hai");
             sock.close();
             sock.send("PING".getBytes(), 0);
-        } catch(ZMQException e) {
+        } catch (ZMQException e) {
             assertEquals(ZMQ.ENOTSOCK(), e.getErrorCode());
+        } finally {
+            try {
+                sock.close();
+            } catch (Exception ignore) {
+            }
+            try {
+                context.term();
+            } catch (Exception ignore) {
+            }
         }
-        finally {
+    }
+
+    @Test
+    public void testZeroCopyRecv() throws InterruptedException {
+        ZMQ.Context context = ZMQ.context(1);
+
+        ByteBuffer response = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
+        ZMQ.Socket push = null;
+        ZMQ.Socket pull = null;
+        try {
+            push = context.socket(ZMQ.PUSH);
+            pull = context.socket(ZMQ.PULL);
+            pull.bind("tcp://*:45324");
+            push.connect("tcp://localhost:45324");
+
+            push.send("PING");
+            Thread.sleep(100);
+            int rc = pull.recvZeroCopy(response, 16, 0);
+            response.flip();
+            byte[] b = new byte[rc];
+            response.get(b);
+            assertEquals("PING", new String(b));
+        } finally {
             try {
-                sock.close ();
-            } catch (Exception ignore) {}
+                push.close();
+            } catch (Exception ignore) {
+            }
             try {
-                context.term ();
-            } catch (Exception ignore) {}
+                pull.close();
+            } catch (Exception ignore) {
+            }
+            try {
+                context.term();
+            } catch (Exception ignore) {
+            }
         }
     }
 }
