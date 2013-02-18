@@ -489,6 +489,7 @@ Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
                                               jint length,
                                               jint flags)
 {
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     jbyte* buf = 0;
     int rc = 0;
     void *sock = get_socket (env, obj, 0);
@@ -500,6 +501,9 @@ Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
         return JNI_FALSE;
     }
     return JNI_TRUE;
+#else
+    return JNI_FALSE;
+#endif
 }
 
 /**
@@ -587,6 +591,7 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
                                               jint length,
                                               jint flags)
 {
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     void* sock = get_socket (env, obj, 0);
     jbyte* buf = 0;
     int rc = 0;
@@ -601,6 +606,9 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
         }
     }
     return rc;
+#else
+    return -1;
+#endif
 } 
 
 /**
