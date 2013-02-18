@@ -1,3 +1,20 @@
+jzmq (2.1.2-1) unstable; urgency=low
+
+  * Fix regression where compatibility with zmq 2.1.X was broken by zero copy
+
+ -- Trevor Bernard <trevor.bernard@gmail.com>  Sun, 17 Feb 2013 20:38:05 -0400
+
+jzmq (2.1.1-1) unstable; urgency=low
+
+  * Add zero copy API to send and recv
+  * Remove asserts from get_context JNI
+  * Add ZLoop support
+  * Poller rewrite
+  * No longer c assert when trying to write to a closed Socket
+  * Add a continuous integration support through travis-ci
+
+ -- Trevor Bernard <trevor.bernard@gmail.com>  Sun, 17 Feb 2013 20:38:05 -0400
+
 jzmq (2.1.0-1) unstable; urgency=low
 
   * Development release
