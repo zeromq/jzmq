@@ -1,5 +1,7 @@
 # Changelog
 
+* Fix regression where compatibility with zmq 2.1.X was broken by zero copy 
+
 ## v2.1.1 - February 16, 2013
 
 * Add zero copy API to send and recv
