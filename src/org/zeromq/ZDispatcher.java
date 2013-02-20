@@ -10,6 +10,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * Dispatcher for ZeroMQ Sockets.
+ *
+ * ATTENTION: This code uses busy waiting an may not be production ready!
+ * See: https://github.com/zeromq/jzmq/issues/111
+ *
+ * With this dispatcher, you can register ONE handler per socket and get a Sender for sending ZMsg.
  */
 public class ZDispatcher {
     private ConcurrentMap<ZMQ.Socket, SocketDispatcher> dispatchers = new ConcurrentHashMap<ZMQ.Socket, SocketDispatcher>();
