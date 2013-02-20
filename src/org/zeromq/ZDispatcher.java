@@ -10,6 +10,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * Dispatcher for ZeroMQ Sockets.
+ *
+ * Warning:
+ * The Dispatcher uses a busy spin loop when waiting on events.
+ * This is ideal for low latency applications but not in all situations.
+ * It has the side effect of consuming 100% of a CPU when waiting for events.
+ *
+ * With this dispatcher, you can register ONE handler per socket 
+ * and get a Sender for sending ZMsg.
  */
 public class ZDispatcher {
     private ConcurrentMap<ZMQ.Socket, SocketDispatcher> dispatchers = new ConcurrentHashMap<ZMQ.Socket, SocketDispatcher>();
