@@ -90,7 +90,7 @@ AC_CHECK_LIB([zmq], [zmq_init],
     [AC_MSG_ERROR([cannot link with -lzmq])])
 
 # Check for JDK
-test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac)
+test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac -encoding ut8)
 test "x$JAVAC" = x && AC_MSG_ERROR([cannot find javac])
 AC_SUBST(JAVAC)
 
