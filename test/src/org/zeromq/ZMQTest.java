@@ -311,6 +311,34 @@ public class ZMQTest {
     }
 
     @Test
+    public void testSendMoreRequestReplyOverTcp() {
+        ZMQ.Context context = ZMQ.context(1);
+        ZMQ.Socket reply = null;
+        ZMQ.Socket socket = null;
+        try {
+            reply = context.socket(ZMQ.REP);
+            reply.bind("tcp://*:12345");
+            socket = context.socket(ZMQ.REQ);
+            socket.connect("tcp://localhost:12345");
+            socket.send("test1", ZMQ.SNDMORE);
+            socket.send("test2");
+            assertEquals("test1", reply.recvStr());
+            assertTrue(reply.hasReceiveMore());
+            assertEquals("test2", reply.recvStr());
+        } finally {
+            try {
+                socket.close();
+            } catch (Exception ignore){}
+            try {
+                reply.close();
+            } catch (Exception ignore){}
+            try {
+                context.term();    
+            } catch (Exception ignore) {}
+        }
+    }
+
+    @Test
     public void testWritingToClosedSocket() {
         ZMQ.Context context = ZMQ.context(1);
         ZMQ.Socket sock = null;
