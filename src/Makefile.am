@@ -52,7 +52,7 @@ JZMQ_CLASS_FILES = \
 JAVAH_FLAGS = -d . -classpath .
 
 $(jarfile):
-	$(JAVAC) -d . $(JZMQ_JAVA_FILES)
+	$(JAVAC) -encoding utf8 -d . $(JZMQ_JAVA_FILES)
 	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
 
 jar_DATA = $(jarfile)
