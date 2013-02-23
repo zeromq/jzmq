@@ -1,6 +1,10 @@
 # Changelog
 
-* Fix regression where compatibility with zmq 2.1.X was broken by zero copy 
+* Remove assert where runtime errors are more appropriate
+* Use utf8 when compiling java
+* Add unit test for REQ/REP send more
+* Update comment on ZDispatcher to warn users about busy spin wait strategy
+* Fix regression where compatibility with zmq 2.1.X was broken by zero copy
 
 ## v2.1.1 - February 16, 2013
 
