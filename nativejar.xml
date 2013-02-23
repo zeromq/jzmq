@@ -1,16 +1,15 @@
-
 <assembly>
-	<!-- Dependent projects will use this id as the classifier to match this assembly -->
-	<id>native-${native.arch}-${native.os}${native.distro}${native.zmq.version}</id>
-	<formats>
-		<format>jar</format>
-	</formats>
-	<includeBaseDirectory>false</includeBaseDirectory>
-	<files>
-		<file>
-			<source>${native.path.resolved}</source>
-			<outputDirectory>NATIVE/${native.arch}/${native.os}</outputDirectory>
-			<fileMode>0644</fileMode>
-		</file>
-	</files>
+    <!-- Dependent projects will use this id as the classifier to match this assembly -->
+    <id>native-${native.arch}-${native.os}${native.distro}${native.zmq.version}</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <files>
+        <file>
+            <source>${native.path.resolved}</source>
+            <outputDirectory>NATIVE/${native.arch}/${native.os}</outputDirectory>
+            <fileMode>0644</fileMode>
+        </file>
+    </files>
 </assembly>
