@@ -1024,10 +1024,11 @@ public class ZMQ {
 
         /**
          * The 'ZMQ_RECOVERY_IVL' option shall set the recovery interval for multicast transports using the specified
-         * 'socket'. The recovery interval determines the maximum time in seconds that a receiver can be absent from a
-         * multicast group before unrecoverable data loss will occur.
+         * 'socket'. The recovery interval determines the maximum time in seconds (before version 3.0.0) or milliseconds
+         * (version 3.0.0 and after) that a receiver can be absent from a multicast group before unrecoverable data loss
+         * will occur.
          * 
-         * CAUTION: Excersize care when setting large recovery intervals as the data needed for recovery will be held in
+         * CAUTION: Exercise care when setting large recovery intervals as the data needed for recovery will be held in
          * memory. For example, a 1 minute recovery interval at a data rate of 1Gbps requires a 7GB in-memory buffer.
          * {Purpose of this Method}
          * 
