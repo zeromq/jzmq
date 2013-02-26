@@ -341,7 +341,7 @@ public class ZMQ {
      * Inner class: Context.
      */
     public static class Context {
-        private AtomicBoolean closed = new AtomicBoolean(false);
+        private final AtomicBoolean closed = new AtomicBoolean(false);
 
         /**
          * This is an explicit "destructor". It can be called to ensure the corresponding 0MQ Context has been disposed
