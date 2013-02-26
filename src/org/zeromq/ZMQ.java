@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * ZeroMQ JNI Bindings.
@@ -340,13 +341,16 @@ public class ZMQ {
      * Inner class: Context.
      */
     public static class Context {
+        private final AtomicBoolean closed = new AtomicBoolean(false);
 
         /**
          * This is an explicit "destructor". It can be called to ensure the corresponding 0MQ Context has been disposed
          * of.
          */
         public void term() {
-            finalize();
+            if(closed.compareAndSet(false, true)) {
+                finalize();
+            }
         }
 
         /**
@@ -414,12 +418,15 @@ public class ZMQ {
      * Inner class: Socket.
      */
     public static class Socket {
+        private final AtomicBoolean closed = new AtomicBoolean(false);
         /**
          * This is an explicit "destructor". It can be called to ensure the corresponding 0MQ Socket has been disposed
          * of.
          */
         public void close() {
-            finalize();
+            if(closed.compareAndSet(false, true)) {
+                finalize();
+            }
         }
 
         /**
