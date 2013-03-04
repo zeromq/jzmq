@@ -597,7 +597,6 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
     int rc = 0;
     buf = (jbyte*) env->GetDirectBufferAddress(buffer);
     rc = zmq_recv(sock, buf, length, flags);
-    setByteBufferPosition(env, buffer, rc);
     if(rc == -1) {
         int err = zmq_errno();
         if(err == EAGAIN) {
@@ -605,6 +604,7 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
             return 0;
         }
     }
+    setByteBufferPosition(env, buffer, rc);
     return rc;
 #else
     return -1;
