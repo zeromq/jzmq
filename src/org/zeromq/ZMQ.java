@@ -1104,6 +1104,20 @@ public class ZMQ {
         }
 
         /**
+         * Sets the XPUB socket behavior on new subscriptions and unsubscriptions.
+         *
+         * @param verbose A value of false is the default and passes only new subscription messages to upstream.
+         *            A value of true passes all subscription messages upstream.
+         * @since 3.2.2
+         */
+        public void setXpubVerbose(boolean verbose) {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 2, 2))
+                return;
+              
+            setLongSockopt(XPUB_VERBOSE, verbose ? 1L : 0L);
+        }
+
+        /**
          * Bind to network interface. Start listening for new connections.
          * 
          * @param addr the endpoint to bind to.
@@ -1429,6 +1443,7 @@ public class ZMQ {
         private static final int KEEPALIVECNT = 35;
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
+        private static final int XPUB_VERBOSE = 40;
 
     }
 
