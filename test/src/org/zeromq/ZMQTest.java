@@ -137,6 +137,52 @@ public class ZMQTest {
             assertArrayEquals(data, tmp);
         }
     }
+    
+    @Test
+    public void testSetXpubVerbose() {
+        if (ZMQ.getFullVersion() < ZMQ.make_version(3, 2, 2)) {
+            // Can only test ZMQ_XPUB_VERBOSE on ZMQ >= of 3.2.2
+            return;
+        }
+        ZMQ.Context context = ZMQ.context(1);
+        
+        byte[] topic = "topic".getBytes();
+        byte[] subscription = new byte[topic.length + 1];
+        subscription[0] = 1;
+        System.arraycopy(topic, 0, subscription, 1, topic.length);
+        
+        ZMQ.Socket xpubVerbose = context.socket(ZMQ.XPUB);
+        xpubVerbose.setXpubVerbose(true);
+        xpubVerbose.bind("inproc://xpub_verbose");
+        
+        ZMQ.Socket xpubDefault = context.socket(ZMQ.XPUB);
+        xpubDefault.bind("inproc://xpub_default");
+        
+        ZMQ.Socket[] xsubs = new ZMQ.Socket[3];
+        for (int i = 0; i < xsubs.length; i++) {
+            xsubs[i] = context.socket(ZMQ.XSUB);
+            xsubs[i].connect("inproc://xpub_verbose");
+            xsubs[i].connect("inproc://xpub_default");
+        }
+        
+        for (int i = 0; i < xsubs.length; i++) {
+            xsubs[i].send(subscription, 0);
+            assertArrayEquals(subscription, xpubVerbose.recv(0));
+            if (i == 0) {
+                assertArrayEquals(subscription, xpubDefault.recv(0));
+            }
+            else {
+                assertNull(xpubDefault.recv(ZMQ.DONTWAIT));
+            }
+        }
+        
+        for (int i = 0; i < xsubs.length; i++) {
+            xsubs[i].close();
+        }
+        xpubVerbose.close();
+        xpubDefault.close();
+        context.term();
+    }
 
     /**
      * Test method for various set/get options.

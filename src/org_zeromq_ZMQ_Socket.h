@@ -69,6 +69,8 @@ extern "C" {
 #define org_zeromq_ZMQ_Socket_KEEPALIVEIDLE 36L
 #undef org_zeromq_ZMQ_Socket_KEEPALIVEINTVL
 #define org_zeromq_ZMQ_Socket_KEEPALIVEINTVL 37L
+#undef org_zeromq_ZMQ_Socket_XPUB_VERBOSE
+#define org_zeromq_ZMQ_Socket_XPUB_VERBOSE 40L
 /*
  * Class:     org_zeromq_ZMQ_Socket
  * Method:    bind
