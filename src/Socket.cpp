@@ -253,6 +253,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_IPV4ONLY:
     case ZMQ_ROUTER_MANDATORY:
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,2)
+    case ZMQ_XPUB_VERBOSE:
+#endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
     case ZMQ_RECOVERY_IVL:
@@ -282,6 +285,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_TCP_KEEPALIVE_INTVL)
                 || (option == ZMQ_IPV4ONLY)
                 || (option == ZMQ_ROUTER_MANDATORY)
+#endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,2)
+                || (option == ZMQ_XPUB_VERBOSE)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
                 || (option == ZMQ_SNDBUF)
