@@ -184,7 +184,7 @@ public class ZMQ {
     }
 
     /**
-     * Starts the built-in ØMQ proxy in the current application thread. The proxy connects a frontend socket to a
+     * Starts the built-in 0MQ proxy in the current application thread. The proxy connects a frontend socket to a
      * backend socket. Conceptually, data flows from frontend to backend. Depending on the socket types, replies may
      * flow in the opposite direction. The direction is conceptual only; the proxy is fully symmetric and there is no
      * technical difference between frontend and backend.
