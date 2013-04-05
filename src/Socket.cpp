@@ -269,6 +269,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
             if(
                 (option == ZMQ_LINGER)
+                || (option == ZMQ_RATE)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,10)
                 || (option == ZMQ_RECONNECT_IVL)
@@ -295,6 +296,8 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_SNDHWM)
                 || (option == ZMQ_RCVHWM)
                 || (option == ZMQ_RECOVERY_IVL)
+                || (option == ZMQ_BACKLOG)
+                || (option == ZMQ_MULTICAST_HOPS)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)    
             ) {
