@@ -192,7 +192,7 @@ public class ZContext implements Closeable {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         destroy();
     }
 }
