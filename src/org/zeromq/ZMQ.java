@@ -1645,6 +1645,9 @@ public class ZMQ {
         private void unregisterInternal(Object socket) {
             for (int i = 0; i < this.next; ++i) {
                 PollItem item = this.items[i];
+                if (item == null) {
+                    continue;
+                }
                 if (item.socket == socket || item.channel == socket) {
                     this.items[i] = null;
 
