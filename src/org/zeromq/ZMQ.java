@@ -954,7 +954,8 @@ public class ZMQ {
          * Override TCP_KEEPINTVL socket option (where supported by OS). The default value -1 will skip all overrides
          * and do the OS default.
          * 
-         * @param optVal The value of 'ZMQ_TCP_KEEPALIVE_INTVL' defines the interval between keepalives in ms.
+         * @param optVal The value of 'ZMQ_TCP_KEEPALIVE_INTVL' defines the interval between keepalives. Unit is OS
+         *            dependant.
          */
         public void setTCPKeepAliveInterval(long optVal) {
             if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0))
@@ -966,7 +967,7 @@ public class ZMQ {
          * -1 will skip all overrides and do the OS default.
          * 
          * @param optVal The value of 'ZMQ_TCP_KEEPALIVE_IDLE' defines the interval between the last data packet sent
-         *            over the socket and the first keepalive probe in ms.
+         *            over the socket and the first keepalive probe. Unit is OS dependant.
          */
         public void setTCPKeepAliveIdle(long optVal) {
             if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0))
