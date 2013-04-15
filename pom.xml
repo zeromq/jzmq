@@ -30,7 +30,7 @@
     </scm>
     <licenses>
         <license>
-            <name>GNU LGPL 3</name>
+            <name>LGPLv3+</name>
             <url>http://www.gnu.org/licenses/lgpl.txt</url>
         </license>
     </licenses>
