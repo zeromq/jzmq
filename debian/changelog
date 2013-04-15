@@ -1,3 +1,19 @@
+jzmq (2.1.3-1) precise; urgency=low
+  * Fix issue #200 - Correct inaccurate javadocs for setTCPKeepAliveInterval and setTCPKeepAliveIdle
+  * Fixed unregisterInternal to skip PollItems which were nulled by a previous unregisterInternal.
+  * Fix Issue #203 - An overriding instance method doesn't have to throw exceptions specified by it's superclass.
+  * Prevent EINVAL in setsockopt
+  * Fix issue #197 - Only sign artifacts when it's time to release
+  * Create CMakeLists.txt
+  * Work around to a Locale javac bug
+  * test added to verify sockopt ZMQ_XPUB_VERBOSE
+  * Add set method for sockopt ZMQ_XPUB_VERBOSE
+  * recvZeroCopy failure is hidden by failure to set position on ByteBuffer
+  * Fix #186 - Enforce only calling finalize once in Socket and Context
+  * Fixed ZMQ.Socket.setRecoveryInterval() to work with v3.0.0 and up.
+
+ -- Trevor Bernard <trevor.bernard@gmail.com>  Sun, 14 Apr 2013 21:04:55 -0300
+
 jzmq (2.1.2-1) precise; urgency=low
 
   * Remove assert where runtime errors are more appropriate
