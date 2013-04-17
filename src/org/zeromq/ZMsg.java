@@ -335,7 +335,7 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
     /**
      * Convert the message to a string, for use in debugging.
      */
-    public void toString() {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         dump(sb);
         return sb.toString();
