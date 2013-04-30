@@ -18,6 +18,15 @@ To build you need to have the libzmq library already installed, then you run:
 make
 ```
 
+Installing JZMQ
+-------------
+
+To install you need to have the libzmq library built, then you run:
+
+```bash
+make install
+```
+
 Avoiding JNI
 ------------
 
