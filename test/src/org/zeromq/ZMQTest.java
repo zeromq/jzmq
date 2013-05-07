@@ -6,6 +6,7 @@ import java.nio.ByteOrder;
 import org.junit.Test;
 
 import org.zeromq.ZMQ.Context;
+import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
 
 import static org.junit.Assert.*;
@@ -474,5 +475,25 @@ public class ZMQTest {
                 }
             }
         }
+    }
+    
+    @Test
+    public void testPollerUnregister() {
+        Context context = ZMQ.context(1);
+        Socket socketOne = context.socket(ZMQ.SUB);
+        Socket socketTwo = context.socket(ZMQ.REP);
+        Poller poller = new ZMQ.Poller(2);
+        poller.register(socketOne, ZMQ.Poller.POLLIN);
+        poller.register(socketTwo, ZMQ.Poller.POLLIN);
+
+        socketOne.setLinger(0);
+        socketOne.close();
+        socketTwo.setLinger(0);
+        socketTwo.close();
+
+        poller.unregister(socketOne);
+        poller.unregister(socketTwo);
+        
+        context.term();
     }
 }
