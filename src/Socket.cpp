@@ -491,6 +491,39 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_disconnect (JNIEnv *env,
 #endif
 }
 
+typedef struct _jzmq_zerocopy_t {
+    JNIEnv *env;
+    jobject ref_buffer;
+} jzmq_zerocopy_t;
+
+static
+void s_delete_ref (void *ptr, void *hint)
+{
+    jzmq_zerocopy_t *free_hint = (jzmq_zerocopy_t *)hint;
+    free_hint->env->DeleteGlobalRef(free_hint->ref_buffer);
+    delete free_hint;
+}
+
+static
+jboolean s_zerocopy_init (JNIEnv *env, zmq_msg_t *message, jobject obj, jint length)
+{
+    jobject ref_buffer = env->NewGlobalRef(obj);
+    jzmq_zerocopy_t *free_hint = new jzmq_zerocopy_t;
+
+    free_hint->env = env;
+    free_hint->ref_buffer = ref_buffer;
+
+    jbyte* buf = (jbyte*) env->GetDirectBufferAddress(ref_buffer);
+
+    int rc = zmq_msg_init_data (message, buf, length, s_delete_ref, free_hint);
+    if (rc != 0) {
+        int err = zmq_errno();
+        raise_exception (env, err);
+        return JNI_FALSE;
+    }
+    return JNI_TRUE;
+}
+
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
                                               jobject obj,
@@ -502,10 +535,17 @@ Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
     jbyte* buf = 0;
     int rc = 0;
     void *sock = get_socket (env, obj);
-    buf = (jbyte*) env->GetDirectBufferAddress(buffer);
-    rc = zmq_send (sock, buf, length, flags);
+
+    // init the message
+    zmq_msg_t message;
+    jboolean retval = s_zerocopy_init (env, &message, buffer, length);
+    if (retval == JNI_FALSE)
+        return JNI_FALSE;
+
+    rc = zmq_sendmsg (sock, &message, flags);
     if (rc == -1) {
         int err = zmq_errno();
+        zmq_msg_close (&message);
         raise_exception (env, err);
         return JNI_FALSE;
     }
