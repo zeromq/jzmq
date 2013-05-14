@@ -63,7 +63,7 @@ JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
     // Add 0MQ sockets.  Array containing them can be "sparse": there
     // may be null elements.  The count argument has the real number
     // of valid sockets in the array.
-    for (int i = 0; i < ls; ++i) {
+    for (int i = 0; i < ls_0mq; ++i) {
         jobject s_0mq = env->GetObjectArrayElement (socket_0mq, i);
         if (!s_0mq)
             continue;
@@ -95,9 +95,12 @@ JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
 
     //  Set 0MQ results.
     if (rc > 0 && ls > 0) {
-        for (int i = 0; i < ls; ++i) {
+        for (int i = 0; i < ls_0mq; ++i) {
             jobject s_0mq = env->GetObjectArrayElement (socket_0mq, i);
-            env->SetIntField (s_0mq, field_revents, pitem [i].revents);
+            if (!s_0mq)
+                continue;
+            env->SetIntField (s_0mq, field_revents, pitem [pc].revents);
+            ++pc;
             env->DeleteLocalRef (s_0mq);
         }
     }
