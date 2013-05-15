@@ -204,7 +204,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
                 return env->NewByteArray(0);
             }
 
-            env->SetByteArrayRegion (array, 0, optvallen, (const jbyte*) optval);
+            env->SetByteArrayRegion (array, 0, optvallen, (jbyte*) optval);
             return array;
         }
 #endif
