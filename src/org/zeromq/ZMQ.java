@@ -1854,7 +1854,7 @@ public class ZMQ {
          * @return true if specific socket was signalled as specified.
          */
         private boolean poll_mask(int index, int mask) {
-            if (mask <= 0 || index < 0 || index >= this.next) {
+            if (mask <= 0 || index < 0 || index >= this.next || this.items[index] == null) {
                 return false;
             }
             return (this.items[index].revents & mask) > 0;
