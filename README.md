@@ -7,8 +7,8 @@ This is the Java language binding for libzmq (aka ZeroMQ, 0MQ).
 
 The latest [javadocs](http://zeromq.github.com/jzmq/javadocs/).
 
-Building JZMQ
--------------
+Building and Installing JZMQ
+----------------------------
 
 To build you need to have the libzmq library already installed, then you run:
 
@@ -16,6 +16,7 @@ To build you need to have the libzmq library already installed, then you run:
 ./autogen.sh
 ./configure
 make
+make install
 ```
 
 Avoiding JNI
