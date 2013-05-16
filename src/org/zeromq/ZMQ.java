@@ -1283,6 +1283,15 @@ public class ZMQ {
         }
 
         /**
+         * Send a message
+         *
+         * @param bb ByteBuffer payload
+         * @param flags the flags to apply to the send operation
+         * @return the number of bytes sent
+         */
+        public native int sendByteBuffer(ByteBuffer bb, int flags);
+
+        /**
          * Receive a message.
          * 
          * @param flags the flags to apply to the receive operation.
@@ -1345,6 +1354,14 @@ public class ZMQ {
 
             return new String(data);
         }
+        /**
+         * Receive a message
+         * 
+         * @param buffer
+         * @param flags
+         * @return bytes read, -1 on error
+         */
+        public native int recvByteBuffer(ByteBuffer buffer, int flags);
 
         /**
          * Class constructor.
