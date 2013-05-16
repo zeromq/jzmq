@@ -1,15 +1,20 @@
 package org.zeromq;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.CharacterCodingException;
 
 import org.junit.Test;
-
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Cliff Evans
@@ -476,7 +481,76 @@ public class ZMQTest {
             }
         }
     }
-    
+
+    @Test
+    public void testByteBufferSend() throws InterruptedException {
+        if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0)) {
+            ZMQ.Context context = ZMQ.context(1);
+            ByteBuffer bb = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder());
+            ZMQ.Socket push = null;
+            ZMQ.Socket pull = null;
+            try {
+                push = context.socket(ZMQ.PUSH);
+                pull = context.socket(ZMQ.PULL);
+                pull.bind("ipc:///tmp/sendbb");
+                push.connect("ipc:///tmp/sendbb");
+                bb.put("PING".getBytes());
+                bb.flip();
+                push.sendByteBuffer(bb, 0);
+                String actual = new String(pull.recv());
+                System.out.println(actual);
+                assertEquals("PING", actual);
+            } finally {
+                try {
+                    push.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    pull.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    context.term();
+                } catch (Exception ignore) {
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testByteBufferRecv() throws InterruptedException, CharacterCodingException {
+        if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0)) {
+            ZMQ.Context context = ZMQ.context(1);
+            ByteBuffer bb = ByteBuffer.allocateDirect(6).order(ByteOrder.nativeOrder());
+            ZMQ.Socket push = null;
+            ZMQ.Socket pull = null;
+            try {
+                push = context.socket(ZMQ.PUSH);
+                pull = context.socket(ZMQ.PULL);
+                pull.bind("ipc:///tmp/recvbb");
+                push.connect("ipc:///tmp/recvbb");
+                push.send("PING".getBytes(), 0);
+                int size = pull.recvByteBuffer(bb, 0);
+                bb.limit(size);
+                byte[] b = new byte[bb.remaining()];
+                bb.duplicate().get(b);
+                assertEquals("PING", new String(b));
+            } finally {
+                try {
+                    push.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    pull.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    context.term();
+                } catch (Exception ignore) {
+                }
+            }
+        }
+    }
     @Test
     public void testPollerUnregister() {
         Context context = ZMQ.context(1);
