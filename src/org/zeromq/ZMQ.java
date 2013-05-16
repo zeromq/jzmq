@@ -18,6 +18,7 @@
  */
 package org.zeromq;
 
+import java.io.Closeable;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.util.LinkedList;
@@ -340,7 +341,7 @@ public class ZMQ {
     /**
      * Inner class: Context.
      */
-    public static class Context {
+    public static class Context implements Closeable {
         private final AtomicBoolean closed = new AtomicBoolean(false);
 
         /**
@@ -412,12 +413,16 @@ public class ZMQ {
 
         /** Opaque data used by JNI driver. */
         private long contextHandle;
+
+        public void close() {
+            term();
+        }
     }
 
     /**
      * Inner class: Socket.
      */
-    public static class Socket {
+    public static class Socket implements Closeable {
         private final AtomicBoolean closed = new AtomicBoolean(false);
         /**
          * This is an explicit "destructor". It can be called to ensure the corresponding 0MQ Socket has been disposed
