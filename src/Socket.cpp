@@ -72,8 +72,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_construct (JNIEnv *env,
 /**
  * Called to destroy a Java Socket object.
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_finalize (JNIEnv *env,
-                                                                 jobject obj)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_destroy (JNIEnv *env, jobject obj)
 {
     void *s = get_socket (env, obj);
     if (! s)

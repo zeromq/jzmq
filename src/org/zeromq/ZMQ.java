@@ -350,7 +350,7 @@ public class ZMQ {
          */
         public void term() {
             if(closed.compareAndSet(false, true)) {
-                finalize();
+                destroy();
             }
         }
 
@@ -398,8 +398,7 @@ public class ZMQ {
         protected native void construct(int ioThreads);
 
         /** Free all resources used by JNI interface. */
-        @Override
-        protected native void finalize();
+        protected native void destroy();
 
         /**
          * Get the underlying context handle. This is private because it is only accessed from JNI, where Java access
@@ -430,7 +429,7 @@ public class ZMQ {
          */
         public void close() {
             if(closed.compareAndSet(false, true)) {
-                finalize();
+                destroy();
             }
         }
 
@@ -1385,8 +1384,7 @@ public class ZMQ {
         protected native void construct(Context ctx, int type);
 
         /** Free all resources used by JNI interface. */
-        @Override
-        protected native void finalize();
+        protected native void destroy();
 
         /**
          * Get the socket option value, as a long.
