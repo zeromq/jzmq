@@ -63,8 +63,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
 /**
  * Called to destroy a Java Context object.
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_finalize (JNIEnv *env,
-                                                                  jobject obj)
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_destroy (JNIEnv *env, jobject obj)
 {
     void *c = get_context (env, obj);
     if (! c)
