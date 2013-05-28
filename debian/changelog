@@ -1,3 +1,16 @@
+jzmq (2.2.0-1) precise; urgency=low
+  * Add toString method to ZMsg
+  * Fix README, plus note about JeroMQ
+  * Add unit test for issue #216
+  * Fix NullPointerException in Poller and fix bad null login in JNI
+  * Fix issue #81 - invalid conversion from 'const jbyte*' to 'jbyte*'
+  * Fix zero copy send
+  * Add ByteBuffer API for send and recv
+  * Fix issue #226 - Socket and Context now implement CLoseable
+  * Fix issue #228 - Socket and Context no longer override finalize
+
+ -- Trevor Bernard <trevor.bernard@gmail.com>  Mon, 27 May 2013 21:46:40 -0300
+
 jzmq (2.1.3-1) precise; urgency=low
   * Fix issue #200 - Correct inaccurate javadocs for setTCPKeepAliveInterval and setTCPKeepAliveIdle
   * Fixed unregisterInternal to skip PollItems which were nulled by a previous unregisterInternal.
