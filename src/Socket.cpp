@@ -503,6 +503,7 @@ void s_delete_ref (void *ptr, void *hint)
     delete free_hint;
 }
 
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
 static
 jboolean s_zerocopy_init (JNIEnv *env, zmq_msg_t *message, jobject obj, jint length)
 {
@@ -522,6 +523,7 @@ jboolean s_zerocopy_init (JNIEnv *env, zmq_msg_t *message, jobject obj, jint len
     }
     return JNI_TRUE;
 }
+#endif
 
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
@@ -557,6 +559,7 @@ Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
 JNIEXPORT jint JNICALL
 Java_org_zeromq_ZMQ_00024Socket_sendByteBuffer (JNIEnv *env, jobject obj, jobject buffer, jint flags)
 {
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     jbyte* buf = 0;
     int rc = 0;
 
@@ -580,6 +583,9 @@ Java_org_zeromq_ZMQ_00024Socket_sendByteBuffer (JNIEnv *env, jobject obj, jobjec
         return -1;
     }
     return rc;
+#else
+    return JNI_FALSE;
+#endif
 }
 
 /**
@@ -690,6 +696,7 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
 JNIEXPORT jint JNICALL
 Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobject buffer, jint flags)
 {
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     jbyte* buf = 0;
     int rc = 0;
 
@@ -714,6 +721,9 @@ Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobjec
         }
     }
     return rc;
+#else
+    return JNI_FALSE;
+#endif
 }
 
 /**
