@@ -1,3 +1,8 @@
+jzmq (2.2.1-1) precise; urgency=low
+  * Fix issue ZeroMQ 2.x compatibility
+
+ -- Trevor Bernard <trevor.bernard@gmail.com>  Mon, 29 Jul 2013 13:06:19 -0300
+
 jzmq (2.2.0-1) precise; urgency=low
   * Add toString method to ZMsg
   * Fix README, plus note about JeroMQ
