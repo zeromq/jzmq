@@ -1,5 +1,5 @@
 before_install:
- - sudo add-apt-repository ppa:chris-lea/zeromq -y
+ - sudo add-apt-repository ppa:trevorbernard/zeromq -y
  - sudo apt-get update -y
  - sudo apt-get install libzmq-dev libpgm-dev make build-essential uuid-dev unzip pkg-config libtool automake -y
  - ./autogen.sh
