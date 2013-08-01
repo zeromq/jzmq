@@ -1,3 +1,9 @@
+jzmq (2.2.2-1) precise; urgency=low
+  * Fix issue #241 - Fix travis-ci build
+  * Update the appropriate build files to the correct version
+
+ -- Trevor Bernard <trevor.bernard@gmail.com>  Thu, 01 Aug 2013 09:02:27 -0300
+
 jzmq (2.2.1-1) precise; urgency=low
   * Fix issue ZeroMQ 2.x compatibility
 
