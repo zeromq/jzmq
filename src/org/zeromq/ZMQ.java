@@ -20,6 +20,7 @@ package org.zeromq;
 
 import java.io.Closeable;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.channels.SelectableChannel;
 import java.util.LinkedList;
 import java.util.Random;
@@ -1335,32 +1336,57 @@ public class ZMQ {
         }
 
         /**
-         * Receive a message as a String.
-         * 
+         * Receive a message as a String with the default Charset.
+         *
+         * @deprecated use {@link recvStr(Charset)} instead.
          * @return the message received, as a String; null on error.
          */
+        @Deprecated
         public String recvStr() {
             return recvStr(0);
         }
 
         /**
-         * Receive a message as a String.
-         * 
+         * Receive a message as a String with a given Charset.
+         *
+         * @param charset the charset of the resulting string.
+         * @return the message received, as a String; null on error.
+         */
+        public String recvStr(Charset charset) {
+            return recvStr(0, charset);
+        }
+
+        /**
+         * Receive a message as a String with the default charset.
+         *
+         * @deprecated use {@link recvStr(int, Charset)} instead.
          * @param flags the flags to apply to the receive operation.
          * @return the message received, as a String; null on error.
          */
-
+        @Deprecated
         public String recvStr(int flags) {
+            return recvStr(flags, Charset.defaultCharset());
+        }
+
+        /**
+         * Receive a message as a String.
+         *
+         * @param flags the flags to apply to the receive operation.
+         * @param charset the charset of the resulting string.
+         * @return the message received, as a String; null on error.
+         */
+        public String recvStr(int flags, Charset charset) {
             byte[] data = recv(flags);
 
-            if (data == null)
+            if (data == null) {
                 return null;
-
-            return new String(data);
+            } else {
+                return new String(data, charset);
+            }
         }
         /**
          * Receive a message
-         * 
+         *
          * @param buffer
          * @param flags
          * @return bytes read, -1 on error
