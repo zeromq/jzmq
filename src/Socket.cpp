@@ -27,6 +27,8 @@
 
 /** Handle to Java's Socket::socketHandle. */
 static jfieldID socket_handle_fid = NULL;
+static jmethodID remainingHandle = NULL;
+static jmethodID positionHandle = NULL;
 
 static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags);
 
@@ -561,7 +563,6 @@ Java_org_zeromq_ZMQ_00024Socket_sendByteBuffer (JNIEnv *env, jobject obj, jobjec
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     jbyte* buf = 0;
-    int rc = 0;
 
     buf = (jbyte*) env->GetDirectBufferAddress(buffer);
     if(buf == NULL)
@@ -569,14 +570,16 @@ Java_org_zeromq_ZMQ_00024Socket_sendByteBuffer (JNIEnv *env, jobject obj, jobjec
 
     void *sock = get_socket (env, obj);
 
-    // TODO: Cache remaining method handle
-    //       One embodiment is a static native initializer function that caches method and class handles
-    jclass cls = env->GetObjectClass(buffer);
-    jmethodID remainingHandle = env->GetMethodID(cls, "remaining", "()I");
-    env->DeleteLocalRef(cls);
+    if (remainingHandle == NULL) {
+        jclass cls = env->GetObjectClass(buffer);
+        remainingHandle = env->GetMethodID(cls, "remaining", "()I");
+        positionHandle = env->GetMethodID(cls, "position", "()I");
+        env->DeleteLocalRef(cls);
+    }
     int length = env->CallIntMethod(buffer, remainingHandle);
-
-    rc = zmq_send (sock, buf, length, flags);
+    int offset = env->CallIntMethod(buffer, positionHandle);
+    
+    int rc = zmq_send (sock, buf + offset, length, flags);
     if (rc == -1) {
         int err = zmq_errno();
         raise_exception (env, err);
@@ -698,21 +701,23 @@ Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobjec
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     jbyte* buf = 0;
-    int rc = 0;
 
     buf = (jbyte*) env->GetDirectBufferAddress(buffer);
-
     if(buf == NULL)
         return -1;
 
     void* sock = get_socket (env, obj);
-    // Cache me
-    jclass cls = env->GetObjectClass(buffer);
-    jmethodID remainingHandle = env->GetMethodID(cls, "remaining", "()I");
-    env->DeleteLocalRef(cls);
-    int length = env->CallIntMethod(buffer, remainingHandle);
 
-    rc = zmq_recv(sock, buf, length, flags);
+    if (remainingHandle == NULL) {
+        jclass cls = env->GetObjectClass(buffer);
+        remainingHandle = env->GetMethodID(cls, "remaining", "()I");
+        positionHandle = env->GetMethodID(cls, "position", "()I");
+        env->DeleteLocalRef(cls);
+    }
+    int length = env->CallIntMethod(buffer, remainingHandle);
+    int offset = env->CallIntMethod(buffer, positionHandle);
+    
+    int rc = zmq_recv(sock, buf + offset, length, flags);
     if(rc == -1) {
         int err = zmq_errno();
         if(err == EAGAIN) {
