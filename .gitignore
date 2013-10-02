@@ -74,3 +74,5 @@ builds/msvc/remote_lat/remote_lat.vcxproj*
 builds/msvc/remote_thr/remote_thr.vcxproj*
 perf/*.dll
 perf/*.jar
+\#*
+.\#*
