@@ -27,21 +27,32 @@
 
 /** Handle to Java's Socket::socketHandle. */
 static jfieldID socket_handle_fid = NULL;
-static jmethodID remainingHandle = NULL;
+
+static jmethodID limitHandle = NULL;
 static jmethodID positionHandle = NULL;
+static jmethodID setPositionHandle = NULL;
 
 static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags);
 
-static void ensure_socket (JNIEnv *env,
-                           jobject obj);
-void *get_socket (JNIEnv *env,
-                  jobject obj);
-static void put_socket (JNIEnv *env,
-                        jobject obj,
-                        void *s);
+void *get_socket (JNIEnv *env, jobject obj);
+
+static void put_socket (JNIEnv *env, jobject obj, void *s);
+
 static void *fetch_context (JNIEnv *env,
                             jobject context);
 
+
+JNIEXPORT
+void JNICALL
+Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
+{
+    jclass cls = env->FindClass("java/nio/ByteBuffer");
+    limitHandle = env->GetMethodID(cls, "limit", "()I");
+    positionHandle = env->GetMethodID(cls, "position", "()I");
+    setPositionHandle = env->GetMethodID(cls, "position", "(I)Ljava/nio/Buffer;");
+    env->DeleteLocalRef(cls);
+    socket_handle_fid = env->GetFieldID (c, "socketHandle", "J");
+}
 
 /**
  * Called to construct a Java Socket object.
@@ -558,28 +569,26 @@ Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
 #endif
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT
+jint JNICALL
 Java_org_zeromq_ZMQ_00024Socket_sendByteBuffer (JNIEnv *env, jobject obj, jobject buffer, jint flags)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
-    jbyte* buf = 0;
-
-    buf = (jbyte*) env->GetDirectBufferAddress(buffer);
+    jbyte* buf = (jbyte*) env->GetDirectBufferAddress(buffer);
     if(buf == NULL)
         return -1;
 
     void *sock = get_socket (env, obj);
 
-    if (remainingHandle == NULL) {
-        jclass cls = env->GetObjectClass(buffer);
-        remainingHandle = env->GetMethodID(cls, "remaining", "()I");
-        positionHandle = env->GetMethodID(cls, "position", "()I");
-        env->DeleteLocalRef(cls);
-    }
-    int length = env->CallIntMethod(buffer, remainingHandle);
-    int offset = env->CallIntMethod(buffer, positionHandle);
-    
-    int rc = zmq_send (sock, buf + offset, length, flags);
+    int lim = env->CallIntMethod(buffer, limitHandle);
+    int pos = env->CallIntMethod(buffer, positionHandle);
+    int rem = pos <= lim ? lim - pos : 0;
+
+    int rc = zmq_send(sock, buf + pos, rem, flags);
+
+    if (rc > 0)
+        env->CallVoidMethod(buffer, setPositionHandle, pos + rc);
+
     if (rc == -1) {
         int err = zmq_errno();
         raise_exception (env, err);
@@ -696,28 +705,26 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
 #endif
 } 
 
-JNIEXPORT jint JNICALL
+JNIEXPORT
+jint JNICALL
 Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobject buffer, jint flags)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
-    jbyte* buf = 0;
-
-    buf = (jbyte*) env->GetDirectBufferAddress(buffer);
+    jbyte* buf = (jbyte*) env->GetDirectBufferAddress(buffer);
     if(buf == NULL)
         return -1;
 
     void* sock = get_socket (env, obj);
 
-    if (remainingHandle == NULL) {
-        jclass cls = env->GetObjectClass(buffer);
-        remainingHandle = env->GetMethodID(cls, "remaining", "()I");
-        positionHandle = env->GetMethodID(cls, "position", "()I");
-        env->DeleteLocalRef(cls);
-    }
-    int length = env->CallIntMethod(buffer, remainingHandle);
-    int offset = env->CallIntMethod(buffer, positionHandle);
-    
-    int rc = zmq_recv(sock, buf + offset, length, flags);
+    int lim = env->CallIntMethod(buffer, limitHandle);
+    int pos = env->CallIntMethod(buffer, positionHandle);
+    int rem = pos <= lim ? lim - pos : 0;
+
+    int rc = zmq_recv(sock, buf + pos, rem, flags);
+
+    if (rc > 0)
+        env->CallVoidMethod(buffer, setPositionHandle, pos + rc);
+
     if(rc == -1) {
         int err = zmq_errno();
         if(err == EAGAIN) {
@@ -838,49 +845,20 @@ static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flag
     return message;
 }
 
-/**
- * Make sure we have a valid pointer to Java's Socket::socketHandle.
- */
-static void ensure_socket (JNIEnv *env,
-                           jobject obj)
+void * get_socket (JNIEnv *env, jobject obj)
 {
-    if (socket_handle_fid == NULL) {
-        jclass cls = env->GetObjectClass (obj);
-        assert (cls);
-        socket_handle_fid = env->GetFieldID (cls, "socketHandle", "J");
-        assert (socket_handle_fid);
-        env->DeleteLocalRef (cls);
-    }
+    return (void*) env->GetLongField (obj, socket_handle_fid);
 }
 
-/**
- * Get the value of Java's Socket::socketHandle.
- */
-void *get_socket (JNIEnv *env,
-                  jobject obj)
+static void put_socket (JNIEnv *env, jobject obj, void *s)
 {
-    ensure_socket (env, obj);
-    void *s = (void*) env->GetLongField (obj, socket_handle_fid);
-    return s;
-}
-
-/**
- * Set the value of Java's Socket::socketHandle.
- */
-static void put_socket (JNIEnv *env,
-                        jobject obj,
-                        void *s)
-{
-    ensure_socket (env, obj);
     env->SetLongField (obj, socket_handle_fid, (jlong) s);
-    
 }
 
 /**
  * Get the value of contextHandle for the specified Java Context.
  */
-static void *fetch_context (JNIEnv *env,
-                            jobject context)
+static void *fetch_context (JNIEnv *env, jobject context)
 {
     static jmethodID get_context_handle_mid = NULL;
 
