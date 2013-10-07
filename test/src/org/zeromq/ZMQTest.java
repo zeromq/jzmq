@@ -521,7 +521,7 @@ public class ZMQTest {
     public void testByteBufferRecv() throws InterruptedException, CharacterCodingException {
         if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0)) {
             ZMQ.Context context = ZMQ.context(1);
-            ByteBuffer bb = ByteBuffer.allocateDirect(6).order(ByteOrder.nativeOrder());
+            ByteBuffer bb = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder());
             ZMQ.Socket push = null;
             ZMQ.Socket pull = null;
             try {
@@ -530,10 +530,10 @@ public class ZMQTest {
                 pull.bind("ipc:///tmp/recvbb");
                 push.connect("ipc:///tmp/recvbb");
                 push.send("PING".getBytes(), 0);
-                int size = pull.recvByteBuffer(bb, 0);
-                bb.limit(size);
-                byte[] b = new byte[bb.remaining()];
-                bb.duplicate().get(b);
+                pull.recvByteBuffer(bb, 0);
+                bb.flip();
+                byte[] b = new byte[4];
+                bb.get(b);
                 assertEquals("PING", new String(b));
             } finally {
                 try {
