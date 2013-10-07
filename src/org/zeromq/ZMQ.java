@@ -423,6 +423,12 @@ public class ZMQ {
      * Inner class: Socket.
      */
     public static class Socket implements Closeable {
+        private static native void nativeInit();
+
+        static {
+            nativeInit();
+        }
+
         private final AtomicBoolean closed = new AtomicBoolean(false);
         /**
          * This is an explicit "destructor". It can be called to ensure the corresponding 0MQ Socket has been disposed
