@@ -423,6 +423,12 @@ public class ZMQ {
      * Inner class: Socket.
      */
     public static class Socket implements Closeable {
+        static {
+            // if no embedded native library, revert to loading from java.library.path
+            if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
+                System.loadLibrary("jzmq");
+        }
+
         private static native void nativeInit();
 
         static {

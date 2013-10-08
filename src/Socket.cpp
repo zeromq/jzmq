@@ -38,8 +38,7 @@ void *get_socket (JNIEnv *env, jobject obj);
 
 static void put_socket (JNIEnv *env, jobject obj, void *s);
 
-static void *fetch_context (JNIEnv *env,
-                            jobject context);
+static void *fetch_context (JNIEnv *env, jobject context);
 
 
 JNIEXPORT
