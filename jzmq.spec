@@ -1,5 +1,5 @@
 Name:          jzmq
-Version:       2.2.2
+Version:       4.0.0
 Release:       1%{?dist}
 Summary:       The Java ZeroMQ bindings
 Group:         Applications/Internet
