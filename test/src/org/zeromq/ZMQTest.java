@@ -551,6 +551,41 @@ public class ZMQTest {
             }
         }
     }
+
+    @Test
+    public void testByteBufferRecvTooLarge() throws InterruptedException, CharacterCodingException {
+        if (ZMQ.version_full() >= ZMQ.make_version(3, 0, 0)) {
+            ZMQ.Context context = ZMQ.context(1);
+            ByteBuffer bb = ByteBuffer.allocateDirect(5).order(ByteOrder.nativeOrder());
+            ZMQ.Socket push = null;
+            ZMQ.Socket pull = null;
+            try {
+                push = context.socket(ZMQ.PUSH);
+                pull = context.socket(ZMQ.PULL);
+                pull.bind("tcp://*:6787");
+                push.connect("tcp://127.0.0.1:6787");
+                push.send("helloworld".getBytes(), 0);
+                int size = pull.recvByteBuffer(bb, 0);
+                bb.flip();
+                byte[] b = new byte[size];
+                bb.get(b);
+                assertEquals("hello", new String(b));
+            } finally {
+                try {
+                    push.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    pull.close();
+                } catch (Exception ignore) {
+                }
+                try {
+                    context.term();
+                } catch (Exception ignore) {
+                }
+            }
+        }
+    }
     @Test
     public void testPollerUnregister() {
         Context context = ZMQ.context(1);

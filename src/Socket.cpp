@@ -545,7 +545,6 @@ Java_org_zeromq_ZMQ_00024Socket_sendZeroCopy (JNIEnv *env,
                                               jint flags)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
-    jbyte* buf = 0;
     int rc = 0;
     void *sock = get_socket (env, obj);
 
@@ -685,11 +684,17 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
                                               jint flags)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+    jbyte* buf = (jbyte*) env->GetDirectBufferAddress(buffer);
+
+    if(buf == NULL)
+        return -1;
+
     void* sock = get_socket (env, obj);
-    jbyte* buf = 0;
-    int rc = 0;
-    buf = (jbyte*) env->GetDirectBufferAddress(buffer);
-    rc = zmq_recv(sock, buf, length, flags);
+    int rc = zmq_recv(sock, buf, length, flags);
+    if (rc > 0) {
+        int newpos = rc > length ? length : rc;
+        setByteBufferPosition(env, buffer, newpos);
+    }
     if(rc == -1) {
         int err = zmq_errno();
         if(err == EAGAIN) {
@@ -697,7 +702,6 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
             return 0;
         }
     }
-    setByteBufferPosition(env, buffer, rc);
     return rc;
 #else
     return -1;
@@ -709,29 +713,30 @@ jint JNICALL
 Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobject buffer, jint flags)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
-    jbyte* buf = (jbyte*) env->GetDirectBufferAddress(buffer);
+    jbyte *buf = (jbyte*) env->GetDirectBufferAddress(buffer);
     if(buf == NULL)
         return -1;
 
-    void* sock = get_socket (env, obj);
+    void *sock = get_socket (env, obj);
 
     int lim = env->CallIntMethod(buffer, limitHandle);
     int pos = env->CallIntMethod(buffer, positionHandle);
     int rem = pos <= lim ? lim - pos : 0;
 
-    int rc = zmq_recv(sock, buf + pos, rem, flags);
-
-    if (rc > 0)
-        env->CallVoidMethod(buffer, setPositionHandle, pos + rc);
-
-    if(rc == -1) {
+    int read = zmq_recv(sock, buf + pos, rem, flags);
+    if (read > 0) {
+        read = read > rem ? rem : read;
+        env->CallVoidMethod(buffer, setPositionHandle, read + pos);
+        return read;
+    }
+    else if(read == -1) {
         int err = zmq_errno();
         if(err == EAGAIN) {
             raise_exception (env, err);
             return 0;
         }
     }
-    return rc;
+    return read;
 #else
     return JNI_FALSE;
 #endif
