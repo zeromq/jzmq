@@ -25,18 +25,11 @@
 #include "util.hpp"
 #include "org_zeromq_ZMQ_Context.h"
 
+static jfieldID contextptrFID;
 
-/** Handle to Java's Context::contextHandle. */
-static jfieldID ctx_handle_fid = NULL;
-
-
-static void ensure_context (JNIEnv *env,
-                            jobject obj);
-static void *get_context (JNIEnv *env,
-                          jobject obj);
-static void put_context (JNIEnv *env,
-                         jobject obj,
-                         void *s);
+static void ensure_context (JNIEnv *env, jobject obj);
+static void *get_context (JNIEnv *env, jobject obj);
+static void put_context (JNIEnv *env, jobject obj, void *s);
 
 
 /**
@@ -87,11 +80,11 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_destroy (JNIEnv *env, jo
 static void ensure_context (JNIEnv *env,
                             jobject obj)
 {
-    if (ctx_handle_fid == NULL) {
+    if (contextptrFID == NULL) {
         jclass cls = env->GetObjectClass (obj);
         assert (cls);
-        ctx_handle_fid = env->GetFieldID (cls, "contextHandle", "J");
-        assert (ctx_handle_fid);
+        contextptrFID = env->GetFieldID (cls, "contextHandle", "J");
+        assert (contextptrFID);
         env->DeleteLocalRef (cls);
     }
 }
@@ -103,7 +96,7 @@ static void *get_context (JNIEnv *env,
                           jobject obj)
 {
     ensure_context (env, obj);
-    void *s = (void*) env->GetLongField (obj, ctx_handle_fid);
+    void *s = (void*) env->GetLongField (obj, contextptrFID);
 
     return s;
 }
@@ -116,5 +109,5 @@ static void put_context (JNIEnv *env,
                          void *s)
 {
     ensure_context (env, obj);
-    env->SetLongField (obj, ctx_handle_fid, (jlong) s);
+    env->SetLongField (obj, contextptrFID, (jlong) s);
 }
