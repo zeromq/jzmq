@@ -1,9 +1,6 @@
 Makefile.in
 perf/Makefile.in
 src/Makefile.in
-src/zmq.jar
-src/Zmq.jar
-perf/zmq-perf.jar
 Makefile
 aclocal.m4
 autom4te.cache
@@ -73,6 +70,6 @@ builds/msvc/local_thr/local_thr.vcxproj*
 builds/msvc/remote_lat/remote_lat.vcxproj*
 builds/msvc/remote_thr/remote_thr.vcxproj*
 perf/*.dll
-perf/*.jar
 \#*
 .\#*
+*.jar

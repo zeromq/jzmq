@@ -116,7 +116,7 @@ AC_SUBST(CPPFLAGS)
 AC_C_CONST
 AC_TYPE_SIZE_T
 
-AC_OUTPUT(Makefile src/Makefile perf/Makefile)
+AC_OUTPUT(Makefile src/Makefile src/perf/Makefile)
 
 #  On Linux patch libtool to delete hardcoded paths (rpath).
 case "${host_os}" in
