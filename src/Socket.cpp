@@ -344,9 +344,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *
                                                                         jbyteArray value)
 {
     switch (option) {
-#if (ZMQ_VERSION_MAJOR <= 3)
     case ZMQ_IDENTITY:
-#endif
     case ZMQ_SUBSCRIBE:
     case ZMQ_UNSUBSCRIBE:
         {
