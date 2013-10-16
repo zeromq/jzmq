@@ -25,32 +25,28 @@
 #include "util.hpp"
 #include "org_zeromq_ZMQ_Socket.h"
 
-/** Handle to Java's Socket::socketHandle. */
-static jfieldID socket_handle_fid = NULL;
-
-static jmethodID limitHandle = NULL;
-static jmethodID positionHandle = NULL;
-static jmethodID setPositionHandle = NULL;
+static jfieldID  socketptrFID;
+static jmethodID limitMID;
+static jmethodID positionMID;
+static jmethodID setPositionMID;
 
 static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags);
 
 void *get_socket (JNIEnv *env, jobject obj);
 
 static void put_socket (JNIEnv *env, jobject obj, void *s);
-
 static void *fetch_context (JNIEnv *env, jobject context);
 
 
-JNIEXPORT
-void JNICALL
+JNIEXPORT void JNICALL
 Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
 {
     jclass cls = env->FindClass("java/nio/ByteBuffer");
-    limitHandle = env->GetMethodID(cls, "limit", "()I");
-    positionHandle = env->GetMethodID(cls, "position", "()I");
-    setPositionHandle = env->GetMethodID(cls, "position", "(I)Ljava/nio/Buffer;");
+    limitMID = env->GetMethodID(cls, "limit", "()I");
+    positionMID = env->GetMethodID(cls, "position", "()I");
+    setPositionMID = env->GetMethodID(cls, "position", "(I)Ljava/nio/Buffer;");
     env->DeleteLocalRef(cls);
-    socket_handle_fid = env->GetFieldID (c, "socketHandle", "J");
+    socketptrFID = env->GetFieldID (c, "socketHandle", "J");
 }
 
 /**
@@ -579,14 +575,14 @@ Java_org_zeromq_ZMQ_00024Socket_sendByteBuffer (JNIEnv *env, jobject obj, jobjec
 
     void *sock = get_socket (env, obj);
 
-    int lim = env->CallIntMethod(buffer, limitHandle);
-    int pos = env->CallIntMethod(buffer, positionHandle);
+    int lim = env->CallIntMethod(buffer, limitMID);
+    int pos = env->CallIntMethod(buffer, positionMID);
     int rem = pos <= lim ? lim - pos : 0;
 
     int rc = zmq_send(sock, buf + pos, rem, flags);
 
     if (rc > 0)
-        env->CallVoidMethod(buffer, setPositionHandle, pos + rc);
+        env->CallVoidMethod(buffer, setPositionMID, pos + rc);
 
     if (rc == -1) {
         int err = zmq_errno();
@@ -720,14 +716,14 @@ Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobjec
 
     void *sock = get_socket (env, obj);
 
-    int lim = env->CallIntMethod(buffer, limitHandle);
-    int pos = env->CallIntMethod(buffer, positionHandle);
+    int lim = env->CallIntMethod(buffer, limitMID);
+    int pos = env->CallIntMethod(buffer, positionMID);
     int rem = pos <= lim ? lim - pos : 0;
 
     int read = zmq_recv(sock, buf + pos, rem, flags);
     if (read > 0) {
         read = read > rem ? rem : read;
-        env->CallVoidMethod(buffer, setPositionHandle, read + pos);
+        env->CallVoidMethod(buffer, setPositionMID, read + pos);
         return read;
     }
     else if(read == -1) {
@@ -852,12 +848,12 @@ static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flag
 
 void * get_socket (JNIEnv *env, jobject obj)
 {
-    return (void*) env->GetLongField (obj, socket_handle_fid);
+    return (void*) env->GetLongField (obj, socketptrFID);
 }
 
 static void put_socket (JNIEnv *env, jobject obj, void *s)
 {
-    env->SetLongField (obj, socket_handle_fid, (jlong) s);
+    env->SetLongField (obj, socketptrFID, (jlong) s);
 }
 
 /**
