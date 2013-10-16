@@ -2,5 +2,5 @@ SHELL = /bin/sh
 
 ACLOCAL_AMFLAGS = -I config
 
-SUBDIRS = src src/perf
-DIST_SUBDIRS = src src/perf
+SUBDIRS = src/main/c++ src/main/perf
+DIST_SUBDIRS = src/main/c++ src/main/perf

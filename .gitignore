@@ -19,8 +19,8 @@ stamp-*
 *.o
 *.lo
 *~
-src/config.hpp
-src/org_zeromq_*.h
+src/main/c++/config.hpp
+src/main/c++/org_zeromq_*.h
 lib/
 target/
 .classpath

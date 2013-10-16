@@ -6,7 +6,7 @@
 # The version in git should reflect the *next* version planned.
 # Version must be MAJOR.MINOR.PATCH otherwise things will break.
 #
-AC_INIT([jzmq],[2.1.0],[zeromq-dev@lists.zeromq.org])
+AC_INIT([jzmq],[4.0.0],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
@@ -116,7 +116,7 @@ AC_SUBST(CPPFLAGS)
 AC_C_CONST
 AC_TYPE_SIZE_T
 
-AC_OUTPUT(Makefile src/Makefile src/perf/Makefile)
+AC_OUTPUT(Makefile src/main/c++/Makefile src/main/perf/Makefile)
 
 #  On Linux patch libtool to delete hardcoded paths (rpath).
 case "${host_os}" in

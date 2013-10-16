@@ -1,4 +1,4 @@
-AM_JAVACFLAGS=-classpath $(top_builddir)/src
+AM_JAVACFLAGS=-classpath $(top_builddir)/src/main/java
 
 jarfile = zmq-perf.jar
 
