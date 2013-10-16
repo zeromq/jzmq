@@ -26,33 +26,84 @@
 #include "org_zeromq_ZMQ_Socket.h"
 
 static jfieldID  socketHandleFID;
+static jmethodID contextHandleMID;
 static jmethodID limitMID;
 static jmethodID positionMID;
 static jmethodID setPositionMID;
 
 static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags);
 
-static void *fetch_context (JNIEnv *env, jobject context);
+JNIEXPORT void JNICALL
+Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
+{
+    jclass bbcls = env->FindClass("java/nio/ByteBuffer");
+    limitMID = env->GetMethodID(bbcls, "limit", "()I");
+    positionMID = env->GetMethodID(bbcls, "position", "()I");
+    setPositionMID = env->GetMethodID(bbcls, "position", "(I)Ljava/nio/Buffer;");
+    env->DeleteLocalRef(bbcls);
 
-static inline void *get_socket (JNIEnv *env, jobject obj)
+    jclass contextcls = env->FindClass("org/zeromq/ZMQ$Context");
+    contextHandleMID = env->GetMethodID(contextcls, "getContextHandle", "()J");
+    env->DeleteLocalRef(contextcls);
+
+    socketHandleFID = env->GetFieldID(c, "socketHandle", "J");
+}
+
+static inline
+void *get_socket (JNIEnv *env, jobject obj)
 {
     return (void*) env->GetLongField (obj, socketHandleFID);
 }
 
-static inline void put_socket (JNIEnv *env, jobject obj, void *s)
+static inline
+void put_socket (JNIEnv *env, jobject obj, void *s)
 {
     env->SetLongField (obj, socketHandleFID, (jlong) s);
 }
 
-JNIEXPORT void JNICALL
-Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
+static inline
+void *fetch_context (JNIEnv *env, jobject context)
 {
-    jclass cls = env->FindClass("java/nio/ByteBuffer");
-    limitMID = env->GetMethodID(cls, "limit", "()I");
-    positionMID = env->GetMethodID(cls, "position", "()I");
-    setPositionMID = env->GetMethodID(cls, "position", "(I)Ljava/nio/Buffer;");
-    env->DeleteLocalRef(cls);
-    socketHandleFID = env->GetFieldID (c, "socketHandle", "J");
+    return (void*) env->CallLongMethod (context, contextHandleMID);
+}
+
+static
+zmq_msg_t *do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags)
+{
+    void *socket = get_socket (env, obj);
+
+    int rc = zmq_msg_init (message);
+    if (rc != 0) {
+        raise_exception (env, zmq_errno());
+        return NULL;
+    }
+
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+    rc = zmq_recvmsg (socket, message, flags);
+#else
+    rc = zmq_recv (socket, message, flags);
+#endif
+    int err = zmq_errno();
+    if (rc < 0 && err == EAGAIN) {
+        rc = zmq_msg_close (message);
+        err = zmq_errno();
+        if (rc != 0) {
+            raise_exception (env, err);
+            return NULL;
+        }
+        return NULL;
+    }
+    if (rc < 0) {
+        raise_exception (env, err);
+        rc = zmq_msg_close (message);
+        err = zmq_errno();
+        if (rc != 0) {
+            raise_exception (env, err);
+            return NULL;
+        }
+        return NULL;
+    }
+    return message;
 }
 
 /**
@@ -806,71 +857,4 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv__I (JNIEnv *en
         return NULL;
     } 
     return data;
-}
-
-
-/**
- * Issue a read on the socket.
- */
-static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags)
-{
-    void *s = get_socket (env, obj);
-
-    int rc = zmq_msg_init (message);
-    if (rc != 0) {
-        raise_exception (env, zmq_errno());
-        return NULL;
-    }
-
-#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
-    rc = zmq_recvmsg (s, message, flags);
-#else
-    rc = zmq_recv (s, message, flags);
-#endif
-    int err = zmq_errno();
-    if (rc < 0 && err == EAGAIN) {
-        rc = zmq_msg_close (message);
-        err = zmq_errno();
-        if (rc != 0) {
-            raise_exception (env, err);
-            return NULL;
-        }
-        return NULL;
-    }
-
-    if (rc < 0) {
-        raise_exception (env, err);
-        rc = zmq_msg_close (message);
-        err = zmq_errno();
-        if (rc != 0) {
-            raise_exception (env, err);
-            return NULL;
-        }
-        return NULL;
-    }
-    
-    return message;
-}
-
-/**
- * Get the value of contextHandle for the specified Java Context.
- */
-static void *fetch_context (JNIEnv *env, jobject context)
-{
-    static jmethodID get_context_handle_mid = NULL;
-
-    if (get_context_handle_mid == NULL) {
-        jclass cls = env->GetObjectClass (context);
-        assert (cls);
-        get_context_handle_mid = env->GetMethodID (cls, "getContextHandle", "()J");
-        env->DeleteLocalRef (cls);
-        assert (get_context_handle_mid);
-    }
-
-    void *c = (void*) env->CallLongMethod (context, get_context_handle_mid);
-    if (env->ExceptionCheck ()) {
-        c = NULL;
-    }
-
-    return c;
 }
