@@ -25,18 +25,24 @@
 #include "util.hpp"
 #include "org_zeromq_ZMQ_Socket.h"
 
-static jfieldID  socketptrFID;
+static jfieldID  socketHandleFID;
 static jmethodID limitMID;
 static jmethodID positionMID;
 static jmethodID setPositionMID;
 
 static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags);
 
-void *get_socket (JNIEnv *env, jobject obj);
-
-static void put_socket (JNIEnv *env, jobject obj, void *s);
 static void *fetch_context (JNIEnv *env, jobject context);
 
+static inline void *get_socket (JNIEnv *env, jobject obj)
+{
+    return (void*) env->GetLongField (obj, socketHandleFID);
+}
+
+static inline void put_socket (JNIEnv *env, jobject obj, void *s)
+{
+    env->SetLongField (obj, socketHandleFID, (jlong) s);
+}
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
@@ -46,7 +52,7 @@ Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
     positionMID = env->GetMethodID(cls, "position", "()I");
     setPositionMID = env->GetMethodID(cls, "position", "(I)Ljava/nio/Buffer;");
     env->DeleteLocalRef(cls);
-    socketptrFID = env->GetFieldID (c, "socketHandle", "J");
+    socketHandleFID = env->GetFieldID (c, "socketHandle", "J");
 }
 
 /**
@@ -846,16 +852,6 @@ static zmq_msg_t* do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flag
     return message;
 }
 
-void * get_socket (JNIEnv *env, jobject obj)
-{
-    return (void*) env->GetLongField (obj, socketptrFID);
-}
-
-static void put_socket (JNIEnv *env, jobject obj, void *s)
-{
-    env->SetLongField (obj, socketptrFID, (jlong) s);
-}
-
 /**
  * Get the value of contextHandle for the specified Java Context.
  */
@@ -866,8 +862,7 @@ static void *fetch_context (JNIEnv *env, jobject context)
     if (get_context_handle_mid == NULL) {
         jclass cls = env->GetObjectClass (context);
         assert (cls);
-        get_context_handle_mid = env->GetMethodID (cls,
-            "getContextHandle", "()J");
+        get_context_handle_mid = env->GetMethodID (cls, "getContextHandle", "()J");
         env->DeleteLocalRef (cls);
         assert (get_context_handle_mid);
     }

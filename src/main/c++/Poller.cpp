@@ -25,22 +25,16 @@
 #include "util.hpp"
 #include "org_zeromq_ZMQ_Poller.h"
 
+static jfieldID field_channel;
+static jfieldID field_socket;
+static jfieldID field_events;
+static jfieldID field_revents;
 
-static void *fetch_socket (JNIEnv *env,
-                           jobject socket);
-static int fetch_socket_fd (JNIEnv *env,
-                           jobject socket);
+static void *fetch_socket (JNIEnv *env, jobject socket);
+static int fetch_socket_fd (JNIEnv *env, jobject socket);
 
-static jfieldID field_channel = NULL;
-static jfieldID field_socket = NULL;
-static jfieldID field_events = NULL;
-static jfieldID field_revents = NULL;
-
-JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
-                                                                   jclass cls,
-                                                                   jobjectArray socket_0mq,
-                                                                   jint count,
-                                                                   jlong timeout)
+JNIEXPORT jint JNICALL
+Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env, jclass cls, jobjectArray socket_0mq, jint count, jlong timeout)
 {
     int ls = (int) count;
     if (ls <= 0) {
