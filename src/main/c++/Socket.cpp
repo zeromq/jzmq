@@ -45,7 +45,6 @@ Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
     jclass contextcls = env->FindClass("org/zeromq/ZMQ$Context");
     contextHandleMID = env->GetMethodID(contextcls, "getContextHandle", "()J");
     env->DeleteLocalRef(contextcls);
-
     socketHandleFID = env->GetFieldID(c, "socketHandle", "J");
 }
 
@@ -106,13 +105,8 @@ zmq_msg_t *do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags)
     return message;
 }
 
-/**
- * Called to construct a Java Socket object.
- */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_construct (JNIEnv *env,
-                                                                  jobject obj,
-                                                                  jobject context,
-                                                                  jint type)
+JNIEXPORT void JNICALL
+Java_org_zeromq_ZMQ_00024Socket_construct (JNIEnv *env, jobject obj, jobject context, jint type)
 {
     void *s = get_socket (env, obj);
     if (s)
@@ -126,12 +120,12 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_construct (JNIEnv *env,
 
     s = zmq_socket (c, type);
     int err = zmq_errno();
-    put_socket(env, obj, s);
 
     if (s == NULL) {
         raise_exception (env, err);
         return;
     }
+    put_socket(env, obj, s);
 }
 
 /**
@@ -154,12 +148,8 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_destroy (JNIEnv *env, job
     }
 }
 
-/**
- * Called by Java's Socket::getLongSockopt(int option).
- */
-JNIEXPORT jlong JNICALL Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env,
-                                                                        jobject obj,
-                                                                        jint option)
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env, jobject obj, jint option)
 {
     switch (option) {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
@@ -247,7 +237,6 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
                                                                               jint option)
 {
     switch (option) {
-#if (ZMQ_VERSION_MAJOR <= 3)
     case ZMQ_IDENTITY:
         {
             void *s = get_socket (env, obj);
@@ -271,7 +260,6 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
             env->SetByteArrayRegion (array, 0, optvallen, (jbyte*) optval);
             return array;
         }
-#endif
     default:
         raise_exception (env, EINVAL);
         return env->NewByteArray(0);
