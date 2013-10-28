@@ -52,6 +52,10 @@ See http://stackoverflow.com/questions/3522248/how-do-i-compile-jzmq-for-zeromq-
 
 You may also need to symlink the header files of your standard Java installation (e.g. `/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Headers/*.h`) into a suitable directory (e.g. `/usr/local/include`) and point the `JAVA_HOME` environment variable to the parent directory (e.g.`/usr/local`).
 
+## Acknowledgements
+
+YourKit is kindly supporting ZeroMQ project with its full-featured [Java Profiler](http://www.yourkit.com/java/profiler/index.jsp).
+
 Copying
 -------
 
