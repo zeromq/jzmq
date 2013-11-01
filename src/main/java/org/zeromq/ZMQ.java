@@ -1308,6 +1308,18 @@ public class ZMQ {
                 setBytesSockopt(ZAP_DOMAIN, domain);
             }
         }
+        
+        public void setGSSAPIServer(int server) {
+            if(ZMQ.version_full() >= ZMQ.makeVersion(4, 0, 0)) {
+                setLongSockopt(GSSAPI_SERVER,server);
+            }   
+        }
+        
+        public void setGSSAPIClient(int client) {
+            if(ZMQ.version_full() >= ZMQ.makeVersion(4, 0, 0)) {
+                setLongSockopt(GSSAPI_CLIENT,client);
+            }   
+        }
 
         /**
          * Sets whether socket should keep only last received/to be sent message in its inbound/outbound queue. 
@@ -1751,7 +1763,9 @@ public class ZMQ {
         private static final int PLAIN_PASSWORD = 46;
         private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
-        
+        private static final int GSSAPI_SERVER = 56;
+        private static final int GSSAPI_CLIENT = 57;
+
     }
 
     public static class PollItem {

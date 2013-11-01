@@ -68,6 +68,8 @@ public class ZAuth {
                     self.password = request.popString();
                 } else if (self.mechanism.equals("CURVE")) {
                     // TODO: Handle CURVE authentication
+                } else if (self.mechanism.equals("GSSAPI")) {
+                    //  TODO pass along krb principal here?
                 }
 
                 request.destroy();
@@ -147,6 +149,9 @@ public class ZAuth {
                 reply.add("OK");
                 reply.send(pipe);
                 reply.destroy();
+            } else if (command.equals("GSSAPI")) {
+                //for now, we don't do anything with domains
+                String domain = msg.popString();
             } else if (command.equals("VERBOSE")) {
                 String verboseStr = msg.popString();
                 this.verbose = verboseStr.equals("true");
@@ -213,9 +218,14 @@ public class ZAuth {
                 } else if (request.mechanism.equals("CURVE")) {
                     // For CURVE, even a whitelisted address must authenticate
                     // TODO: Handle CURVE authentication
+                } else if (request.mechanism.equals("GSSAPI")) {
+                    // For GSSAPI, even a whitelisted address must authenticate
+                    allowed = authenticateGSS(request);
+                } else {
+                    System.out.printf("Skipping unknown mechanism%n");
                 }
             }
-            
+
             if (allowed) {
                 ZAPRequest.reply(request, "200", "OK");
             } else {
@@ -247,6 +257,13 @@ public class ZAuth {
             }
         }
 
+        private boolean authenticateGSS(ZAPRequest request) {
+            if (verbose) {
+                System.out.println("I: ALLOWED (GSSAPI)%n");
+            }
+            return true;
+        }
+
         @Override
         public void run(Object[] args, ZContext ctx, Socket pipe) {
             this.pipe = pipe;
@@ -267,6 +284,7 @@ public class ZAuth {
                 int rc = ZMQ.poll(pollItems, -1);
                 if (rc == -1) {
                     break; //interrupt
+
                 }
 
                 if (pollItems[0].isReadable()) {
@@ -406,5 +424,17 @@ public class ZAuth {
 
         ZMsg reply = ZMsg.recvMsg(pipe);
         reply.destroy();
+    }
+
+    /*Configure GSSAPI authentication for a given domain. GSSAPI authentication
+     uses an underlying mechanism (usually Kerberos) to establish a secure
+     context and perform mutual authentication.  To cover all domains, use "*". */
+    public void configureGSSAPI(String domain) {
+        assert (domain != null);
+        ZMsg msg = new ZMsg();
+        msg.add("GSSAPI");
+        msg.add(domain);
+        msg.send(pipe);
+        msg.destroy();
     }
 }
