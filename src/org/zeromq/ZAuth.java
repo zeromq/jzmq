@@ -186,6 +186,16 @@ public class ZAuth {
             }
 
             //mechanism specific check
+            if (!denied) {
+                if (request.mechanism.equals("NULL") && !allowed) {
+                    //  For NULL, we allow if the address wasn't blacklisted
+                    if (verbose) {
+                        System.out.printf("I: ALLOWED (NULL)%n");
+                    }
+                    allowed = true;
+                }
+            }
+            
             if (allowed) {
                 ZAPRequest.reply(request, "200", "OK");
             } else {
