@@ -34,9 +34,7 @@ class local_thr
         long messageCount = Integer.parseInt (args [2]);
 
         ZMQ.Context ctx = ZMQ.context (1);
-        ZMQ.Socket s = ctx.socket (ZMQ.SUB);
-
-        s.subscribe(new byte[0]);
+        ZMQ.Socket s = ctx.socket (ZMQ.PULL);
 
         //  Add your socket options here.
         //  For example ZMQ_RATE, ZMQ_RECOVERY_IVL and ZMQ_MCAST_LOOP for PGM.

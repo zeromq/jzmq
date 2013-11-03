@@ -35,7 +35,7 @@ class remote_thr
         int messageCount = Integer.parseInt (args [2]);
 
         ZMQ.Context ctx = ZMQ.context (1);
-        ZMQ.Socket s = ctx.socket (ZMQ.PUB);
+        ZMQ.Socket s = ctx.socket (ZMQ.PUSH);
 
         //  Add your socket options here.
         //  For example ZMQ_RATE, ZMQ_RECOVERY_IVL and ZMQ_MCAST_LOOP for PGM.
@@ -46,11 +46,5 @@ class remote_thr
         for (int i = 0; i != messageCount; i++)
             s.send (msg, 0);
 
-        try {
-            Thread.sleep (10000);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace ();
-        }
     }
 }
