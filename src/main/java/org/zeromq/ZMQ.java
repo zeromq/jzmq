@@ -1309,15 +1309,15 @@ public class ZMQ {
             }
         }
         
-        public void setGSSAPIServer(int server) {
+        public void setGSSAPIServer(boolean isServer) {
             if(ZMQ.version_full() >= ZMQ.makeVersion(4, 0, 0)) {
-                setLongSockopt(GSSAPI_SERVER,server);
+                setLongSockopt(GSSAPI_SERVER, isServer ? 1L : 0L);
             }   
         }
         
-        public void setGSSAPIClient(int client) {
+        public void setGSSAPIClient(boolean isClient) {
             if(ZMQ.version_full() >= ZMQ.makeVersion(4, 0, 0)) {
-                setLongSockopt(GSSAPI_CLIENT,client);
+                setLongSockopt(GSSAPI_CLIENT, isClient ? 1L : 0L);
             }   
         }
 
