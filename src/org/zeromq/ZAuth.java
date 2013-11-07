@@ -59,18 +59,8 @@ public class ZAuth {
                 //  If the version is wrong, we're linked with a bogus libzmq, so die
                 assert (self.version.equals("1.0"));
 
-                //  Get mechanism-specific frames
-                if (self.mechanism.equals("PLAIN")) {
-                    self.username = request.popString();
-                    self.password = request.popString();
-                } else if (self.mechanism.equals("CURVE")) {
-                    ZFrame frame = request.pop();
-
-                    assert (frame.size() == 32);
-                    //FIXME
-                    //zmq_z85_encode(self - > client_key, zframe_data(frame), 32);
-                    frame.destroy();
-                }
+                //  TODO: Get mechanism-specific frames
+                
                 request.destroy();
                 return self;
             } else {
@@ -151,7 +141,6 @@ public class ZAuth {
         private boolean authenticate() {
             ZAPRequest request = ZAPRequest.recvRequest(handler);
             if (request == null) {
-                //FIXME
                 return false;
             }
 
@@ -251,9 +240,6 @@ public class ZAuth {
         pipe = ZThread.fork(ctx, new ZAuthAgent());
         ZMsg msg = ZMsg.recvMsg(pipe);
         String response = msg.popString();
-        if (response == null || !response.equals("OK")) {
-            //FIXME
-        }
 
         msg.destroy();
     }
