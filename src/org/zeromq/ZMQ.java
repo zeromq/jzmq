@@ -1134,6 +1134,19 @@ public class ZMQ {
               
             setLongSockopt(XPUB_VERBOSE, verbose ? 1L : 0L);
         }
+        
+        /**
+         * Sets the domain for ZAP (ZMQ RFC 27) authentication.
+         * @param domain  For NULL security (the default on all tcp:// connections), 
+         * ZAP authentication only happens if you set a non-empty domain. For PLAIN and CURVE security, 
+         * ZAP requests are always made, if there is a ZAP handler present. 
+         * See http://rfc.zeromq.org/spec:27 for more details.
+         */
+        public void setZAPDomain(byte[] domain) {
+            if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(ZAP_DOMAIN, domain);
+            }
+        }
 
         /**
          * Bind to network interface. Start listening for new connections.
@@ -1503,6 +1516,7 @@ public class ZMQ {
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
         private static final int XPUB_VERBOSE = 40;
+        private static final int ZAP_DOMAIN = 55;
 
     }
 

@@ -347,6 +347,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *
     case ZMQ_IDENTITY:
     case ZMQ_SUBSCRIBE:
     case ZMQ_UNSUBSCRIBE:
+    case ZMQ_ZAP_DOMAIN:
         {
             if (value == NULL) {
                 raise_exception (env, EINVAL);
