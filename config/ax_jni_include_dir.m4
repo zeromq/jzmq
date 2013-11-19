@@ -86,6 +86,7 @@ fi
 case "$host_os" in
 bsdi*)          _JNI_INC_SUBDIRS="bsdos";;
 linux*)         _JNI_INC_SUBDIRS="linux genunix";;
+darwin*)         _JNI_INC_SUBDIRS="darwin";;
 osf*)           _JNI_INC_SUBDIRS="alpha";;
 solaris*)       _JNI_INC_SUBDIRS="solaris";;
 mingw*)		_JNI_INC_SUBDIRS="win32";;
