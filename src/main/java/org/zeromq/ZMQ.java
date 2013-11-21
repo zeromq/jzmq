@@ -1314,11 +1314,17 @@ public class ZMQ {
                 setLongSockopt(GSSAPI_SERVER, isServer ? 1L : 0L);
             }   
         }
-        
-        public void setGSSAPIClient(boolean isClient) {
-            if(ZMQ.version_full() >= ZMQ.makeVersion(4, 0, 0)) {
-                setLongSockopt(GSSAPI_CLIENT, isClient ? 1L : 0L);
-            }   
+
+        public void setGSSAPIPrinciple(byte[] principle) {
+            if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(GSSAPI_PRINCIPLE, principle);
+            }
+        }
+
+        public void setGSSAPIServicePrinciple(byte[] principle) {
+            if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(GSSAPI_SERVICE_PRINCIPLE, principle);
+            }
         }
 
         /**
@@ -1764,7 +1770,8 @@ public class ZMQ {
         private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
         private static final int GSSAPI_SERVER = 56;
-        private static final int GSSAPI_CLIENT = 57;
+        private static final int GSSAPI_PRINCIPLE = 57;
+        private static final int GSSAPI_SERVICE_PRINCIPLE = 58;
 
     }
 

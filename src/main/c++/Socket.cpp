@@ -335,7 +335,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_RCVBUF:
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
     case ZMQ_GSSAPI_SERVER:
-    case ZMQ_GSSAPI_CLIENT:
 #endif
         {
             void *s = get_socket (env, obj);
@@ -381,7 +380,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_PLAIN_SERVER)
                 || (option == ZMQ_IMMEDIATE)
                 || (option == ZMQ_GSSAPI_SERVER)
-                || (option == ZMQ_GSSAPI_CLIENT)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
             ) {
@@ -424,6 +422,8 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *
     case ZMQ_ZAP_DOMAIN:
     case ZMQ_PLAIN_USERNAME:
     case ZMQ_PLAIN_PASSWORD:
+    case ZMQ_GSSAPI_PRINCIPLE:
+    case ZMQ_GSSAPI_SERVICE_PRINCIPLE:
 #endif
         {
             if (value == NULL) {
