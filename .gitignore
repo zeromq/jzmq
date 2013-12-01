@@ -74,3 +74,4 @@ perf/*.dll
 \#*
 .\#*
 *.jar
+INSTALL
