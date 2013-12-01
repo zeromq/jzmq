@@ -1481,7 +1481,7 @@ public class ZMQ {
 
         /** Opaque data used by JNI driver. */
         private long socketHandle;
-        private Context context = null;
+        private final Context context;
         // private Constants use the appropriate setter instead.
         private static final int HWM = 1;
         // public static final int LWM = 2; // No longer supported

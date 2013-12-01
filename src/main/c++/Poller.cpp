@@ -1,19 +1,19 @@
 /*
-    Copyright (c) 2007-2010 iMatix Corporation
+    Copyright (c) 2007-2013 Contributors as noted in the AUTHORS file
 
     This file is part of 0MQ.
 
     0MQ is free software; you can redistribute it and/or modify it under
-    the terms of the Lesser GNU General Public License as published by
+    the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
     0MQ is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    Lesser GNU General Public License for more details.
+    GNU Lesser General Public License for more details.
 
-    You should have received a copy of the Lesser GNU General Public License
+    You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
@@ -25,22 +25,16 @@
 #include "util.hpp"
 #include "org_zeromq_ZMQ_Poller.h"
 
+static jfieldID field_channel;
+static jfieldID field_socket;
+static jfieldID field_events;
+static jfieldID field_revents;
 
-static void *fetch_socket (JNIEnv *env,
-                           jobject socket);
-static int fetch_socket_fd (JNIEnv *env,
-                           jobject socket);
+static void *fetch_socket (JNIEnv *env, jobject socket);
+static int fetch_socket_fd (JNIEnv *env, jobject socket);
 
-static jfieldID field_channel = NULL;
-static jfieldID field_socket = NULL;
-static jfieldID field_events = NULL;
-static jfieldID field_revents = NULL;
-
-JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env,
-                                                                   jclass cls,
-                                                                   jobjectArray socket_0mq,
-                                                                   jint count,
-                                                                   jlong timeout)
+JNIEXPORT jint JNICALL
+Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env, jclass cls, jobjectArray socket_0mq, jint count, jlong timeout)
 {
     int ls = (int) count;
     if (ls <= 0) {

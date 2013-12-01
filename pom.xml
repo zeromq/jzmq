@@ -70,9 +70,9 @@
       </activation>
       <properties>
 	<native.os>${os.name}</native.os>
-	<native.path>src/.libs/libjzmq.so</native.path>
+	<native.path>src/main/c++/.libs/libjzmq.so</native.path>
 	<!-- Use platform-specific path separators here: -->
-	<native.library-path>src/.libs/</native.library-path>
+	<native.library-path>src/main/c++/.libs/</native.library-path>
       </properties>
     </profile>
     <profile>
@@ -98,9 +98,9 @@
       </activation>
       <properties>
 	<native.os>${os.name}</native.os>
-	<native.path>src/.libs/libjzmq.dylib</native.path>
+	<native.path>src/main/c++/.libs/libjzmq.dylib</native.path>
 	<!-- Use platform-specific path separators here: -->
-	<native.library-path>src/.libs/</native.library-path>
+	<native.library-path>src/main/c++/.libs/</native.library-path>
       </properties>
     </profile>
     <profile>
@@ -155,8 +155,6 @@
     </dependency>
   </dependencies>
   <build>
-    <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test/src</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

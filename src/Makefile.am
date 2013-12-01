@@ -2,19 +2,19 @@ jarfile = zmq.jar
 jardir = $(datadir)/java
 
 JZMQ_JAVA_FILES = \
-	org/zeromq/ZMQ.java \
-	org/zeromq/ZMQException.java \
-	org/zeromq/ZMQQueue.java \
-	org/zeromq/ZMQForwarder.java \
-	org/zeromq/ZMQStreamer.java \
-	org/zeromq/ZContext.java \
-	org/zeromq/ZFrame.java \
-	org/zeromq/ZMsg.java \
-	org/zeromq/ZThread.java \
-	org/zeromq/ZLoop.java \
-	org/zeromq/ZDispatcher.java \
-	org/zeromq/EmbeddedLibraryTools.java \
-	org/zeromq/ZAuth.java
+	main/java/org/zeromq/ZMQ.java \
+	main/java/org/zeromq/ZMQException.java \
+	main/java/org/zeromq/ZMQQueue.java \
+	main/java/org/zeromq/ZMQForwarder.java \
+	main/java/org/zeromq/ZMQStreamer.java \
+	main/java/org/zeromq/ZContext.java \
+	main/java/org/zeromq/ZFrame.java \
+	main/java/org/zeromq/ZMsg.java \
+	main/java/org/zeromq/ZThread.java \
+	main/java/org/zeromq/ZLoop.java \
+	main/java/org/zeromq/ZDispatcher.java \
+	main/java/org/zeromq/EmbeddedLibraryTools.java
+	main/java/org/zeromq/ZAuth.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \
@@ -34,28 +34,28 @@ JZMQ_HPP_FILES = \
 	util.hpp
 
 JZMQ_CLASS_FILES = \
-	org/zeromq/ZMQ.class \
-	org/zeromq/ZMQ$$Context.class \
-	org/zeromq/ZMQ$$Socket.class \
-	org/zeromq/ZMQ$$Poller.class \
-	org/zeromq/ZMQ$$Error.class \
-	org/zeromq/ZMQException.class \
-	org/zeromq/ZMQQueue.class \
-	org/zeromq/ZMQForwarder.class \
-	org/zeromq/ZMQStreamer.class \
-	org/zeromq/ZContext.class \
-	org/zeromq/ZFrame.class \
-	org/zeromq/ZMsg.class \
-	org/zeromq/ZThread.class \
-	org/zeromq/ZLoop.class \
-	org/zeromq/ZAuth.class \
-	org/zeromq/ZDispatcher.class 
+	main/java/org/zeromq/ZMQ.class \
+	main/java/org/zeromq/ZMQ$$Context.class \
+	main/java/org/zeromq/ZMQ$$Socket.class \
+	main/java/org/zeromq/ZMQ$$Poller.class \
+	main/java/org/zeromq/ZMQ$$Error.class \
+	main/java/org/zeromq/ZMQException.class \
+	main/java/org/zeromq/ZMQQueue.class \
+	main/java/org/zeromq/ZMQForwarder.class \
+	main/java/org/zeromq/ZMQStreamer.class \
+	main/java/org/zeromq/ZContext.class \
+	main/java/org/zeromq/ZFrame.class \
+	main/java/org/zeromq/ZMsg.class \
+	main/java/org/zeromq/ZThread.class \
+	main/java/org/zeromq/ZLoop.class \
+	main/java/org/zeromq/ZAuth.class \
+	main/java/org/zeromq/ZDispatcher.class 
 
 JAVAH_FLAGS = -d . -classpath .
 
 $(jarfile):
-	$(JAVAC) -encoding utf8 -d . $(JZMQ_JAVA_FILES)
-	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
+	$(JAVAC) -d ./main/java/ $(JZMQ_JAVA_FILES)
+	$(JAR) cf $(JARFLAGS) $@ main/java/org/zeromq/*.class
 
 jar_DATA = $(jarfile)
 
@@ -87,7 +87,7 @@ CLEANFILES = \
 
 
 $(JZMQ_H_FILES): $(jarfile)
-	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ
+	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath ./main/java org.zeromq.ZMQ
 
 $(srcdir)/ZMQ.cpp: \
 	$(JZMQ_H_FILES) \

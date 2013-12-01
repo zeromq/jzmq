@@ -117,6 +117,7 @@ set(cxx-sources
 
 include_directories(
         src
+        src/main/java
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -170,7 +171,7 @@ list(APPEND sources ${javah-headers})
 
 set (source-tmp "")
 foreach (source ${java-sources})
-	list (APPEND source-tmp ${CMAKE_CURRENT_SOURCE_DIR}/src/${source})
+	list (APPEND source-tmp ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java/${source})
 endforeach()
 set (java-sources ${source-tmp})
 
@@ -178,7 +179,7 @@ add_custom_command(
 	OUTPUT ${java-classes}
 	COMMAND ${JAVA_COMPILE}
 	ARGS	-classpath ${CMAKE_CURRENT_BINARY_DIR}
-		-sourcepath ${CMAKE_CURRENT_SOURCE_DIR}/src
+		-sourcepath ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
 		-d ${CMAKE_CURRENT_BINARY_DIR}
 		${java-sources}
 	DEPENDS ${java-sources}
