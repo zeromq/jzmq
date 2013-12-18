@@ -24,13 +24,14 @@ import org.zeromq.ZThread.IAttachedRunnable;
 public class ZAuth {
 
     private Socket pipe; //pipe to backend agent
+    private boolean verbose;
 
     /**
      * A small class for working with ZAP requests and replies. This isn't
      * exported in the JZMQ API just used internally in zauth to simplify
      * working with RFC 27 requests and replies.
      */
-    private static class ZAPRequest {
+    public static class ZAPRequest {
 
         Socket handler; //socket we're talking to
         String version;              //  Version number, must be "1.0"
@@ -118,6 +119,11 @@ public class ZAuth {
         private boolean terminated; //did api ask us to quit?
         private File passwords_file;
         private long passwords_modified;
+        final private ZAuth auth; //our parent auth, used for authorization callbacks
+
+        private ZAuthAgent(ZAuth auth) {
+            this.auth = auth;
+        }
 
         /**
          * handle a message from the front end api
@@ -220,8 +226,9 @@ public class ZAuth {
                     // For CURVE, even a whitelisted address must authenticate
                     // TODO: Handle CURVE authentication
                 } else if (request.mechanism.equals("GSSAPI")) {
-                    // For GSSAPI, even a whitelisted address must authenticate
-                    allowed = authenticateGSS(request);
+                    // At this point, the request is authenticated, send to 
+                    //zauth callback for complete authorization
+                    allowed = auth.authenticateGSS(request);
                 } else {
                     System.out.printf("Skipping unknown mechanism%n");
                 }
@@ -256,13 +263,6 @@ public class ZAuth {
 
                 return false;
             }
-        }
-
-        protected boolean authenticateGSS(ZAPRequest request) {
-            if (verbose) {
-                System.out.printf("I: ALLOWED (GSSAPI allow any client) principle = %s identity = %s%n", request.principle, request.identity );
-            }
-            return true;
         }
 
         @Override
@@ -340,7 +340,7 @@ public class ZAuth {
      * behaviour), and all PLAIN and CURVE connections are denied.
      */
     public ZAuth(ZContext ctx) {
-        pipe = ZThread.fork(ctx, new ZAuthAgent());
+        pipe = ZThread.fork(ctx, new ZAuthAgent(this));
         ZMsg msg = ZMsg.recvMsg(pipe);
         String response = msg.popString();
 
@@ -353,6 +353,9 @@ public class ZAuth {
      * @param verbose
      */
     public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+
+        //agent should also be verbose
         ZMsg msg = new ZMsg();
         msg.add("VERBOSE");
         msg.add(String.format("%b", verbose));
@@ -437,5 +440,18 @@ public class ZAuth {
         msg.add(domain);
         msg.send(pipe);
         msg.destroy();
+    }
+
+    /*
+     * Callback for authorizing an authenticated GSS connection.  Returns true 
+     * if the connection is authorized, false otherwise.  Default implementation 
+     * authorizes all authenticated connections.
+     */
+    protected boolean authenticateGSS(ZAPRequest request) {
+        if (verbose) {
+            System.out.printf("I: ALLOWED (GSSAPI allow any client) principle = %s identity = %s%n", request.principle, request.identity);
+        }
+
+        return true;
     }
 }
