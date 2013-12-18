@@ -1945,8 +1945,7 @@ public class ZMQ {
         private static final int SIZE_INCREMENT = 16;
     }
 
-    // To generate the appropriate .h files:
-    // under src/main/java, run javah org.zeromq.ZMQ
+
     /**
      * Generate a public/private Curve keypair
      */
@@ -1961,10 +1960,10 @@ public class ZMQ {
 	 * one of Java's existing key pair classes.
 	 */
 
-	public Byte[] publicKey;
-	public Byte[] privateKey;
+	public byte[] publicKey;
+	public byte[] privateKey;
 
-	CurveKeyPair(Byte[] pub, Byte[] priv) {
+	CurveKeyPair(byte[] pub, byte[] priv) {
 	    publicKey = pub;
 	    privateKey = priv;
 	}
@@ -1973,10 +1972,10 @@ public class ZMQ {
     /**
      * Convert a binary key from Z85 printable text
      */
-    public static native String Z85Encode(Byte[] key);
+    public static native String Z85Encode(byte[] key);
 
     /**
      * Convert Z85 printable text into its associated byte array
      */
-    public static native Byte[] Z85Decode (String s);
+    public static native byte[] Z85Decode (String s);
 }
