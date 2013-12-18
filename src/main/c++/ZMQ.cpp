@@ -156,3 +156,36 @@ Java_org_zeromq_ZMQ_run_1proxy (JNIEnv *env, jclass cls, jobject frontend_, jobj
     zmq_proxy (frontend, backend, capture);
 #endif
 }
+
+JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
+  (JNIEnv *env, jclass cls)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
+  char public_key[41];
+  char private_key[41];
+  int rc = zmq_curve_keypair(public_key, private_key);
+  if(rc == 0)
+    {
+      // TODO: Need to make a new instance of cls, passing in public/private keys as parameters.
+    }
+  else
+    {
+      // FIXME: How are errors being handled at this level?
+    }
+#endif
+}
+
+JNIEXPORT jstring JNICALL Java_org_zeromq_ZMQ_Z85Encode
+  (JNIEnv *, jclass, jobjectArray)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
+#endif
+}
+
+JNIEXPORT jobjectArray JNICALL Java_org_zeromq_ZMQ_Z85Decode
+  (JNIEnv *, jclass, jstring)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
+#endif
+}
+
