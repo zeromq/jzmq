@@ -144,7 +144,7 @@ link_directories(
 # source generators
 
 foreach (source ${cxx-sources})
-	list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/src/${source})	
+	list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/src/main/c++/${source})	
 endforeach()
 
 add_custom_command(
