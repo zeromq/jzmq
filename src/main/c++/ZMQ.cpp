@@ -169,16 +169,24 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
   int rc = zmq_curve_keypair(publicKey, privateKey);
   if(rc == 0)
     {
-      const jbyte* transitive((const jbyte*)publicKey);
+      const jbyte* j_key(reinterpret_cast<const jbyte*>(publicKey));
       jbyteArray outPublicKey(env->NewByteArray(40));  
-      env->SetByteArrayRegion(outPublicKey, 0, 40, transitive); 
+      env->SetByteArrayRegion(outPublicKey, 0, 40, j_key); 
 
       jbyteArray outPrivateKey(env->NewByteArray(40));
-      transitive = (const jbyte*)privateKey;
-      env->SetByteArrayRegion(outPrivateKey, 0, 40, transitive);
+      j_key = reinterpret_cast<const jbyte*>(privateKey);
+      env->SetByteArrayRegion(outPrivateKey, 0, 40, j_key);
 
       // TODO: Need to make a new instance of cls, passing in public/private keys as parameters.
-      return NULL;
+      // OTOH, to quote stack overflow: object creation/access is messy and hard to debug.
+      // Generally cleaner to just pass around primitive types and arrays.
+      // An extra incentive here: I don't have the CurveKeyPair class. I have a reference
+      // to the containing ZMQ class...which is pretty much useless.
+
+      // FIXME: What is the ctor's method signature?
+      jmethodID ctor(env->GetMethodID(cls, "<init>", "(B[B[)V"));
+      jobject result(env->NewObject(cls, ctor, outPublicKey, outPrivateKey));
+      return result;
       //assert(false, "Finish writing this");
     }
   else
