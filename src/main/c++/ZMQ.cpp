@@ -194,46 +194,78 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
 #endif
 }
 
+struct JavaByteArrayWrapper
+// Because C++ doesn't offer try/finally
+// Realistically, this should be a template.
+// OTOH...I'm shocked that google didn't turn up something exactly along these lines.
+{
+public:
+  jbyteArray _src;
+  jbyte* _bytes;
+  uint8_t* _binary;
+  JNIEnv* _env;
+
+  JavaByteArrayWrapper(JNIEnv* env, jbyteArray source)
+    : _src(source),
+      _bytes(env->GetByteArrayElements(source, NULL)),
+      _binary(reinterpret_cast<uint8_t*>(_bytes)),
+      _env(env)
+  {}
+
+  virtual ~JavaByteArrayWrapper()
+  {
+    _env->ReleaseByteArrayElements(_src, _bytes, JNI_ABORT);
+  }
+};
+
+class AutoString
+{
+public:
+  char* buffer;
+
+  AutoString(int len)
+    : buffer(new char[len])
+  {}
+
+  virtual ~AutoString()
+  {
+    delete buffer;
+  }
+};
+
 JNIEXPORT jstring JNICALL Java_org_zeromq_ZMQ_Z85Encode
   (JNIEnv *env, jclass cls, jbyteArray src)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
   jstring result;
 
-#if false
-  // This won't work: src is really a byte[], not a Byte[]
-  const char* c_src(env->GetStringUTFChars(src));
-#else
-  const jbyte* bytes(env->GetByteArrayElements(src));
-  const char* c_src((const char*)bytes);
-#endif
-  
-  // No finally in C++. RAII says I have to build a class which frees
-  // up resources in the destructor.
-  try {
-    int src_len(strlen(c_src));
+  JavaByteArrayWrapper wrapper(env, src);
 
-    // Destination length must be source length*1.25 + 1 for the NULL terminator
-    int src_len_mod_4(src_len % 4);
-    // Source must be an even multiple of 4 bytes
-    assert(src_len_mod_4 == src_len / 4);
-    int dst_len(src_len_mod_4 * 5 + 1);
-    char* c_dst(new char[dst_len]);
-    try {
-      const char* encoded(zmq_z85_encode(c_dst, c_src, src_len));
-      if(NULL == encoded) {
-	//assert(false, "Handle errors");
-	return NULL;
-      }
-      else {
-	result = env->NewStringUTF(c_dst);
-      }
+#if false
+  // We didn't receive a string.
+  int src_len(strlen(wrapper._binary));
+#else
+  int src_len(env->GetArrayLength(src));
+#endif
+
+  // Destination length must be source length*1.25 + 1 for the NULL terminator
+  int src_len_mod_4(src_len % 4);
+  // Source must be an even multiple of 4 bytes
+  if (src_len_mod_4 != src_len / 4)
+    {
+      return NULL;
     }
-    finally {
-      delete c_dst;
-    }
-  finally {
-    env->ReleaseByteArrayElements(src, bytes, JNI_ABORT);
+
+  int dst_len(src_len_mod_4 * 5 + 1);
+  AutoString c_dst(dst_len);
+
+  const char* encoded(zmq_z85_encode(c_dst.buffer, wrapper._binary, src_len));
+  if(NULL == encoded) {
+    //assert(false, "Handle errors");
+    return NULL;
+  }
+  else {
+    result = env->NewStringUTF(c_dst.buffer);
   }
 
   return result;
