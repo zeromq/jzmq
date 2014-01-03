@@ -1443,7 +1443,7 @@ public class ZMQ {
          * @param option ID of the option to set.
          * @return The socket option value (as a long).
          */
-        protected native long getLongSockopt(int option);
+        public native long getLongSockopt(int option);
 
         /**
          * Get the socket option value, as a byte array.
@@ -1451,15 +1451,17 @@ public class ZMQ {
          * @param option ID of the option to set.
          * @return The socket option value (as a byte array).
          */
-        protected native byte[] getBytesSockopt(int option);
+        public native byte[] getBytesSockopt(int option);
 
         /**
          * Set the socket option value, given as a long.
+         * public so future API changes that use the socket 
+	 * options don't require actual library rebuilding.
          * 
          * @param option ID of the option to set.
          * @param optval value (as a long) to set the option to.
          */
-        protected native void setLongSockopt(int option, long optval);
+        public native void setLongSockopt(int option, long optval);
 
         /**
          * Set the socket option value, given as a byte array.
@@ -1467,7 +1469,7 @@ public class ZMQ {
          * @param option ID of the option to set.
          * @param optval value (as a byte array) to set the option to.
          */
-        protected native void setBytesSockopt(int option, byte[] optval);
+        public native void setBytesSockopt(int option, byte[] optval);
 
         /**
          * Get the underlying socket handle. This is private because it is only accessed from JNI, where Java access
