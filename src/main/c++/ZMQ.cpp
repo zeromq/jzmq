@@ -241,12 +241,7 @@ JNIEXPORT jstring JNICALL Java_org_zeromq_ZMQ_Z85Encode
 
   JavaByteArrayWrapper wrapper(env, src);
 
-#if false
-  // We didn't receive a string.
-  int src_len(strlen(wrapper._binary));
-#else
   int src_len(env->GetArrayLength(src));
-#endif
 
   // Destination length must be source length*1.25 + 1 for the NULL terminator
   int src_len_mod_4(src_len % 4);
@@ -276,40 +271,68 @@ JNIEXPORT jstring JNICALL Java_org_zeromq_ZMQ_Z85Encode
 #endif
 }
 
+struct UtfWrapper
+{
+public:
+  jsize _length;
+  // The constant buffer that java gave us
+  const char* _utf;
+  // Needed because zmq_z85_decode might mutate it.
+  char* _s;
+  jstring _src;
+  JNIEnv* _env;
+
+  UtfWrapper(JNIEnv* env, jstring src)
+    : _length(env->GetStringUTFLength(src)),
+      _utf(env->GetStringUTFChars(src, NULL)),
+      _s(new char[_length]),
+      _src(src),
+      _env(env)
+  {
+    memcpy(_s, _utf, _length);
+  }
+
+  virtual ~UtfWrapper()
+  {
+    _env->ReleaseStringUTFChars(_src, _utf);
+    delete _s;
+  }
+};
+
 JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_Z85Decode
   (JNIEnv *env, jclass cls, jstring src)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
   jbyteArray result;
 
-  const char* c_src(env->GetStringUTFChars(src));
-  try {
-    int src_len(strlen(c_src));
-    int src_len_mod_5(src_len % 5);
-    assert(src_len_mod_5 == src_len/5);
-    int dst_len(src_len_mod_5 * 4);
-    char* dst(new char[dst_len]);
-    try
-      {
-	char* decoded(zmq_85_decode(src, dst));
-	if(NULL == decoded)
-	  {
-	    assert(false, "Decoding failed");
-	  }
-	else
-	  {
-	    result = env->NewByteArray(dst_len);
-	    env->SetByteArrayRegion(result, 0, dst_len, decoded);
-	  }
-      }
-    finally
-      {
-	delete dst;
-      }
-  }
-  finally {
-    (*env)->ReleaseStringUTFChars(env, src, c_src);
-  }
+  UtfWrapper str(env, src);
+
+  int src_len(strlen(str._s));
+  
+  // Must be a multiple of 5 in length
+  int src_len_mod_5(src_len % 5);
+  if(src_len_mod_5 != src_len/5)
+    {
+      return NULL;
+    }
+
+  int dst_len(src_len_mod_5 * 4);
+  AutoString dst(dst_len);
+  const uint8_t* decoded(zmq_z85_decode(reinterpret_cast<uint8_t*>(dst.buffer), str._s));
+  if(NULL == decoded)
+    {
+      return NULL;
+    }
+  else
+    {
+      result = env->NewByteArray(dst_len);
+#if false
+      env->SetByteArrayRegion(result, 0, dst_len, decoded);
+#else
+      const jbyte* j_decoded(reinterpret_cast<const jbyte*>(decoded));
+      env->SetByteArrayRegion(result, 0, dst_len, j_decoded);
+#endif
+    }
 
   return result;
 #else
