@@ -161,7 +161,7 @@ Java_org_zeromq_ZMQ_run_1proxy (JNIEnv *env, jclass cls, jobject frontend_, jobj
 }
 
 JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
-  (JNIEnv *env, jclass cls)
+  (JNIEnv *env, jclass container_cls)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
   char publicKey[41];
@@ -177,6 +177,8 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
       j_key = reinterpret_cast<const jbyte*>(privateKey);
       env->SetByteArrayRegion(outPrivateKey, 0, 40, j_key);
 
+      jclass cls(env->FindClass("org/zeromq/ZMQ$CurveKeyPair"));
+
       // TODO: Need to make a new instance of cls, passing in public/private keys as parameters.
       // OTOH, to quote stack overflow: object creation/access is messy and hard to debug.
       // Generally cleaner to just pass around primitive types and arrays.
@@ -184,7 +186,7 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
       // to the containing ZMQ class...which is pretty much useless.
 
       // FIXME: What is the ctor's method signature?
-      jmethodID ctor(env->GetMethodID(cls, "<init>", "(B[B[)V"));
+      jmethodID ctor(env->GetMethodID(cls, "<init>", "([B[B)V"));
       jobject result(env->NewObject(cls, ctor, outPublicKey, outPrivateKey));
       return result;
       //assert(false, "Finish writing this");
