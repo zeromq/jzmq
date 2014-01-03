@@ -817,6 +817,48 @@ public class ZMQ {
             return getLongSockopt(EVENTS);
         }
 
+	// Q: Do CURVE sockets actually support getting these options after they've been set?
+
+	/**
+	 * Has this been marked as a CURVE server?
+	 *
+	 * @return True if it's a server, false if not
+	 * @since 4.0.0
+	 */
+	public boolean getCurveServer() {
+	    return getLongSockopt(CURVE_SERVER) != 0;
+	}
+
+	/**
+	 * CURVE sockets must have the public key of the server associated with them.
+	 * 
+	 * @return That key
+	 * @since 4.0.0
+	 */
+	public byte[] getCurveServerKey() {
+	    return getBytesSockopt(CURVE_SERVER_KEY);
+	}
+
+	/**
+	 * Only for CURVE clients
+	 *
+	 * @return The client-side long-term public key
+	 * @since 4.0.0
+	 */
+	public byte[] getCurveClientPublicKey() {
+	    return getBytesSockopt(CURVE_PUBLIC_KEY);
+	}
+
+	/**
+	 * Only for CURVE clients
+	 *
+	 * @return The client-side long-term private key
+	 * @since 4.0.0
+	 */
+	public byte[] getCurveClientPrivateKey() {
+	    return getBytesSockopt(CURVE_SECRET_KEY);
+	}
+
         /**
          * The 'ZMQ_LINGER' option shall retrieve the period for pending outbound messages to linger in memory after
          * closing the socket. Value of -1 means infinite. Pending messages will be kept until they are fully
@@ -1147,6 +1189,86 @@ public class ZMQ {
                 setBytesSockopt(ZAP_DOMAIN, domain);
             }
         }
+
+	/**
+	 * Flag the socket as a CURVE server (or not)
+	 * @param server A value of true starts configuring the socket as a server.
+	 * You must still set the Server Key.
+	 * @see #setServerKey(long)
+	 * @see #makeIntoCurveServer(byte[])
+	 * Q: I this the version it was added to zmq, or to here?
+	 * @since 4.0.0
+	 */
+	public void setCurveServer(boolean server) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setLongSockopt(CURVE_SERVER, server ? 1L : 0L);
+	    }
+	}
+
+	/**
+	 * Set the long-term public key associated with the server.
+	 * Which could very well be this.
+	 * @param key The public one.
+	 * @see #makeIntoCurveServer(byte[])
+	 * @see #makeIntoCurveClient(CurveKeyPair, byte[])
+	 * @since 4.0.0
+	 */
+	public void setCurveServerKey(byte[] key) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setBytesSockopt(CURVE_SERVER_KEY, key);
+	    }
+	}
+
+	/**
+	 * Make this into a CURVE-encrypted server
+	 * Really just a slightly higher-level convenience function around setting
+	 * the socket options manually.
+	 * @param key The public one
+	 * @since 4.0.0
+	 */
+	public void makeIntoCurveServer(byte[] key) {
+	    setCurveServer(true);
+	    setCurveServerKey(key);
+	}
+
+	/**
+	 * Set the long-term private key associated with this client socket.
+	 * @param key The private one.
+	 * @see #makeIntoCurveClient(CurveKeyPair, byte[])
+	 * @since 4.0.0
+	 */
+	public void setCurveClientPrivateKey(byte[] key) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setBytesSockopt(CURVE_SECRET_KEY, key);
+	    }
+	}
+
+	/**
+	 * Set the long-term public key associated with this client socket.
+	 * @param key The public one.
+	 * @see #makeIntoCurveClient(CurveKeyPair, byte[])
+	 * @since 4.0.0
+	 */
+	public void setCurveClientPublicKey(byte[] key) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setBytesSockopt(CURVE_PUBLIC_KEY, key);
+	    }
+	}
+
+	/**
+	 * Configure this as a CURVE client.
+	 * @param keyPair The long-term keypair associated with this
+	 * @param serverKey The server's long-term public key
+	 * @since 4.0.0
+	 */
+	public void makeIntoCurveClient(CurveKeyPair keyPair, byte[] serverKey) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setCurveServer(false);
+		setCurveServerKey(serverKey);
+		setCurveClientPrivateKey(keyPair.privateKey);
+		setCurveClientPublicKey(keyPair.publicKey);
+	    }
+	}
 
         /**
          * Bind to network interface. Start listening for new connections.
@@ -1518,8 +1640,11 @@ public class ZMQ {
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
         private static final int XPUB_VERBOSE = 40;
+	private static final int CURVE_SERVER = 47;
+	private static final int CURVE_PUBLIC_KEY = 48;
+	private static final int CURVE_SECRET_KEY = 49;
+	private static final int CURVE_SERVER_KEY = 50;
         private static final int ZAP_DOMAIN = 55;
-
     }
 
     public static class PollItem {
