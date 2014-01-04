@@ -1246,7 +1246,9 @@ public class ZMQ {
 	/**
 	 * Set the long-term public key associated with this client socket.
 	 * @param key The public one.
-	 * @see #makeIntoCurveClient(CurveKeyPair, byte[])
+	 * Q: What on earth is wrong with the next line? (And all the
+	 * similar ones that are causing basically the same warning?)
+	 * @see ZMQ.Socket#makeIntoCurveClient(CurveKeyPair, byte[])
 	 * @since 4.0.0
 	 */
 	public void setCurveClientPublicKey(byte[] key) {
@@ -1372,7 +1374,7 @@ public class ZMQ {
          * @param offset
          * @param len
          * @param flags
-         * @return
+         * @return true on success, false on failure
          */
         public native boolean send(byte[] msg, int offset, int len, int flags);
 
@@ -1382,7 +1384,7 @@ public class ZMQ {
          * @param buffer
          * @param len
          * @param flags
-         * @return
+         * @return true on success, false on failure
          */
         public native boolean sendZeroCopy(ByteBuffer buffer, int len, int flags);
 
@@ -1485,7 +1487,7 @@ public class ZMQ {
         /**
          * Receive a message as a String with the default Charset.
          *
-         * @deprecated use {@link recvStr(Charset)} instead.
+         * @deprecated use {@link #recvStr(Charset)} instead.
          * @return the message received, as a String; null on error.
          */
         @Deprecated
@@ -1506,7 +1508,7 @@ public class ZMQ {
         /**
          * Receive a message as a String with the default charset.
          *
-         * @deprecated use {@link recvStr(int, Charset)} instead.
+         * @deprecated use {@link #recvStr(int, Charset)} instead.
          * @param flags the flags to apply to the receive operation.
          * @return the message received, as a String; null on error.
          */

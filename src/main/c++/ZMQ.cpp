@@ -24,6 +24,7 @@
 
 #include "jzmq.hpp"
 #include "org_zeromq_ZMQ.h"
+#include "util.hpp"
 
 static void *get_socket (JNIEnv *env, jobject obj)
 {
@@ -163,12 +164,20 @@ Java_org_zeromq_ZMQ_run_1proxy (JNIEnv *env, jclass cls, jobject frontend_, jobj
 JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
   (JNIEnv *env, jclass container_cls)
 {
+  jobject result(NULL);
+
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
   char publicKey[41];
   char privateKey[41];
+  // FIXME: DEBUG only: Make these string-safe. 
+  publicKey[40] = 0;
+  privateKey[40] = 0;
+
   int rc = zmq_curve_keypair(publicKey, privateKey);
+  printf("Generated a KeyPair:\nPublic: %s\nPrivate: %s\nSuccess: %d\n", publicKey, privateKey, rc);
   if(rc == 0)
     {
+      printf("Setting Byte Regions\n");
       const jbyte* j_key(reinterpret_cast<const jbyte*>(publicKey));
       jbyteArray outPublicKey(env->NewByteArray(40));  
       env->SetByteArrayRegion(outPublicKey, 0, 40, j_key); 
@@ -177,31 +186,65 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
       j_key = reinterpret_cast<const jbyte*>(privateKey);
       env->SetByteArrayRegion(outPrivateKey, 0, 40, j_key);
 
-      jclass cls(env->FindClass("org/zeromq/ZMQ$CurveKeyPair"));
+      printf("Initializing the KeyPair instance\n");
 
-      // TODO: Need to make a new instance of cls, passing in public/private keys as parameters.
-      // OTOH, to quote stack overflow: object creation/access is messy and hard to debug.
+      // To quote stack overflow: object creation/access is messy and hard to debug.
       // Generally cleaner to just pass around primitive types and arrays.
       // An extra incentive here: I don't have the CurveKeyPair class. I have a reference
       // to the containing ZMQ class...which is pretty much useless.
+      jclass cls(env->FindClass("org/zeromq/ZMQ$CurveKeyPair"));
+      if(cls != NULL)
+	{
+	  jmethodID ctor(env->GetMethodID(cls, "<init>", "(Lorg/zeromq/ZMQ;[B[B)V"));
+	  if(ctor != NULL)
+	    {
+	      printf("Creating a new key pair instance\nenvironment: %x\nclass handle: %x\n"
+		     "constructor: %x\nPublic Key: %x\nPrivate Key:%x\n",
+		     env, cls, ctor, outPublicKey, outPrivateKey);
+	      result = env->NewObject(cls, ctor, outPublicKey, outPrivateKey);
+	      printf("Key pair created\n");
+	    }
+	  else
+	    {
+	      printf("No constructor found\n");
+	    }
+	}
+      else
+	{
+	  printf("Failed to locate the CurveKeyPair class\n");
+	}
 
-      // FIXME: What is the ctor's method signature?
-      jmethodID ctor(env->GetMethodID(cls, "<init>", "([B[B)V"));
-      jobject result(env->NewObject(cls, ctor, outPublicKey, outPrivateKey));
-      return result;
-      //assert(false, "Finish writing this");
+      env->DeleteLocalRef(cls);
+      // Q: Do I need to release my handle to the byte arrays?
+      // A: According to Stack Overflow, this doesn't work:
+      //env->ReleaseByteArrayElements(outPublicKey, (jbyte*)outPublicKey, 0);
+      // But this does:
+      env->DeleteLocalRef(outPrivateKey);
+      env->DeleteLocalRef(outPublicKey);
+      // TODO: RAII. Really need a class to hold those and release them
+      // during its destructor.
     }
   else
     {
-      // FIXME: How are errors being handled at this level?
-      return NULL;
-      //assert(false, "Failed to generate key pair");
+      // Q: How are errors being handled at this level?
+      // A: Seems to just be a matter of returning NULL.
+      // TODO: A better question might be "How *should*
+      // errors be handled at this level?"
+      printf("Curve key creation failed. Error Code: %d\n", rc);
+    }
+
+  if(!result)
+    {
+      // TODO: This really isn't a 0mq error, which is what raise_exception
+      // generates.
+      raise_exception(env, -1);
     }
 #else
   // This seems like a poor way to handle this situation
   //assert(false, "No Curve before version 4");
-  return NULL;
+  // In all honesty, should be raising an exception.
 #endif
+  return result;
 }
 
 struct JavaByteArrayWrapper

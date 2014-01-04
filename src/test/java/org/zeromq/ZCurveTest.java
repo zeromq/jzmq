@@ -1,8 +1,12 @@
 package org.zeromq;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+// FIXME: Debug only
+import static java.lang.System.out;
 
 import org.junit.Test;
 
@@ -13,8 +17,13 @@ public class ZCurveTest {
 
     @Test
     public void testKeyCenversion() {
+	out.println("Trying to generate a KeyPair");
 	ZMQ.CurveKeyPair keys = ZMQ.curveKeyPairFactory();
+	assertNotNull("building KeyPair instance failed", keys);
+
+	out.println("KeyPair created. Accessing the public key");
 	byte[] publicKey = keys.publicKey;
+	out.println(new String(publicKey));
 
 	String encoded = ZMQ.Z85Encode(publicKey);
 	byte[] decoded = ZMQ.Z85Decode(encoded);
@@ -29,7 +38,9 @@ public class ZCurveTest {
 	// No encryption before version 4
         if (ZMQ.getFullVersion() >= ZMQ.make_version(4, 0, 0)) {
 	    ZMQ.CurveKeyPair clientKeys = ZMQ.curveKeyPairFactory();
+	    assertNotNull("Client Key generation failed", clientKeys);
 	    ZMQ.CurveKeyPair serverKeys = ZMQ.curveKeyPairFactory();
+	    assertNotNull("Server Key generation failed", serverKeys);
 
 	    ZMQ.Context context = ZMQ.context(1);
 

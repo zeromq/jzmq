@@ -19,6 +19,15 @@ make
 make install
 ```
 
+That installs the native language wrapper layer.
+
+```mvn install```
+
+will run the unit tests and install the actual java library.
+
+Note that you require a default gpg key (and gpg needs to be installed and available on your
+PATH) to actually sign the library. 
+
 Avoiding JNI
 ------------
 
