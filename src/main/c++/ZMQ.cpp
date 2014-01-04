@@ -161,8 +161,8 @@ Java_org_zeromq_ZMQ_run_1proxy (JNIEnv *env, jclass cls, jobject frontend_, jobj
 #endif
 }
 
-JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
-  (JNIEnv *env, jclass container_cls)
+JNIEXPORT jobject JNICALL Java_org_zeromq_ZKeyPairFactory
+  (JNIEnv *env, jclass cls)
 {
   jobject result(NULL);
 
@@ -192,14 +192,16 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
       // Generally cleaner to just pass around primitive types and arrays.
       // An extra incentive here: I don't have the CurveKeyPair class. I have a reference
       // to the containing ZMQ class...which is pretty much useless.
-      jclass cls(env->FindClass("org/zeromq/ZMQ$CurveKeyPair"));
+#if false
+      jclass cls(env->FindClass("org/zeromq/ZCurveKeyPair"));
+#endif
       if(cls != NULL)
 	{
-	  jmethodID ctor(env->GetMethodID(cls, "<init>", "(Lorg/zeromq/ZMQ;[B[B)V"));
+	  jmethodID ctor(env->GetMethodID(cls, "<init>", "([B[B)V"));
 	  if(ctor != NULL)
 	    {
-	      printf("Creating a new key pair instance\nenvironment: %x\nclass handle: %x\n"
-		     "constructor: %x\nPublic Key: %x\nPrivate Key:%x\n",
+	      printf("Creating a new key pair instance\nenvironment: %p\n class handle: %p\n"
+		     "constructor: %p\nPublic Key: %p\nPrivate Key: %p\n",
 		     env, cls, ctor, outPublicKey, outPrivateKey);
 	      result = env->NewObject(cls, ctor, outPublicKey, outPrivateKey);
 	      printf("Key pair created\n");
@@ -211,7 +213,7 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZMQ_curveKeyPairFactory
 	}
       else
 	{
-	  printf("Failed to locate the CurveKeyPair class\n");
+	  printf("Failed to locate the ZCurveKeyPair class\n");
 	}
 
       env->DeleteLocalRef(cls);
@@ -286,7 +288,7 @@ public:
   }
 };
 
-JNIEXPORT jstring JNICALL Java_org_zeromq_ZMQ_Z85Encode
+JNIEXPORT jstring JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Encode
   (JNIEnv *env, jclass cls, jbyteArray src)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
@@ -352,7 +354,7 @@ public:
   }
 };
 
-JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_Z85Decode
+JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Decode
   (JNIEnv *env, jclass cls, jstring src)
 {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)

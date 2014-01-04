@@ -12,6 +12,7 @@ JZMQ_JAVA_FILES = \
 	../java/org/zeromq/ZMsg.java \
 	../java/org/zeromq/ZThread.java \
 	../java/org/zeromq/ZLoop.java \
+	../java/org/zeromq/ZCurveKeyPair.java \
 	../java/org/zeromq/ZDispatcher.java \
 	../java/org/zeromq/EmbeddedLibraryTools.java
 

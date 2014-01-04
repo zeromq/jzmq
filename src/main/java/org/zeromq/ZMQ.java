@@ -1210,7 +1210,7 @@ public class ZMQ {
 	 * Which could very well be this.
 	 * @param key The public one.
 	 * @see #makeIntoCurveServer(byte[])
-	 * @see #makeIntoCurveClient(CurveKeyPair, byte[])
+	 * @see #makeIntoCurveClient(ZCurveKeyPair, byte[])
 	 * @since 4.0.0
 	 */
 	public void setCurveServerKey(byte[] key) {
@@ -1234,7 +1234,7 @@ public class ZMQ {
 	/**
 	 * Set the long-term private key associated with this client socket.
 	 * @param key The private one.
-	 * @see #makeIntoCurveClient(CurveKeyPair, byte[])
+	 * @see #makeIntoCurveClient(ZCurveKeyPair, byte[])
 	 * @since 4.0.0
 	 */
 	public void setCurveClientPrivateKey(byte[] key) {
@@ -1248,7 +1248,7 @@ public class ZMQ {
 	 * @param key The public one.
 	 * Q: What on earth is wrong with the next line? (And all the
 	 * similar ones that are causing basically the same warning?)
-	 * @see ZMQ.Socket#makeIntoCurveClient(CurveKeyPair, byte[])
+	 * @see ZMQ.Socket#makeIntoCurveClient(ZCurveKeyPair, byte[])
 	 * @since 4.0.0
 	 */
 	public void setCurveClientPublicKey(byte[] key) {
@@ -1263,7 +1263,7 @@ public class ZMQ {
 	 * @param serverKey The server's long-term public key
 	 * @since 4.0.0
 	 */
-	public void makeIntoCurveClient(CurveKeyPair keyPair, byte[] serverKey) {
+	public void makeIntoCurveClient(ZCurveKeyPair keyPair, byte[] serverKey) {
 	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
 		setCurveServer(false);
 		setCurveServerKey(serverKey);
@@ -2073,38 +2073,4 @@ public class ZMQ {
         private static final int SIZE_DEFAULT = 32;
         private static final int SIZE_INCREMENT = 16;
     }
-
-
-    /**
-     * Generate a public/private Curve keypair
-     */
-    public static native CurveKeyPair curveKeyPairFactory();
-
-    /**
-     * Inner class to represent a Key Pair
-     */
-    public class CurveKeyPair {
-	/**
-	 * I have a sneaking suspicion that this should really inherit from
-	 * one of Java's existing key pair classes.
-	 */
-
-	public byte[] publicKey;
-	public byte[] privateKey;
-
-	CurveKeyPair(byte[] pub, byte[] priv) {
-	    publicKey = pub;
-	    privateKey = priv;
-	}
-    }
-
-    /**
-     * Convert a binary key from Z85 printable text
-     */
-    public static native String Z85Encode(byte[] key);
-
-    /**
-     * Convert Z85 printable text into its associated byte array
-     */
-    public static native byte[] Z85Decode (String s);
 }

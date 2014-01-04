@@ -1,4 +1,24 @@
+/*
+  Copyright (c) 2007-2010 iMatix Corporation
+
+  This file is part of 0MQ.
+
+  0MQ is free software; you can redistribute it and/or modify it under
+  the terms of the Lesser GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  0MQ is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  Lesser GNU General Public License for more details.
+
+  You should have received a copy of the Lesser GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.zeromq;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -8,8 +28,6 @@ import static org.junit.Assert.assertTrue;
 // FIXME: Debug only
 import static java.lang.System.out;
 
-import org.junit.Test;
-
 /**
  * @author James Gatannah
  */
@@ -18,7 +36,7 @@ public class ZCurveTest {
     @Test
     public void testKeyCenversion() {
 	out.println("Trying to generate a KeyPair");
-	ZMQ.CurveKeyPair keys = ZMQ.curveKeyPairFactory();
+	ZCurveKeyPair keys = ZCurveKeyPair.curveKeyPairFactory();
 	assertNotNull("building KeyPair instance failed", keys);
 
 	out.println("KeyPair created. Accessing the public key");
@@ -37,9 +55,9 @@ public class ZCurveTest {
 
 	// No encryption before version 4
         if (ZMQ.getFullVersion() >= ZMQ.make_version(4, 0, 0)) {
-	    ZMQ.CurveKeyPair clientKeys = ZMQ.curveKeyPairFactory();
+	    ZCurveKeyPair clientKeys = ZCurveKeyPair.curveKeyPairFactory();
 	    assertNotNull("Client Key generation failed", clientKeys);
-	    ZMQ.CurveKeyPair serverKeys = ZMQ.curveKeyPairFactory();
+	    ZCurveKeyPair serverKeys = ZCurveKeyPair.curveKeyPairFactory();
 	    assertNotNull("Server Key generation failed", serverKeys);
 
 	    ZMQ.Context context = ZMQ.context(1);

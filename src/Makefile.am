@@ -8,6 +8,7 @@ JZMQ_JAVA_FILES = \
 	main/java/org/zeromq/ZMQForwarder.java \
 	main/java/org/zeromq/ZMQStreamer.java \
 	main/java/org/zeromq/ZContext.java \
+	main/java/org/zeromq/ZCurveKeyPair.java \
 	main/java/org/zeromq/ZFrame.java \
 	main/java/org/zeromq/ZMsg.java \
 	main/java/org/zeromq/ZThread.java \
@@ -27,6 +28,7 @@ JZMQ_H_FILES = \
 	org_zeromq_ZMQ.h \
 	org_zeromq_ZMQ_Error.h \
 	org_zeromq_ZMQ_Context.h \
+	org_zeromq_ZMQ_ZCurveKeyPair.h \
 	org_zeromq_ZMQ_Socket.h \
 	org_zeromq_ZMQ_Poller.h
 
@@ -44,6 +46,7 @@ JZMQ_CLASS_FILES = \
 	main/java/org/zeromq/ZMQForwarder.class \
 	main/java/org/zeromq/ZMQStreamer.class \
 	main/java/org/zeromq/ZContext.class \
+	main/java/org/zeromq/ZCurveKeyPair.class \
 	main/java/org/zeromq/ZFrame.class \
 	main/java/org/zeromq/ZMsg.class \
 	main/java/org/zeromq/ZThread.class \
