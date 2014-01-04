@@ -17,9 +17,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cstring>
+
 #include <zmq.h>
-// Needed for the curve pieces. Seems like a strong indicator that their
-// equivalents belong in util.cpp here.
 #include <zmq_utils.h>
 
 #include "jzmq.hpp"
