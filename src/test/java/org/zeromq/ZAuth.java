@@ -161,6 +161,8 @@ public class ZAuth {
                     }
                 }
             } else if (!blacklist.isEmpty()) {
+		// This looks like a copy/paste error. I think it really should be checking
+		// blacklist instead of whitelist
                 if (whitelist.containsKey(request.address)) {
                     denied = true;
                     if (verbose) {
