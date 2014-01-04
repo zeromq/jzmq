@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * @author James Gatannah
  */
-public class ZMQCurveTest {
+public class ZCurveTest {
 
     @Test
     public void testKeyCenversion() {
