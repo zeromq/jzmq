@@ -33,25 +33,27 @@ JZMQ_HPP_FILES = \
 	util.hpp
 
 JZMQ_CLASS_FILES = \
-	../java/org/zeromq/ZMQ.class \
-	../java/org/zeromq/ZMQ$$Context.class \
-	../java/org/zeromq/ZMQ$$Socket.class \
-	../java/org/zeromq/ZMQ$$Poller.class \
-	../java/org/zeromq/ZMQ$$Error.class \
-	../java/org/zeromq/ZMQException.class \
-	../java/org/zeromq/ZMQQueue.class \
-	../java/org/zeromq/ZMQForwarder.class \
-	../java/org/zeromq/ZMQStreamer.class \
-	../java/org/zeromq/ZContext.class \
-	../java/org/zeromq/ZFrame.class \
-	../java/org/zeromq/ZMsg.class \
-	../java/org/zeromq/ZThread.class \
-	../java/org/zeromq/ZLoop.class \
-	../java/org/zeromq/ZDispatcher.class
+	org/zeromq/ZMQ.class \
+	org/zeromq/ZMQ$$Context.class \
+	org/zeromq/ZMQ$$Socket.class \
+	org/zeromq/ZMQ$$Poller.class \
+	org/zeromq/ZMQ$$Error.class \
+	org/zeromq/ZMQException.class \
+	org/zeromq/ZMQQueue.class \
+	org/zeromq/ZMQForwarder.class \
+	org/zeromq/ZMQStreamer.class \
+	org/zeromq/ZContext.class \
+	org/zeromq/ZFrame.class \
+	org/zeromq/ZMsg.class \
+	org/zeromq/ZThread.class \
+	org/zeromq/ZLoop.class \
+	org/zeromq/ZDispatcher.class
 
 $(jarfile):
 	$(JAVAC) -d ../java/ $(JZMQ_JAVA_FILES)
-	$(JAR) cf $(JARFLAGS) $@ ../java/org/zeromq/*.class
+	pushd .
+	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
+	popd
 
 jar_DATA = $(jarfile)
 
