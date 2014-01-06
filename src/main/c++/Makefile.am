@@ -50,10 +50,8 @@ JZMQ_CLASS_FILES = \
 	org/zeromq/ZDispatcher.class
 
 $(jarfile):
-	$(JAVAC) -d ../java/ $(JZMQ_JAVA_FILES)
-	pushd .
-	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
-	popd
+	$(JAVAC) -d . $(JZMQ_JAVA_FILES)
+	$(JAR) cf $(JARFLAGS) $@ $(JZMQ_CLASS_FILES)
 
 jar_DATA = $(jarfile)
 
