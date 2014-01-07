@@ -48,9 +48,9 @@ public class ZCurveTest {
 
 	out.println("Encoding");
 	String encoded = ZCurveKeyPair.Z85Encode(publicKey);
-	out.println("Decoding");
+	out.println("Decoding '" + encoded + "'");
 	byte[] decoded = ZCurveKeyPair.Z85Decode(encoded);
-	out.println("Decoded");
+	out.println("Decoded '" + new String(decoded) + "'");
 
 	assertArrayEquals("failure - decoded doesn't match original", publicKey, decoded);
     }

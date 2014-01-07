@@ -179,12 +179,8 @@ Java_org_zeromq_ZCurveKeyPair_Factory
 
   int rc = zmq_curve_keypair(publicKey, privateKey);
   
-  // FIXME: Debug only
-  FILE* logger(fopen("log.txt", "w"));
-  fprintf(logger, "Generated a KeyPair:\nPublic: %s\nPrivate: %s\nSuccess: %d\n", publicKey, privateKey, rc);
   if(rc == 0)
     {
-      fprintf(logger, "Setting Byte Regions\n");
       const jbyte* j_key(reinterpret_cast<const jbyte*>(publicKey));
       jbyteArray outPublicKey(env->NewByteArray(40));  
       env->SetByteArrayRegion(outPublicKey, 0, 40, j_key); 
@@ -192,8 +188,6 @@ Java_org_zeromq_ZCurveKeyPair_Factory
       jbyteArray outPrivateKey(env->NewByteArray(40));
       j_key = reinterpret_cast<const jbyte*>(privateKey);
       env->SetByteArrayRegion(outPrivateKey, 0, 40, j_key);
-
-      fprintf(logger, "Initializing the KeyPair instance\n");
 
       // To quote stack overflow: object creation/access is messy and hard to debug.
       // Generally cleaner to just pass around primitive types and arrays.
@@ -207,20 +201,8 @@ Java_org_zeromq_ZCurveKeyPair_Factory
 	  jmethodID ctor(env->GetMethodID(cls, "<init>", "([B[B)V"));
 	  if(ctor != NULL)
 	    {
-	      fprintf(logger, "Creating a new key pair instance\nenvironment: %p\n class handle: %p\n"
-		     "constructor: %p\nPublic Key: %p\nPrivate Key: %p\n",
-		     env, cls, ctor, outPublicKey, outPrivateKey);
 	      result = env->NewObject(cls, ctor, outPublicKey, outPrivateKey);
-	      fprintf(logger, "Key pair created\n");
 	    }
-	  else
-	    {
-	      fprintf(logger, "No constructor found\n");
-	    }
-	}
-      else
-	{
-	  fprintf(logger, "Failed to locate the ZCurveKeyPair class\n");
 	}
 
       env->DeleteLocalRef(cls);
@@ -239,10 +221,8 @@ Java_org_zeromq_ZCurveKeyPair_Factory
       // A: Seems to just be a matter of returning NULL.
       // TODO: A better question might be "How *should*
       // errors be handled at this level?"
-      fprintf(logger, "Curve key creation failed. Error Code: %d\n", rc);
+      printf("Curve key creation failed. Error Code: %d\n", rc);
     }
-
-  fclose(logger);
 
   if(!result)
     {
@@ -278,7 +258,13 @@ public:
 
   virtual ~JavaByteArrayWrapper()
   {
+#if false
+    // I don't think I want to abort this.
     _env->ReleaseByteArrayElements(_src, _bytes, JNI_ABORT);
+#else
+    // According to the docs, this should commit changes and free the buffer
+    _env->ReleaseByteArrayElements(_src, _bytes, 0);
+#endif
   }
 };
 
@@ -300,39 +286,52 @@ public:
 JNIEXPORT jstring JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Encode
   (JNIEnv *env, jclass cls, jbyteArray src)
 {
-#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
   jstring result;
 
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
+  FILE* logger(fopen("log.txt", "w"));
+  fprintf(logger, "Encoding %p\n", src);
   JavaByteArrayWrapper wrapper(env, src);
 
   int src_len(env->GetArrayLength(src));
+  fprintf(logger, "%d bytes\n", src_len);
+  fflush(logger);
 
   // Destination length must be source length*1.25 + 1 for the NULL terminator
   int src_len_mod_4(src_len % 4);
-  // Source must be an even multiple of 4 bytes
-  if (src_len_mod_4 != src_len / 4)
+  // Which means that source must be an even multiple of 4 bytes
+  if (0 == src_len_mod_4)
     {
-      return NULL;
+      fprintf(logger, "That's an even multiple of 4\n");
+      int dst_len(((src_len / 4) * 5) + 1);
+      fprintf(logger, "Encoding to %d bytes\n", dst_len);
+      fflush(logger);
+      AutoString c_dst(dst_len);
+
+      const char* encoded(zmq_z85_encode(c_dst.buffer, wrapper._binary, src_len));
+      if(NULL != encoded)
+	{
+	  fprintf(logger, "Encoded value: '%s'\n", encoded);
+	  fflush(logger);
+	  result = env->NewStringUTF(c_dst.buffer);
+#if false
+	  // Q: Release the local reference to that?
+	  // A: Nope. This causes an error about duplicate free/delete
+	  // and a core dump.
+	  env->ReleaseStringUTFChars(result, c_dst.buffer);
+#endif
+	}
     }
-
-  int dst_len(src_len_mod_4 * 5 + 1);
-  AutoString c_dst(dst_len);
-
-  const char* encoded(zmq_z85_encode(c_dst.buffer, wrapper._binary, src_len));
-  if(NULL == encoded) {
-    //assert(false, "Handle errors");
-    return NULL;
-  }
-  else {
-    result = env->NewStringUTF(c_dst.buffer);
-  }
-
-  return result;
+  else
+    {
+      fprintf(logger, "Bad length\n");
+    }
 #else
   // This seems like a poor way to handle this situation
   //assert(false, "No Curve before version 4");
-  return NULL;
 #endif
+
+  return result;
 }
 
 struct UtfWrapper
@@ -347,12 +346,34 @@ public:
   JNIEnv* _env;
 
   UtfWrapper(JNIEnv* env, jstring src)
+#if false
     : _length(env->GetStringUTFLength(src)),
       _utf(env->GetStringUTFChars(src, NULL)),
       _s(new char[_length]),
       _src(src),
       _env(env)
+#endif
   {
+    #if true
+    FILE* logger(fopen("log1.txt", "w"));
+    fprintf(logger, "Getting the byte count of the source string\n");
+    fflush(logger);
+    _length = env->GetStringUTFLength(src);
+    fprintf(logger, "Getting the actual UTF\n");
+    fflush(logger);
+    _utf = env->GetStringUTFChars(src, NULL);
+    fprintf(logger, "Allocating the destination buffer\n");
+    fflush(logger);
+    _s = new char[_length];
+    fprintf(logger, "Hanging onto the source buffer\n");
+    fflush(logger);
+    _src = src;
+    fprintf(logger, "Stashing the environment\n");
+    fflush(logger);
+    _env = env;
+#endif
+    fprintf(logger, "Copying %d bytes\n", _length);
+    fclose(logger);
     memcpy(_s, _utf, _length);
   }
 
@@ -366,43 +387,46 @@ public:
 JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Decode
   (JNIEnv *env, jclass cls, jstring src)
 {
+  jbyteArray result(NULL);
+
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
-  jbyteArray result;
+  FILE* logger(fopen("log.txt", "a"));
+  fprintf(logger, "Decoding %p\n", src);
+  fflush(logger);
 
   UtfWrapper str(env, src);
+  fprintf(logger, "UTF wrapper generated\n");
+  fflush(logger);
 
   int src_len(strlen(str._s));
+  fprintf(logger, "String to decode (%s) is %d bytes long\n", str._s, src_len);
+  fflush(logger);
   
   // Must be a multiple of 5 in length
   int src_len_mod_5(src_len % 5);
-  if(src_len_mod_5 != src_len/5)
+  if(0 == src_len_mod_5)
     {
-      return NULL;
-    }
-
-  int dst_len(src_len_mod_5 * 4);
-  AutoString dst(dst_len);
-  const uint8_t* decoded(zmq_z85_decode(reinterpret_cast<uint8_t*>(dst.buffer), str._s));
-  if(NULL == decoded)
-    {
-      return NULL;
-    }
-  else
-    {
-      result = env->NewByteArray(dst_len);
+      int dst_len(((src_len / 5) * 4) + 1);
+      AutoString dst(dst_len);
+      uint8_t* decoded(zmq_z85_decode(reinterpret_cast<uint8_t*>(dst.buffer), str._s));
+      if(NULL != decoded)
+	{
+	  fprintf(logger, "Decoded something\n");
+	  fflush(logger);
+	  result = env->NewByteArray(dst_len);
+	  jbyte* j_decoded(reinterpret_cast<jbyte*>(decoded));
+	  env->SetByteArrayRegion(result, 0, dst_len, j_decoded);
 #if false
-      env->SetByteArrayRegion(result, 0, dst_len, decoded);
-#else
-      const jbyte* j_decoded(reinterpret_cast<const jbyte*>(decoded));
-      env->SetByteArrayRegion(result, 0, dst_len, j_decoded);
+	  env->ReleaseByteArrayElements(result, j_decoded, 0);
 #endif
+	}
     }
-
-  return result;
+  fprintf(logger, "All done\n");
+  fclose(logger);
 #else
   // This seems like a poor way to handle this situation
   //assert(false, "No Curve before version 4");
-  return NULL;
 #endif
+  return result;
 }
 
