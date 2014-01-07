@@ -1191,17 +1191,16 @@ public class ZMQ {
         }
 
 	/**
-	 * Flag the socket as a CURVE server (or not)
-	 * @param server A value of true starts configuring the socket as a server.
-	 * You must still set the Server Key.
+	 * Flag the socket as a CURVE server
+	 * I wanted this to have an on/off option, but that fails.
 	 * @see #setServerKey(long)
 	 * @see #makeIntoCurveServer(byte[])
 	 * Q: I this the version it was added to zmq, or to here?
 	 * @since 4.0.0
 	 */
-	public void setCurveServer(boolean server) {
+	public void setCurveServer() {
 	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
-		setLongSockopt(CURVE_SERVER, server ? 1L : 0L);
+		setLongSockopt(CURVE_SERVER, 1L);
 	    }
 	}
 
@@ -1227,7 +1226,7 @@ public class ZMQ {
 	 * @since 4.0.0
 	 */
 	public void makeIntoCurveServer(byte[] key) {
-	    setCurveServer(true);
+	    setCurveServer();
 	    setCurveServerKey(key);
 	}
 
@@ -1265,7 +1264,6 @@ public class ZMQ {
 	 */
 	public void makeIntoCurveClient(ZCurveKeyPair keyPair, byte[] serverKey) {
 	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
-		setCurveServer(false);
 		setCurveServerKey(serverKey);
 		setCurveClientPrivateKey(keyPair.privateKey);
 		setCurveClientPublicKey(keyPair.publicKey);

@@ -275,7 +275,12 @@ public:
 
   AutoString(int len)
     : buffer(new char[len])
-  {}
+  {
+    // Because strings should be NULL-terminated.
+    // This probably doesn't actually matter except for logging, but
+    // it's better to be safe than sorry.
+    buffer[len-1] = 0;
+  }
 
   virtual ~AutoString()
   {
@@ -304,7 +309,7 @@ JNIEXPORT jstring JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Encode
     {
       fprintf(logger, "That's an even multiple of 4\n");
       int dst_len(((src_len / 4) * 5) + 1);
-      fprintf(logger, "Encoding to %d bytes\n", dst_len);
+      fprintf(logger, "Encoding from %d to %d bytes\n", src_len, dst_len);
       fflush(logger);
       AutoString c_dst(dst_len);
 
@@ -314,12 +319,6 @@ JNIEXPORT jstring JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Encode
 	  fprintf(logger, "Encoded value: '%s'\n", encoded);
 	  fflush(logger);
 	  result = env->NewStringUTF(c_dst.buffer);
-#if false
-	  // Q: Release the local reference to that?
-	  // A: Nope. This causes an error about duplicate free/delete
-	  // and a core dump.
-	  env->ReleaseStringUTFChars(result, c_dst.buffer);
-#endif
 	}
     }
   else
@@ -346,7 +345,7 @@ public:
   JNIEnv* _env;
 
   UtfWrapper(JNIEnv* env, jstring src)
-#if false
+#if true
     : _length(env->GetStringUTFLength(src)),
       _utf(env->GetStringUTFChars(src, NULL)),
       _s(new char[_length]),
@@ -364,7 +363,8 @@ public:
     _utf = env->GetStringUTFChars(src, NULL);
     fprintf(logger, "Allocating the destination buffer\n");
     fflush(logger);
-    _s = new char[_length];
+    _s = new char[_length+1];
+    _s[_length-1] = 0;
     fprintf(logger, "Hanging onto the source buffer\n");
     fflush(logger);
     _src = src;
@@ -399,14 +399,14 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Decode
   fflush(logger);
 
   int src_len(strlen(str._s));
-  fprintf(logger, "String to decode (%s) is %d bytes long\n", str._s, src_len);
+  fprintf(logger, "String to decode ('%s') is %d bytes long\n", str._s, src_len);
   fflush(logger);
   
   // Must be a multiple of 5 in length
   int src_len_mod_5(src_len % 5);
   if(0 == src_len_mod_5)
     {
-      int dst_len(((src_len / 5) * 4) + 1);
+      int dst_len((src_len / 5) * 4);
       AutoString dst(dst_len);
       uint8_t* decoded(zmq_z85_decode(reinterpret_cast<uint8_t*>(dst.buffer), str._s));
       if(NULL != decoded)
@@ -420,6 +420,11 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Decode
 	  env->ReleaseByteArrayElements(result, j_decoded, 0);
 #endif
 	}
+    }
+  else
+    {
+      // TODO: How am I winding up with 51 bytes here?
+      fprintf(logger, "Error. Can't decode a %d-byte string\n", src_len);
     }
   fprintf(logger, "All done\n");
   fclose(logger);
