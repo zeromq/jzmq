@@ -1,3 +1,4 @@
+package org.zeromq;
 /*
   Copyright (c) 2007-2010 iMatix Corporation
 
@@ -16,7 +17,6 @@
   You should have received a copy of the Lesser GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.zeromq;
 
 import org.junit.Test;
 
@@ -28,6 +28,9 @@ import static org.junit.Assert.assertTrue;
 // FIXME: Debug only
 import static java.lang.System.out;
 
+import org.zeromq.ZMQ;
+import org.zeromq.ZCurveKeyPair;
+
 /**
  * @author James Gatannah
  */
@@ -36,15 +39,18 @@ public class ZCurveTest {
     @Test
     public void testKeyCenversion() {
 	out.println("Trying to generate a KeyPair");
-	ZCurveKeyPair keys = ZCurveKeyPair.curveKeyPairFactory();
+	ZCurveKeyPair keys = ZCurveKeyPair.Factory();
 	assertNotNull("building KeyPair instance failed", keys);
 
 	out.println("KeyPair created. Accessing the public key");
 	byte[] publicKey = keys.publicKey;
 	out.println(new String(publicKey));
 
-	String encoded = ZMQ.Z85Encode(publicKey);
-	byte[] decoded = ZMQ.Z85Decode(encoded);
+	out.println("Encoding");
+	String encoded = ZCurveKeyPair.Z85Encode(publicKey);
+	out.println("Decoding");
+	byte[] decoded = ZCurveKeyPair.Z85Decode(encoded);
+	out.println("Decoded");
 
 	assertArrayEquals("failure - decoded doesn't match original", publicKey, decoded);
     }
@@ -55,9 +61,9 @@ public class ZCurveTest {
 
 	// No encryption before version 4
         if (ZMQ.getFullVersion() >= ZMQ.make_version(4, 0, 0)) {
-	    ZCurveKeyPair clientKeys = ZCurveKeyPair.curveKeyPairFactory();
+	    ZCurveKeyPair clientKeys = ZCurveKeyPair.Factory();
 	    assertNotNull("Client Key generation failed", clientKeys);
-	    ZCurveKeyPair serverKeys = ZCurveKeyPair.curveKeyPairFactory();
+	    ZCurveKeyPair serverKeys = ZCurveKeyPair.Factory();
 	    assertNotNull("Server Key generation failed", serverKeys);
 
 	    ZMQ.Context context = ZMQ.context(1);

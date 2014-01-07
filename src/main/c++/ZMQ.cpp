@@ -18,12 +18,15 @@
 */
 
 #include <cstring>
+// FIXME: Debug only
+#include <stdio.h>
 
 #include <zmq.h>
 #include <zmq_utils.h>
 
 #include "jzmq.hpp"
 #include "org_zeromq_ZMQ.h"
+#include "org_zeromq_ZCurveKeyPair.h"
 #include "util.hpp"
 
 static void *get_socket (JNIEnv *env, jobject obj)
@@ -161,7 +164,8 @@ Java_org_zeromq_ZMQ_run_1proxy (JNIEnv *env, jclass cls, jobject frontend_, jobj
 #endif
 }
 
-JNIEXPORT jobject JNICALL Java_org_zeromq_ZKeyPairFactory
+JNIEXPORT jobject JNICALL
+Java_org_zeromq_ZCurveKeyPair_Factory
   (JNIEnv *env, jclass cls)
 {
   jobject result(NULL);
@@ -174,10 +178,13 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZKeyPairFactory
   privateKey[40] = 0;
 
   int rc = zmq_curve_keypair(publicKey, privateKey);
-  printf("Generated a KeyPair:\nPublic: %s\nPrivate: %s\nSuccess: %d\n", publicKey, privateKey, rc);
+  
+  // FIXME: Debug only
+  FILE* logger(fopen("log.txt", "w"));
+  fprintf(logger, "Generated a KeyPair:\nPublic: %s\nPrivate: %s\nSuccess: %d\n", publicKey, privateKey, rc);
   if(rc == 0)
     {
-      printf("Setting Byte Regions\n");
+      fprintf(logger, "Setting Byte Regions\n");
       const jbyte* j_key(reinterpret_cast<const jbyte*>(publicKey));
       jbyteArray outPublicKey(env->NewByteArray(40));  
       env->SetByteArrayRegion(outPublicKey, 0, 40, j_key); 
@@ -186,7 +193,7 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZKeyPairFactory
       j_key = reinterpret_cast<const jbyte*>(privateKey);
       env->SetByteArrayRegion(outPrivateKey, 0, 40, j_key);
 
-      printf("Initializing the KeyPair instance\n");
+      fprintf(logger, "Initializing the KeyPair instance\n");
 
       // To quote stack overflow: object creation/access is messy and hard to debug.
       // Generally cleaner to just pass around primitive types and arrays.
@@ -200,20 +207,20 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZKeyPairFactory
 	  jmethodID ctor(env->GetMethodID(cls, "<init>", "([B[B)V"));
 	  if(ctor != NULL)
 	    {
-	      printf("Creating a new key pair instance\nenvironment: %p\n class handle: %p\n"
+	      fprintf(logger, "Creating a new key pair instance\nenvironment: %p\n class handle: %p\n"
 		     "constructor: %p\nPublic Key: %p\nPrivate Key: %p\n",
 		     env, cls, ctor, outPublicKey, outPrivateKey);
 	      result = env->NewObject(cls, ctor, outPublicKey, outPrivateKey);
-	      printf("Key pair created\n");
+	      fprintf(logger, "Key pair created\n");
 	    }
 	  else
 	    {
-	      printf("No constructor found\n");
+	      fprintf(logger, "No constructor found\n");
 	    }
 	}
       else
 	{
-	  printf("Failed to locate the ZCurveKeyPair class\n");
+	  fprintf(logger, "Failed to locate the ZCurveKeyPair class\n");
 	}
 
       env->DeleteLocalRef(cls);
@@ -232,8 +239,10 @@ JNIEXPORT jobject JNICALL Java_org_zeromq_ZKeyPairFactory
       // A: Seems to just be a matter of returning NULL.
       // TODO: A better question might be "How *should*
       // errors be handled at this level?"
-      printf("Curve key creation failed. Error Code: %d\n", rc);
+      fprintf(logger, "Curve key creation failed. Error Code: %d\n", rc);
     }
+
+  fclose(logger);
 
   if(!result)
     {

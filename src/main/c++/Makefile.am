@@ -27,8 +27,10 @@ JZMQ_H_FILES = \
 	org_zeromq_ZMQ.h \
 	org_zeromq_ZMQ_Error.h \
 	org_zeromq_ZMQ_Context.h \
+	org_zeromq_ZMQ_ZCurveKeyPair.h \
 	org_zeromq_ZMQ_Socket.h \
-	org_zeromq_ZMQ_Poller.h
+	org_zeromq_ZMQ_Poller.h \
+	org_zeromq_ZMQ_PollItem.h
 
 JZMQ_HPP_FILES = \
 	util.hpp
@@ -44,6 +46,7 @@ JZMQ_CLASS_FILES = \
 	../java/org/zeromq/ZMQForwarder.class \
 	../java/org/zeromq/ZMQStreamer.class \
 	../java/org/zeromq/ZContext.class \
+	../java/org/zeromq/ZCurveKeyPair.class \
 	../java/org/zeromq/ZFrame.class \
 	../java/org/zeromq/ZMsg.class \
 	../java/org/zeromq/ZThread.class \
@@ -85,6 +88,7 @@ CLEANFILES = \
 
 $(JZMQ_H_FILES): $(jarfile)
 	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath ../java org.zeromq.ZMQ
+	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath ../java org.zeromq.ZCurveKeyPair
 
 $(srcdir)/ZMQ.cpp: \
 	$(JZMQ_H_FILES) \
