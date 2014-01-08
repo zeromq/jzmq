@@ -1192,15 +1192,16 @@ public class ZMQ {
 
 	/**
 	 * Flag the socket as a CURVE server
-	 * I wanted this to have an on/off option, but that fails.
+	 * @param on true to make this plan to work as a server, false for clients
+	 * (defaults to client)
 	 * @see #setServerKey(long)
 	 * @see #makeIntoCurveServer(byte[])
 	 * Q: I this the version it was added to zmq, or to here?
 	 * @since 4.0.0
 	 */
-	public void setCurveServer() {
+	public void setCurveServer(boolean on) {
 	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
-		setLongSockopt(CURVE_SERVER, 1L);
+		setLongSockopt(CURVE_SERVER, on ? 1L : 0L);
 	    }
 	}
 
@@ -1226,7 +1227,7 @@ public class ZMQ {
 	 * @since 4.0.0
 	 */
 	public void makeIntoCurveServer(byte[] key) {
-	    setCurveServer();
+	    setCurveServer(true);
 	    setCurveServerKey(key);
 	}
 
@@ -1264,6 +1265,9 @@ public class ZMQ {
 	 */
 	public void makeIntoCurveClient(ZCurveKeyPair keyPair, byte[] serverKey) {
 	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		// Mostly redundant. But allow for socket re-use.
+		// TODO: Verify that that actually works.
+		setCurveServer(false);
 		setCurveServerKey(serverKey);
 		setCurveClientPrivateKey(keyPair.privateKey);
 		setCurveClientPublicKey(keyPair.publicKey);
