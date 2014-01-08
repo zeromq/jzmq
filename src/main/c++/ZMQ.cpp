@@ -18,8 +18,6 @@
 */
 
 #include <cstring>
-// FIXME: Debug only
-#include <stdio.h>
 
 #include <zmq.h>
 #include <zmq_utils.h>
@@ -179,8 +177,7 @@ Java_org_zeromq_ZCurveKeyPair_Factory
 
   int rc = zmq_curve_keypair(publicKey, privateKey);
   
-  if(rc == 0)
-    {
+  if(rc == 0) {
       const jbyte* j_key(reinterpret_cast<const jbyte*>(publicKey));
       jbyteArray outPublicKey(env->NewByteArray(40));  
       env->SetByteArrayRegion(outPublicKey, 0, 40, j_key); 
@@ -189,13 +186,6 @@ Java_org_zeromq_ZCurveKeyPair_Factory
       j_key = reinterpret_cast<const jbyte*>(privateKey);
       env->SetByteArrayRegion(outPrivateKey, 0, 40, j_key);
 
-      // To quote stack overflow: object creation/access is messy and hard to debug.
-      // Generally cleaner to just pass around primitive types and arrays.
-      // An extra incentive here: I don't have the CurveKeyPair class. I have a reference
-      // to the containing ZMQ class...which is pretty much useless.
-#if false
-      jclass cls(env->FindClass("org/zeromq/ZCurveKeyPair"));
-#endif
       if(cls != NULL)
 	{
 	  jmethodID ctor(env->GetMethodID(cls, "<init>", "([B[B)V"));
@@ -215,8 +205,7 @@ Java_org_zeromq_ZCurveKeyPair_Factory
       // TODO: RAII. Really need a class to hold those and release them
       // during its destructor.
     }
-  else
-    {
+  else {
       // Q: How are errors being handled at this level?
       // A: Seems to just be a matter of returning NULL.
       // TODO: A better question might be "How *should*
@@ -224,8 +213,7 @@ Java_org_zeromq_ZCurveKeyPair_Factory
       printf("Curve key creation failed. Error Code: %d\n", rc);
     }
 
-  if(!result)
-    {
+  if(!result) {
       // TODO: This really isn't a 0mq error, which is what raise_exception
       // generates.
       raise_exception(env, -1);
@@ -294,36 +282,21 @@ JNIEXPORT jstring JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Encode
   jstring result;
 
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
-  FILE* logger(fopen("log.txt", "w"));
-  fprintf(logger, "Encoding %p\n", src);
   JavaByteArrayWrapper wrapper(env, src);
 
   int src_len(env->GetArrayLength(src));
-  fprintf(logger, "%d bytes\n", src_len);
-  fflush(logger);
 
   // Destination length must be source length*1.25 + 1 for the NULL terminator
   int src_len_mod_4(src_len % 4);
   // Which means that source must be an even multiple of 4 bytes
-  if (0 == src_len_mod_4)
-    {
-      fprintf(logger, "That's an even multiple of 4\n");
+  if (0 == src_len_mod_4) {
       int dst_len(((src_len / 4) * 5) + 1);
-      fprintf(logger, "Encoding from %d to %d bytes\n", src_len, dst_len);
-      fflush(logger);
       AutoString c_dst(dst_len);
 
       const char* encoded(zmq_z85_encode(c_dst.buffer, wrapper._binary, src_len));
-      if(NULL != encoded)
-	{
-	  fprintf(logger, "Encoded value: '%s'\n", encoded);
-	  fflush(logger);
+      if(NULL != encoded) {
 	  result = env->NewStringUTF(c_dst.buffer);
 	}
-    }
-  else
-    {
-      fprintf(logger, "Bad length\n");
     }
 #else
   // This seems like a poor way to handle this situation
@@ -345,35 +318,12 @@ public:
   JNIEnv* _env;
 
   UtfWrapper(JNIEnv* env, jstring src)
-#if true
     : _length(env->GetStringUTFLength(src)),
       _utf(env->GetStringUTFChars(src, NULL)),
       _s(new char[_length]),
       _src(src),
       _env(env)
-#endif
   {
-    #if true
-    FILE* logger(fopen("log1.txt", "w"));
-    fprintf(logger, "Getting the byte count of the source string\n");
-    fflush(logger);
-    _length = env->GetStringUTFLength(src);
-    fprintf(logger, "Getting the actual UTF\n");
-    fflush(logger);
-    _utf = env->GetStringUTFChars(src, NULL);
-    fprintf(logger, "Allocating the destination buffer\n");
-    fflush(logger);
-    _s = new char[_length+1];
-    _s[_length-1] = 0;
-    fprintf(logger, "Hanging onto the source buffer\n");
-    fflush(logger);
-    _src = src;
-    fprintf(logger, "Stashing the environment\n");
-    fflush(logger);
-    _env = env;
-#endif
-    fprintf(logger, "Copying %d bytes\n", _length);
-    fclose(logger);
     memcpy(_s, _utf, _length);
   }
 
@@ -390,44 +340,22 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Decode
   jbyteArray result(NULL);
 
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
-  FILE* logger(fopen("log.txt", "a"));
-  fprintf(logger, "Decoding %p\n", src);
-  fflush(logger);
-
   UtfWrapper str(env, src);
-  fprintf(logger, "UTF wrapper generated\n");
-  fflush(logger);
 
   int src_len(strlen(str._s));
-  fprintf(logger, "String to decode ('%s') is %d bytes long\n", str._s, src_len);
-  fflush(logger);
   
   // Must be a multiple of 5 in length
   int src_len_mod_5(src_len % 5);
-  if(0 == src_len_mod_5)
-    {
+  if(0 == src_len_mod_5) {
       int dst_len((src_len / 5) * 4);
       AutoString dst(dst_len);
       uint8_t* decoded(zmq_z85_decode(reinterpret_cast<uint8_t*>(dst.buffer), str._s));
-      if(NULL != decoded)
-	{
-	  fprintf(logger, "Decoded something\n");
-	  fflush(logger);
+      if(NULL != decoded) {
 	  result = env->NewByteArray(dst_len);
 	  jbyte* j_decoded(reinterpret_cast<jbyte*>(decoded));
 	  env->SetByteArrayRegion(result, 0, dst_len, j_decoded);
-#if false
-	  env->ReleaseByteArrayElements(result, j_decoded, 0);
-#endif
 	}
     }
-  else
-    {
-      // TODO: How am I winding up with 51 bytes here?
-      fprintf(logger, "Error. Can't decode a %d-byte string\n", src_len);
-    }
-  fprintf(logger, "All done\n");
-  fclose(logger);
 #else
   // This seems like a poor way to handle this situation
   //assert(false, "No Curve before version 4");
