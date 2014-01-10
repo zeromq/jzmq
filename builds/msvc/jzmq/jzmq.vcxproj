@@ -1,0 +1,363 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D4FC8AD4-EB3C-46AA-A67B-90D290A024F1}</ProjectGuid>
+    <RootNamespace>jzmq</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\..\..\..\lib\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <IncludePath>C:\ZeroMQ\include;C:\Program Files %28x86%29\Java\jdk1.6.0\include;C:\Program Files %28x86%29\Java\jdk1.6.0\include\win32;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\ZeroMQ\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\ZeroMQ\include;C:\Program Files\Java\jdk1.7.0\include;C:\Program Files\Java\jdk1.7.0\include\win32;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\ZeroMQ\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Message>Compiling Java classes</Message>
+      <Command>
+javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\ZMQForwarder.java ..\..\..\src\main\java\org\zeromq\ZMQQueue.java ..\..\..\src\main\java\org\zeromq\ZMQStreamer.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java ..\..\..\src\main\java\org\zeromq\ZContext.java ..\..\..\src\main\java\org\zeromq\ZDispatcher.java ..\..\..\src\main\java\org\zeromq\ZFrame.java ..\..\..\src\main\java\org\zeromq\ZMsg.java
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libzmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../../../lib/jzmq.dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>Creating JAR archive</Message>
+      <Command>cd ..\..\..\src\main\java\
+jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEvent>
+      <Message>Compiling Java classes</Message>
+      <Command>
+javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\ZMQForwarder.java ..\..\..\src\main\java\org\zeromq\ZMQQueue.java ..\..\..\src\main\java\org\zeromq\ZMQStreamer.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java ..\..\..\src\main\java\org\zeromq\ZContext.java ..\..\..\src\main\java\org\zeromq\ZDispatcher.java ..\..\..\src\main\java\org\zeromq\ZFrame.java ..\..\..\src\main\java\org\zeromq\ZMsg.java
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libzmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../../../lib/jzmq.dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Message>Creating JAR archive</Message>
+      <Command>cd ..\..\..\src\main\java\
+jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PreBuildEvent>
+      <Message>Compiling Java classes</Message>
+      <Command>
+          copy ..\config.hpp ..\..\..\src\main\c++\
+          javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\ZMQForwarder.java ..\..\..\src\main\java\org\zeromq\ZMQQueue.java ..\..\..\src\main\java\org\zeromq\ZMQStreamer.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java ..\..\..\src\main\java\org\zeromq\ZContext.java ..\..\..\src\main\java\org\zeromq\ZDispatcher.java ..\..\..\src\main\java\org\zeromq\ZFrame.java ..\..\..\src\main\java\org\zeromq\ZMsg.java
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libzmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../../../lib/jzmq.dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>Creating JAR archive</Message>
+      <Command>cd ..\..\..\src\main\java
+jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PreBuildEvent>
+      <Message>Compiling Java classes</Message>
+      <Command>
+          copy ..\config.hpp ..\..\..\src\main\c++\
+          javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\ZMQForwarder.java ..\..\..\src\main\java\org\zeromq\ZMQQueue.java ..\..\..\src\main\java\org\zeromq\ZMQStreamer.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java ..\..\..\src\main\java\org\zeromq\ZContext.java ..\..\..\src\main\java\org\zeromq\ZDispatcher.java ..\..\..\src\main\java\org\zeromq\ZFrame.java ..\..\..\src\main\java\org\zeromq\ZMsg.java
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libzmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../../../lib/jzmq.dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <PostBuildEvent>
+      <Message>Creating JAR archive</Message>
+      <Command>cd ..\..\..\src\main\java
+jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\main\c++\Context.cpp" />
+    <ClCompile Include="..\..\..\src\main\c++\Poller.cpp" />
+    <ClCompile Include="..\..\..\src\main\c++\Socket.cpp" />
+    <ClCompile Include="..\..\..\src\main\c++\util.cpp" />
+    <ClCompile Include="..\..\..\src\main\c++\ZMQ.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQ.java">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQ
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQ
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQ.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQ.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQ
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQ
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQ.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQ.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQException.java">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQException
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQException
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQException.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQException.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQException
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQException
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQException.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQException.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQForwarder.java">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQForwarder
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQForwarder
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQForwarder.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQForwarder.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQForwarder
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQForwarder
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQForwarder.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQForwarder.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQQueue.java">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQQueue
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQQueue
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQQueue.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQQueue.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQQueue
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQQueue
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQQueue.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQQueue.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQStreamer.java">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQStreamer
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQStreamer
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQStreamer
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQStreamer
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.EmbeddedLibraryTools
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.EmbeddedLibraryTools
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.EmbeddedLibraryTools
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.EmbeddedLibraryTools
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\App.java">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.App
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.App
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.App
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.App
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
