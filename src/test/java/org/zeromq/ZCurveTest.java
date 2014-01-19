@@ -53,7 +53,8 @@ public class ZCurveTest {
 	// En/de-coding is really a second, though it's pretty vital.
 	out.println("Encoding");
 	String encoded = ZCurveKeyPair.Z85Encode(publicKey);
-	out.println("Decoding '" + encoded + "'");
+	int length = encoded.length();
+	out.println("Decoding '" + encoded + "'\n which is " + length + " bytes long)");
 	byte[] decoded = ZCurveKeyPair.Z85Decode(encoded);
 	if(decoded != null) {
 	    out.println("Successfully decoded *something*:\n'" + new String(decoded) + "'"); 

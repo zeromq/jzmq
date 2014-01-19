@@ -284,24 +284,30 @@ JNIEXPORT jstring JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Encode
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
   JavaByteArrayWrapper wrapper(env, src);
 
+  // FIXME: Debug only
+  FILE* log(fopen("log.txt", "w+"));
+
   int src_len(env->GetArrayLength(src));
 
   // Destination length must be source length*1.25 + 1 for the NULL terminator
   int src_len_mod_4(src_len % 4);
   // Which means that source must be an even multiple of 4 bytes
   if (0 == src_len_mod_4) {
-      int dst_len(((src_len / 4) * 5) + 1);
-      AutoString c_dst(dst_len);
+    int dst_len(((src_len / 4) * 5) + 1);
+    AutoString c_dst(dst_len);
 
-      const char* encoded(zmq_z85_encode(c_dst.buffer, wrapper._binary, src_len));
-      if(NULL != encoded) {
-	printf("Encoded value:\n'%s'\n", encoded);
-	result = env->NewStringUTF(c_dst.buffer);
-      }
-      else {
-	printf("Failed to encode '%s'\n", wrapper._binary);
-      }
+    fprintf(log, "Encoding: '%s'\n", wrapper._binary);
+    const char* encoded(zmq_z85_encode(c_dst.buffer, wrapper._binary, src_len));
+    if(NULL != encoded) {
+      fprintf(log, "Encoded value:\n'%s'\n", encoded);
+      result = env->NewStringUTF(c_dst.buffer);
     }
+    else {
+      fprintf(log, "Failed to encode '%s'\n", wrapper._binary);
+    }
+
+    fclose(log);
+  }
 #else
   // This seems like a poor way to handle this situation
   //assert(false, "No Curve before version 4");
@@ -324,7 +330,7 @@ public:
   UtfWrapper(JNIEnv* env, jstring src)
     : _length(env->GetStringUTFLength(src)),
       _utf(env->GetStringUTFChars(src, NULL)),
-      _s(new char[_length]),
+      _s(new char[_length+1]),
       _src(src),
       _env(env)
   {
@@ -333,10 +339,10 @@ public:
     // NULL-terminate the string. This seems like it must be the wrong thing to
     // do, but I'm getting errors without it.
     // And warnings about pointer conversion with it.
-    _s[_length-1] = NULL;
+    _s[_length] = NULL;
 #else
     // Surely there's a "right thing" to do here.
-    _s[_length-1] = 0;
+    _s[_length] = 0;
 #endif
   }
 
@@ -350,33 +356,39 @@ public:
 JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Decode
   (JNIEnv *env, jclass cls, jstring src)
 {
-  printf("Welcome to decoding!!\n");
+  FILE* log(fopen("log.txt", "a"));
+
+  fprintf(log, "Welcome to decoding!!\n");
   jbyteArray result(NULL);
 
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
   UtfWrapper str(env, src);
 
   int src_len(strlen(str._s));
-  printf("Starting with a %d byte source buffer\n", src_len);
+  fprintf(log, "Starting with a %d byte source buffer--'%s'\n", src_len, str._s);
   
   // Must be a multiple of 5 in length
   int src_len_mod_5(src_len % 5);
   if(0 == src_len_mod_5) {
     int dst_len((src_len / 5) * 4);
-      AutoString dst(dst_len);
-      uint8_t* decoded(zmq_z85_decode(reinterpret_cast<uint8_t*>(dst.buffer), str._s));
-      if(NULL != decoded) {
-	printf("Decoded string:\n'%s'\n", decoded);
-	  result = env->NewByteArray(dst_len);
-	  jbyte* j_decoded(reinterpret_cast<jbyte*>(decoded));
-	  env->SetByteArrayRegion(result, 0, dst_len, j_decoded);
-	}
-      else {
-	printf("Failed to decode\n");
-      }
+    AutoString dst(dst_len);
+    uint8_t* decoded(zmq_z85_decode(reinterpret_cast<uint8_t*>(dst.buffer), str._s));
+    if(NULL != decoded) {
+      fprintf(log, "Decoded string:\n'%s'\n", decoded);
+      result = env->NewByteArray(dst_len);
+      jbyte* j_decoded(reinterpret_cast<jbyte*>(decoded));
+      env->SetByteArrayRegion(result, 0, dst_len, j_decoded);
     }
+    else {
+      fprintf(log, "Failed to decode\n");
+    }
+  }
+  else {
+    fprintf(log, "Illegal source buffer length: %d\n", src_len);
+  }
 #else
   // This seems like a poor way to handle this situation
+  // Especially because assert isn't actually defined here.
   assert(false, "No Curve before version 4");
 #endif
   return result;
