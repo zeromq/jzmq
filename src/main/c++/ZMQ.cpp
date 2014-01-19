@@ -295,8 +295,12 @@ JNIEXPORT jstring JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Encode
 
       const char* encoded(zmq_z85_encode(c_dst.buffer, wrapper._binary, src_len));
       if(NULL != encoded) {
-	  result = env->NewStringUTF(c_dst.buffer);
-	}
+	printf("Encoded value:\n'%s'\n", encoded);
+	result = env->NewStringUTF(c_dst.buffer);
+      }
+      else {
+	printf("Failed to encode '%s'\n", wrapper._binary);
+      }
     }
 #else
   // This seems like a poor way to handle this situation
@@ -312,7 +316,7 @@ public:
   jsize _length;
   // The constant buffer that java gave us
   const char* _utf;
-  // Needed because zmq_z85_decode might mutate it.
+  // Needed because zmq_z85_decode might mutate it. It really shouldn't, but...
   char* _s;
   jstring _src;
   JNIEnv* _env;
@@ -325,6 +329,15 @@ public:
       _env(env)
   {
     memcpy(_s, _utf, _length);
+#if false
+    // NULL-terminate the string. This seems like it must be the wrong thing to
+    // do, but I'm getting errors without it.
+    // And warnings about pointer conversion with it.
+    _s[_length-1] = NULL;
+#else
+    // Surely there's a "right thing" to do here.
+    _s[_length-1] = 0;
+#endif
   }
 
   virtual ~UtfWrapper()
@@ -337,28 +350,34 @@ public:
 JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZCurveKeyPair_Z85Decode
   (JNIEnv *env, jclass cls, jstring src)
 {
+  printf("Welcome to decoding!!\n");
   jbyteArray result(NULL);
 
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
   UtfWrapper str(env, src);
 
   int src_len(strlen(str._s));
+  printf("Starting with a %d byte source buffer\n", src_len);
   
   // Must be a multiple of 5 in length
   int src_len_mod_5(src_len % 5);
   if(0 == src_len_mod_5) {
-      int dst_len((src_len / 5) * 4);
+    int dst_len((src_len / 5) * 4);
       AutoString dst(dst_len);
       uint8_t* decoded(zmq_z85_decode(reinterpret_cast<uint8_t*>(dst.buffer), str._s));
       if(NULL != decoded) {
+	printf("Decoded string:\n'%s'\n", decoded);
 	  result = env->NewByteArray(dst_len);
 	  jbyte* j_decoded(reinterpret_cast<jbyte*>(decoded));
 	  env->SetByteArrayRegion(result, 0, dst_len, j_decoded);
 	}
+      else {
+	printf("Failed to decode\n");
+      }
     }
 #else
   // This seems like a poor way to handle this situation
-  //assert(false, "No Curve before version 4");
+  assert(false, "No Curve before version 4");
 #endif
   return result;
 }

@@ -1267,7 +1267,7 @@ public class ZMQ {
 	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
 		// Mostly redundant. But allow for socket re-use.
 		// TODO: Verify that that actually works.
-		setCurveServer(false);
+		//setCurveServer(false);
 		setCurveServerKey(serverKey);
 		setCurveClientPrivateKey(keyPair.privateKey);
 		setCurveClientPublicKey(keyPair.publicKey);
@@ -1414,7 +1414,7 @@ public class ZMQ {
         }
 
         /**
-         * Send a String.
+         * Send a String as one message frame.
          * 
          * @param msg the message to send, as a String.
          * @return true if send was successful, false otherwise.

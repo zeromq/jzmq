@@ -42,15 +42,26 @@ public class ZCurveTest {
 	ZCurveKeyPair keys = ZCurveKeyPair.Factory();
 	assertNotNull("building KeyPair instance failed", keys);
 
+	// Gotta love the JNI. This shouldn't be an issue, but it is.
 	out.println("KeyPair created. Accessing the public key");
 	byte[] publicKey = keys.publicKey;
-	out.println(new String(publicKey));
+	out.println("Accessed: '" + new String(publicKey) + "'\n");
 
+	// TODO: This should really be another test.
+	// "Can I generate a key pair?" without throwing exceptions (or dumping
+	// core) should be (and is) the first.
+	// En/de-coding is really a second, though it's pretty vital.
 	out.println("Encoding");
 	String encoded = ZCurveKeyPair.Z85Encode(publicKey);
 	out.println("Decoding '" + encoded + "'");
 	byte[] decoded = ZCurveKeyPair.Z85Decode(encoded);
-	assertNotNull(decoded);
+	if(decoded != null) {
+	    out.println("Successfully decoded *something*:\n'" + new String(decoded) + "'"); 
+	}
+	else {
+	    out.println("Decoding failed. WTF?");
+	    assertNotNull(decoded);
+	}
 	out.println("Decoded '" + new String(decoded) + "'");
 
 	assertArrayEquals("failure - decoded doesn't match original", publicKey, decoded);
