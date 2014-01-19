@@ -37,7 +37,7 @@ import org.zeromq.ZCurveKeyPair;
 public class ZCurveTest {
 
     @Test
-    public void testKeyCenversion() {
+    public void testKeyConversion() {
 	out.println("Trying to generate a KeyPair");
 	ZCurveKeyPair keys = ZCurveKeyPair.Factory();
 	assertNotNull("building KeyPair instance failed", keys);
@@ -50,6 +50,7 @@ public class ZCurveTest {
 	String encoded = ZCurveKeyPair.Z85Encode(publicKey);
 	out.println("Decoding '" + encoded + "'");
 	byte[] decoded = ZCurveKeyPair.Z85Decode(encoded);
+	assertNotNull(decoded);
 	out.println("Decoded '" + new String(decoded) + "'");
 
 	assertArrayEquals("failure - decoded doesn't match original", publicKey, decoded);
