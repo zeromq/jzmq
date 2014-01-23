@@ -27,23 +27,21 @@ public class ZAuth {
     private boolean verbose;
 
     /**
-     * A small class for working with ZAP requests and replies. This isn't
-     * exported in the JZMQ API just used internally in zauth to simplify
-     * working with RFC 27 requests and replies.
+     * A small class for working with ZAP requests and replies. 
      */
     public static class ZAPRequest {
 
-        Socket handler; //socket we're talking to
-        String version;              //  Version number, must be "1.0"
-        String sequence;             //  Sequence number of request
-        String domain;               //  Server socket domain
-        String address;              //  Client IP address
-        String identity;             //  Server socket idenntity
-        String mechanism;            //  Security mechansim
-        String username;             //  PLAIN user name
-        String password;             //  PLAIN password, in clear text
-        String clientKey;            //  CURVE client public key in ASCII
-        String principle;            //  GSSAPI principle
+        public Socket handler;              //socket we're talking to
+        public String version;              //  Version number, must be "1.0"
+        public String sequence;             //  Sequence number of request
+        public String domain;               //  Server socket domain
+        public String address;              //  Client IP address
+        public String identity;             //  Server socket idenntity
+        public String mechanism;            //  Security mechansim
+        public String username;             //  PLAIN user name
+        public String password;             //  PLAIN password, in clear text
+        public String clientKey;            //  CURVE client public key in ASCII
+        public String principle;            //  GSSAPI principle
 
         static ZAPRequest recvRequest(Socket handler) {
             if (ZMQ.getMajorVersion() == 4) {
