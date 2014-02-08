@@ -1149,6 +1149,20 @@ public class ZMQ {
         }
 
         /**
+         * Sets whether socket should keep only last received/to be sent message in its inbound/outbound queue. 
+         *
+         * @param conflate A value of false is the default which means socket preserves all messages with respect
+         *            to the RECVHWM and SENDHWM options. A value of true means only last message is kept ignoring
+         *            the RECVHWM and SENDHWM options.
+         * @since 4.0.0
+         */
+        public void setConflate(boolean conflate) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setLongSockopt(CONFLATE, conflate ? 1L : 0L);
+            }
+        }
+
+        /**
          * Bind to network interface. Start listening for new connections.
          * 
          * @param addr the endpoint to bind to.
@@ -1516,6 +1530,7 @@ public class ZMQ {
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
         private static final int XPUB_VERBOSE = 40;
+        private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
 
     }
