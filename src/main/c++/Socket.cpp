@@ -195,22 +195,22 @@ Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env, jobject obj, jint o
             jlong ret = 0;
             int rc = 0;
             int err = 0;
-#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
-            if(
-                   (option == ZMQ_TCP_KEEPALIVE)
-                || (option == ZMQ_TCP_KEEPALIVE_IDLE)
-                || (option == ZMQ_TCP_KEEPALIVE_CNT)
-                || (option == ZMQ_TCP_KEEPALIVE_INTVL)
-                || (option == ZMQ_IPV4ONLY)
+            if (
+                   (option == ZMQ_AFFINITY)
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
+                || (option == ZMQ_FD)
+#endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+                || (option == ZMQ_MAXMSGSIZE)
+#endif
             ) {
-                int optval = 0;
+                int64_t optval = 0; 
                 size_t optvallen = sizeof(optval);
                 rc = zmq_getsockopt (s, option, &optval, &optvallen);
                 ret = (jlong) optval;
             } else
-#endif
             {
-                uint64_t optval = 0; 
+                int optval = 0;
                 size_t optvallen = sizeof(optval);
                 rc = zmq_getsockopt (s, option, &optval, &optvallen);
                 ret = (jlong) optval;
