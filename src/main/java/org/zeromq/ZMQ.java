@@ -1163,6 +1163,21 @@ public class ZMQ {
         }
 
         /**
+         * Indicate whether socket should keep only last received/to be sent message in its inbound/outbound queue.
+         *
+         * @return true if should keep only last received/to be sent message in its inbound/outbound queue.
+         * @since 4.0.0
+         */
+        public boolean getConflate() {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                return getLongSockopt(CONFLATE) != 0L;
+            }
+            else {
+                return false;
+            }
+        }
+
+        /**
          * Bind to network interface. Start listening for new connections.
          * 
          * @param addr the endpoint to bind to.
