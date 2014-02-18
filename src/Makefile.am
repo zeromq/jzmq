@@ -14,7 +14,6 @@ JZMQ_JAVA_FILES = \
 	main/java/org/zeromq/ZLoop.java \
 	main/java/org/zeromq/ZDispatcher.java \
 	main/java/org/zeromq/EmbeddedLibraryTools.java
-	main/java/org/zeromq/ZAuth.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \
@@ -25,31 +24,33 @@ JZMQ_CPP_FILES = \
 
 JZMQ_H_FILES = \
 	org_zeromq_ZMQ.h \
-	org_zeromq_ZMQ_Error.h \
 	org_zeromq_ZMQ_Context.h \
-	org_zeromq_ZMQ_Socket.h \
-	org_zeromq_ZMQ_Poller.h
+	org_zeromq_ZMQ_Error.h \
+	org_zeromq_ZMQ_PollItem.h \
+	org_zeromq_ZMQ_Poller.h \
+	org_zeromq_ZMQ_Socket.h
 
 JZMQ_HPP_FILES = \
 	util.hpp
 
 JZMQ_CLASS_FILES = \
-	main/java/org/zeromq/ZMQ.class \
-	main/java/org/zeromq/ZMQ$$Context.class \
-	main/java/org/zeromq/ZMQ$$Socket.class \
-	main/java/org/zeromq/ZMQ$$Poller.class \
-	main/java/org/zeromq/ZMQ$$Error.class \
-	main/java/org/zeromq/ZMQException.class \
-	main/java/org/zeromq/ZMQQueue.class \
-	main/java/org/zeromq/ZMQForwarder.class \
-	main/java/org/zeromq/ZMQStreamer.class \
+	main/java/org/zeromq/EmbeddedLibraryTools.class \
 	main/java/org/zeromq/ZContext.class \
+	main/java/org/zeromq/ZDispatcher.class \
 	main/java/org/zeromq/ZFrame.class \
-	main/java/org/zeromq/ZMsg.class \
-	main/java/org/zeromq/ZThread.class \
 	main/java/org/zeromq/ZLoop.class \
-	main/java/org/zeromq/ZAuth.class \
-	main/java/org/zeromq/ZDispatcher.class 
+	main/java/org/zeromq/ZMQ$$Context.class \
+	main/java/org/zeromq/ZMQ$$Error.class \
+	main/java/org/zeromq/ZMQ$$PollItem.class \
+	main/java/org/zeromq/ZMQ$$Poller.class \
+	main/java/org/zeromq/ZMQ$$Socket.class \
+	main/java/org/zeromq/ZMQ.class \
+	main/java/org/zeromq/ZMQException.class \
+	main/java/org/zeromq/ZMQForwarder.class \
+	main/java/org/zeromq/ZMQQueue.class \
+	main/java/org/zeromq/ZMQStreamer.class \
+	main/java/org/zeromq/ZMsg.class \
+	main/java/org/zeromq/ZThread.class
 
 JAVAH_FLAGS = -d . -classpath .
 

@@ -24,30 +24,33 @@ JZMQ_CPP_FILES = \
 
 JZMQ_H_FILES = \
 	org_zeromq_ZMQ.h \
-	org_zeromq_ZMQ_Error.h \
 	org_zeromq_ZMQ_Context.h \
-	org_zeromq_ZMQ_Socket.h \
-	org_zeromq_ZMQ_Poller.h
+	org_zeromq_ZMQ_Error.h \
+	org_zeromq_ZMQ_PollItem.h \
+	org_zeromq_ZMQ_Poller.h \
+	org_zeromq_ZMQ_Socket.h
 
 JZMQ_HPP_FILES = \
 	util.hpp
 
 JZMQ_CLASS_FILES = \
-	org/zeromq/ZMQ.class \
-	org/zeromq/ZMQ$$Context.class \
-	org/zeromq/ZMQ$$Socket.class \
-	org/zeromq/ZMQ$$Poller.class \
-	org/zeromq/ZMQ$$Error.class \
-	org/zeromq/ZMQException.class \
-	org/zeromq/ZMQQueue.class \
-	org/zeromq/ZMQForwarder.class \
-	org/zeromq/ZMQStreamer.class \
+	org/zeromq/EmbeddedLibraryTools.class \
 	org/zeromq/ZContext.class \
+	org/zeromq/ZDispatcher.class \
 	org/zeromq/ZFrame.class \
-	org/zeromq/ZMsg.class \
-	org/zeromq/ZThread.class \
 	org/zeromq/ZLoop.class \
-	org/zeromq/ZDispatcher.class
+	org/zeromq/ZMQ$$Context.class \
+	org/zeromq/ZMQ$$Error.class \
+	org/zeromq/ZMQ$$PollItem.class \
+	org/zeromq/ZMQ$$Poller.class \
+	org/zeromq/ZMQ$$Socket.class \
+	org/zeromq/ZMQ.class \
+	org/zeromq/ZMQException.class \
+	org/zeromq/ZMQForwarder.class \
+	org/zeromq/ZMQQueue.class \
+	org/zeromq/ZMQStreamer.class \
+	org/zeromq/ZMsg.class \
+	org/zeromq/ZThread.class
 
 $(jarfile):
 	$(JAVAC) -d . $(JZMQ_JAVA_FILES)
