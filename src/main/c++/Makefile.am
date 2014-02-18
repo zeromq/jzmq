@@ -33,9 +33,11 @@ JZMQ_H_FILES = \
 JZMQ_HPP_FILES = \
 	util.hpp
 
+JZMQ_CLASS_FILES = org/zeromq/*.class
+
 $(jarfile):
-	$(JAVAC) -d . $(JZMQ_JAVA_FILES)		
-	$(JAR) cf $(JARFLAGS) $@ org/zeromq/*.class
+	$(JAVAC) -d . $(JZMQ_JAVA_FILES)
+	$(JAR) cf $(JARFLAGS) $@ $(JZMQ_CLASS_FILES)
 
 jar_DATA = $(jarfile)
 
@@ -57,12 +59,12 @@ libjzmq_la_LDFLAGS = -version-info @JLTVER@
 endif
 
 BUILT_SOURCES = \
-	$(JZMQ_H_FILES)	
+	$(JZMQ_H_FILES)
 
 CLEANFILES = \
 	-rf org \
 	$(JZMQ_H_FILES) \
-	org/zeromq/*.class \
+	$(JZMQ_CLASS_FILES) \
 	$(jarfile)
 
 
