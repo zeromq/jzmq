@@ -60,6 +60,7 @@ BUILT_SOURCES = \
 	$(JZMQ_H_FILES)	
 
 CLEANFILES = \
+	-rf org \
 	$(JZMQ_H_FILES) \
 	org/zeromq/*.class \
 	$(jarfile)
