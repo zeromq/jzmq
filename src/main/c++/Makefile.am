@@ -2,18 +2,18 @@ jarfile = zmq.jar
 jardir = $(datadir)/java
 
 JZMQ_JAVA_FILES = \
+	../java/org/zeromq/EmbeddedLibraryTools.java \
+	../java/org/zeromq/ZContext.java \
+	../java/org/zeromq/ZDispatcher.java \
+	../java/org/zeromq/ZFrame.java \
+	../java/org/zeromq/ZLoop.java \
 	../java/org/zeromq/ZMQ.java \
 	../java/org/zeromq/ZMQException.java \
-	../java/org/zeromq/ZMQQueue.java \
 	../java/org/zeromq/ZMQForwarder.java \
+	../java/org/zeromq/ZMQQueue.java \
 	../java/org/zeromq/ZMQStreamer.java \
-	../java/org/zeromq/ZContext.java \
-	../java/org/zeromq/ZFrame.java \
 	../java/org/zeromq/ZMsg.java \
-	../java/org/zeromq/ZThread.java \
-	../java/org/zeromq/ZLoop.java \
-	../java/org/zeromq/ZDispatcher.java \
-	../java/org/zeromq/EmbeddedLibraryTools.java
+	../java/org/zeromq/ZThread.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \
@@ -36,8 +36,18 @@ JZMQ_HPP_FILES = \
 JZMQ_CLASS_FILES = \
 	org/zeromq/EmbeddedLibraryTools.class \
 	org/zeromq/ZContext.class \
+	org/zeromq/ZDispatcher$$1.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$1.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$2.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$ZMessageBuffer.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher.class \
+	org/zeromq/ZDispatcher$$ZMessageHandler.class \
+	org/zeromq/ZDispatcher$$ZSender.class \
 	org/zeromq/ZDispatcher.class \
 	org/zeromq/ZFrame.class \
+	org/zeromq/ZLoop$$IZLoopHandler.class \
+	org/zeromq/ZLoop$$SPoller.class \
+	org/zeromq/ZLoop$$STimer.class \
 	org/zeromq/ZLoop.class \
 	org/zeromq/ZMQ$$Context.class \
 	org/zeromq/ZMQ$$Error.class \
@@ -50,6 +60,9 @@ JZMQ_CLASS_FILES = \
 	org/zeromq/ZMQQueue.class \
 	org/zeromq/ZMQStreamer.class \
 	org/zeromq/ZMsg.class \
+	org/zeromq/ZThread$$IAttachedRunnable.class \
+	org/zeromq/ZThread$$IDetachedRunnable.class \
+	org/zeromq/ZThread$$ShimThread.class \
 	org/zeromq/ZThread.class
 
 $(jarfile):
