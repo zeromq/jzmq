@@ -36,38 +36,38 @@ JZMQ_HPP_FILES = \
 JZMQ_CLASS_FILES = \
 	org/zeromq/EmbeddedLibraryTools.class \
 	org/zeromq/ZContext.class \
-	org/zeromq/ZDispatcher\$$1.class \
+	org/zeromq/ZDispatcher$$1.class \
 	org/zeromq/ZDispatcher.class \
-	org/zeromq/ZDispatcher\$$SocketDispatcher\$$1.class \
-	org/zeromq/ZDispatcher\$$SocketDispatcher\$$2.class \
-	org/zeromq/ZDispatcher\$$SocketDispatcher.class \
-	org/zeromq/ZDispatcher\$$SocketDispatcher\$$ZMessageBuffer.class \
-	org/zeromq/ZDispatcher\$$ZMessageHandler.class \
-	org/zeromq/ZDispatcher\$$ZSender.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$1.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$2.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$ZMessageBuffer.class \
+	org/zeromq/ZDispatcher$$ZMessageHandler.class \
+	org/zeromq/ZDispatcher$$ZSender.class \
 	org/zeromq/ZFrame.class \
 	org/zeromq/ZLoop.class \
-	org/zeromq/ZLoop\$$IZLoopHandler.class \
-	org/zeromq/ZLoop\$$SPoller.class \
-	org/zeromq/ZLoop\$$STimer.class \
+	org/zeromq/ZLoop$$IZLoopHandler.class \
+	org/zeromq/ZLoop$$SPoller.class \
+	org/zeromq/ZLoop$$STimer.class \
 	org/zeromq/ZMQ.class \
-	org/zeromq/ZMQ\$$Context.class \
-	org/zeromq/ZMQ\$$Error.class \
+	org/zeromq/ZMQ$$Context.class \
+	org/zeromq/ZMQ$$Error.class \
 	org/zeromq/ZMQException.class \
 	org/zeromq/ZMQForwarder.class \
-	org/zeromq/ZMQ\$$Poller.class \
-	org/zeromq/ZMQ\$$PollItem.class \
+	org/zeromq/ZMQ$$Poller.class \
+	org/zeromq/ZMQ$$PollItem.class \
 	org/zeromq/ZMQQueue.class \
-	org/zeromq/ZMQ\$$Socket.class \
+	org/zeromq/ZMQ$$Socket.class \
 	org/zeromq/ZMQStreamer.class \
 	org/zeromq/ZMsg.class \
 	org/zeromq/ZThread.class \
-	org/zeromq/ZThread\$$IAttachedRunnable.class \
-	org/zeromq/ZThread\$$IDetachedRunnable.class \
-	org/zeromq/ZThread\$$ShimThread.class
+	org/zeromq/ZThread$$IAttachedRunnable.class \
+	org/zeromq/ZThread$$IDetachedRunnable.class \
+	org/zeromq/ZThread$$ShimThread.class
 
 $(jarfile):
-	$(JAVAC) -d . $(JZMQ_JAVA_FILES)
-	$(JAR) cf $(JARFLAGS) $@ $(JZMQ_CLASS_FILES)
+	$(JAVAC) -d . $(JZMQ_JAVA_FILES)		
+	$(JAR) cf $(JARFLAGS) $@ `ls org/zeromq/*.class`	
 
 jar_DATA = $(jarfile)
 
