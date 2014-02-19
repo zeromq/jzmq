@@ -184,6 +184,9 @@ Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env, jobject obj, jint o
     case ZMQ_TCP_KEEPALIVE_INTVL:
     case ZMQ_IPV4ONLY:
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
+    case ZMQ_CONFLATE:
+#endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
     case ZMQ_RECOVERY_IVL:
@@ -307,6 +310,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,2)
     case ZMQ_XPUB_VERBOSE:
+#endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
+    case ZMQ_CONFLATE:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
