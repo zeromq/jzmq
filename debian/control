@@ -2,7 +2,7 @@ Source: jzmq
 Section: libs
 Priority: optional
 Maintainer: Alois Belaska <alois.belaska@gmail.com>
-Build-Depends: debhelper (>= 7), libzmq-dev [amd64 i386]|libzmq3-dev [amd64 i386], sun-java6-jdk | openjdk-6-jdk, libpgm-dev, pkg-config
+Build-Depends: debhelper (>= 7), libzmq-dev [amd64 i386]|libzmq3-dev [amd64 i386], sun-java6-jdk | openjdk-6-jdk, libpgm-dev, pkg-config, libtool, autoconf
 Standards-Version: 3.9.1
 Homepage: https://github.com/zeromq/jzmq
 
