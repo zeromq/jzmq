@@ -16,7 +16,7 @@ import org.zeromq.ZMQ.Socket;
  * the linger timeout on sockets, and configure contexts for number of I/O threads. Sets-up signal (interrupt) handling
  * for the process.
  * 
- * @see http://github.com/zeromq/czmq/blob/master/src/zctx.c
+ * @see <a href="http://github.com/zeromq/czmq/blob/master/src/zctx.c">czmq version</a>
  * 
  * @author rsmith (at) rsbatechnology (dot) co (dot) uk
  */

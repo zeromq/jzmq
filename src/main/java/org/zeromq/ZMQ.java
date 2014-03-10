@@ -711,7 +711,7 @@ public class ZMQ {
         }
 
         /**
-         * @see #setReceiveTimeOut(long)
+         * @see #setReceiveTimeOut(int)
          * 
          * @return the Receive Timeout in milliseconds
          */
@@ -737,7 +737,7 @@ public class ZMQ {
         }
 
         /**
-         * @see #setSendTimeOut(long)
+         * @see #setSendTimeOut(int)
          * 
          * @return the Send Timeout. in milliseconds
          */
@@ -766,8 +766,8 @@ public class ZMQ {
         }
 
         /**
-         * @see #setIPv4only(long)
-         * 
+         * @see #setIPv4Only(boolean)
+         *
          * @return the IPv4 only socket.
          */
         public boolean getIPv4Only() {
@@ -1392,7 +1392,7 @@ public class ZMQ {
         /**
          * Receive a message as a String with the default Charset.
          *
-         * @deprecated use {@link recvStr(Charset)} instead.
+         * @deprecated use {@link #recvStr(Charset)} instead.
          * @return the message received, as a String; null on error.
          */
         @Deprecated
@@ -1413,7 +1413,7 @@ public class ZMQ {
         /**
          * Receive a message as a String with the default charset.
          *
-         * @deprecated use {@link recvStr(int, Charset)} instead.
+         * @deprecated use {@link #recvStr(int, Charset)} instead.
          * @param flags the flags to apply to the receive operation.
          * @return the message received, as a String; null on error.
          */
@@ -1657,7 +1657,7 @@ public class ZMQ {
          * 
          * Automatically grow the internal representation if needed.
          * 
-         * @param socket the Channel we are registering.
+         * @param channel the Channel we are registering.
          * @param events a mask composed by XORing POLLIN, POLLOUT and POLLERR.
          * @return the index identifying this Channel in the poll set.
          */
@@ -1683,7 +1683,6 @@ public class ZMQ {
          * Automatically grow the internal representation if needed.
          * 
          * @param item the PollItem we are registering.
-         * @param events a mask composed by XORing POLLIN, POLLOUT and POLLERR.
          * @return the index identifying this Socket in the poll set.
          */
         private int registerInternal(PollItem item) {
@@ -1734,7 +1733,7 @@ public class ZMQ {
         /**
          * Unregister a Channel for polling on the specified events.
          * 
-         * @param socket the Channel to be unregistered
+         * @param channel the Channel to be unregistered
          */
         public void unregister(SelectableChannel channel) {
             unregisterInternal(channel);
@@ -1844,15 +1843,16 @@ public class ZMQ {
         /**
          * Issue a poll call, using the specified timeout value.
          * <p>
-         * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds<i>, but prior to this the unit was
-         * <i>microseconds</i>.
+         * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds</i>,
+         * but prior to this the unit was <i>microseconds</i>.
          * 
-         * @param tout the timeout, as per zmq_poll (); if -1, it will block indefinitely until an event happens; if 0,
-         *            it will return immediately; otherwise, it will wait for at most that many
-         *            milliseconds/microseconds (see above).
+         * @param tout the timeout, as per zmq_poll if -1, it will block
+         *             indefinitely until an event happens; if 0, it will
+         *             return immediately; otherwise, it will wait for at most
+         *             that many milliseconds/microseconds (see above).
          * 
-         * @see http://api.zeromq.org/2-1:zmq-poll
-         * @see http://api.zeromq.org/3-0:zmq-poll
+         * @see <a href="http://api.zeromq.org/2-1:zmq-poll">2.1 docs</a>
+         * @see <a href="http://api.zeromq.org/3-0:zmq-poll">3.0 docs</a>
          * 
          * @return how many objects where signalled by poll ()
          */
@@ -1937,14 +1937,14 @@ public class ZMQ {
         /**
          * Issue a poll call on the specified 0MQ items.
          * <p>
-         * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds<i>, but prior to this the unit was
+         * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds</i>, but prior to this the unit was
          * <i>microseconds</i>.
          * 
          * @param items an array of PollItem to poll.
          * @param timeout the maximum timeout in milliseconds/microseconds (see above).
-         * @return how many objects where signalled by poll ().
-         * @see http://api.zeromq.org/2-1:zmq-poll
-         * @see http://api.zeromq.org/3-0:zmq-poll
+         * @return how many objects where signalled by poll.
+         * @see <a href="http://api.zeromq.org/2-1:zmq-poll">2.1 docs</a>
+         * @see <a href="http://api.zeromq.org/3-0:zmq-poll">3.0 docs</a>
          */
         protected native static int run_poll(PollItem[] items, int count, long timeout);
 

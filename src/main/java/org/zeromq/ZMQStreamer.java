@@ -6,7 +6,7 @@ import org.zeromq.ZMQ.Socket;
 /**
  * ZeroMQ Streamer Device implementation.
  * 
- * @author Alois Belaska <alois.belaska@gmail.com>
+ * @author Alois Belaska &lt;alois.belaska@gmail.com&gt;
  */
 public class ZMQStreamer extends ZMQForwarder {
 
