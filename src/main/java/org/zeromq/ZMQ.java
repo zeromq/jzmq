@@ -775,6 +775,45 @@ public class ZMQ {
         }
 
         /**
+         * @see #setPlainServer(boolean)
+         *
+         * @return if the socket is setup for PLAIN security
+         */
+        public boolean getPlainServer() {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                return getLongSockopt(PLAIN_SERVER) == 1;
+            }
+
+            return false;
+        }
+
+        /**
+         * @see #setPlainUsername(byte[])
+         *
+         * @return null terminated byte array in server charset
+         */
+        public byte[] getPlainUsername() {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                return getBytesSockopt(PLAIN_USERNAME);
+            }
+
+            return null;
+        }
+
+        /**
+         * @see #setPlainPassword(byte[])
+         *
+         * @return null terminated byte array in server charset
+         */
+        public byte[] getPlainPassword() {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                return getBytesSockopt(PLAIN_PASSWORD);
+            }
+
+            return null;
+        }
+
+        /**
          * The 'ZMQ_RCVMORE' option shall return a boolean value indicating if the multi-part message currently being
          * read from the specified 'socket' has more message parts to follow. If there are no message parts to follow or
          * if the message currently being read is not a multi-part message a value of zero shall be returned. Otherwise,
@@ -1133,6 +1172,42 @@ public class ZMQ {
                 return;
               
             setLongSockopt(XPUB_VERBOSE, verbose ? 1L : 0L);
+        }
+
+        /**
+         * Sets if the socket is for a server using the PLAIN security mechanism.
+         * @see <a href="http://rfc.zeromq.org/spec:24">PLAIN RFC</a>
+         * @param plain whether or not to use PLAIN security
+         * @since 4.0.0
+         */
+        public void setPlainServer(boolean plain) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setLongSockopt(PLAIN_SERVER, plain ? 1L : 0L);
+            }
+        }
+
+        /**
+         * Sets the username used for the PLAIN security mechanism.
+         * @see <a href="http://rfc.zeromq.org/spec:24">PLAIN RFC</a>
+         * @param username null terminated string in server charset
+         * @since 4.0.0
+         */
+        public void setPlainUsername(byte[] username) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(PLAIN_USERNAME, username);
+            }
+        }
+
+        /**
+         * Sets the password used for the PLAIN security mechanism.
+         * @see <a href="http://rfc.zeromq.org/spec:24">PLAIN RFC</a>
+         * @param password null terminated string in server charset
+         * @since 4.0.0
+         */
+        public void setPlainPassword(byte[] password) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(PLAIN_PASSWORD, password);
+            }
         }
         
         /**
@@ -1545,6 +1620,9 @@ public class ZMQ {
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
         private static final int XPUB_VERBOSE = 40;
+        private static final int PLAIN_SERVER = 44;
+        private static final int PLAIN_USERNAME = 45;
+        private static final int PLAIN_PASSWORD = 46;
         private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
 
