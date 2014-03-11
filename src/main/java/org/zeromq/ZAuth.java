@@ -1,5 +1,8 @@
 package org.zeromq;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.zeromq.ZMQ.PollItem;
@@ -59,8 +62,14 @@ public class ZAuth {
                 //  If the version is wrong, we're linked with a bogus libzmq, so die
                 assert (self.version.equals("1.0"));
 
-                //  TODO: Get mechanism-specific frames
-                
+                // Get mechanism-specific frames
+                if (self.mechanism.equals("PLAIN")) {
+                    self.username = request.popString();
+                    self.password = request.popString();
+                } else if (self.mechanism.equals("CURVE")) {
+                    // TODO: Handle CURVE authentication
+                }
+
                 request.destroy();
                 return self;
             } else {
@@ -102,7 +111,10 @@ public class ZAuth {
         private boolean verbose; //trace output to stdout
         private ConcurrentMap<String, String> whitelist = new ConcurrentHashMap<String, String>(); //whitelisted addresses
         private ConcurrentMap<String, String> blacklist = new ConcurrentHashMap<String, String>(); //blacklisted addresses
+        private ConcurrentMap<String, String> passwords = new ConcurrentHashMap<String, String>(); // PLAIN passwords, if loaded
         private boolean terminated; //did api ask us to quit?
+        private File passwords_file;
+        private long passwords_modified;
 
         /**
          * handle a message from the front end api
@@ -122,6 +134,19 @@ public class ZAuth {
             } else if (command.equals("DENY")) {
                 String address = msg.popString();
                 blacklist.put(address, "OK");
+            } else if (command.equals("PLAIN")) {
+                // For now we don't do anything with domains
+                String domain = msg.popString();
+                // Get password file and load into HashMap
+                // If the file doesn't exist we'll get an empty map
+                String filename = msg.popString();
+                this.passwords_file = new File(filename);
+                this.loadPasswords(true);
+
+                ZMsg reply = new ZMsg();
+                reply.add("OK");
+                reply.send(pipe);
+                reply.destroy();
             } else if (command.equals("VERBOSE")) {
                 String verboseStr = msg.popString();
                 this.verbose = verboseStr.equals("true");
@@ -152,24 +177,24 @@ public class ZAuth {
                 if (whitelist.containsKey(request.address)) {
                     allowed = true;
                     if (verbose) {
-                        System.out.printf("I: PASSED (whitelist) address = %s%n", request.address);
+                        System.out.printf("I: PASSED (whitelist) address = %s\n", request.address);
                     }
                 } else {
                     denied = true;
                     if (verbose) {
-                        System.out.printf("I: DENIED (not in whitelist) address = %s%n", request.address);
+                        System.out.printf("I: DENIED (not in whitelist) address = %s\n", request.address);
                     }
                 }
             } else if (!blacklist.isEmpty()) {
-                if (whitelist.containsKey(request.address)) {
+                if (blacklist.containsKey(request.address)) {
                     denied = true;
                     if (verbose) {
-                        System.out.printf("I: DENIED (blacklist) address = %s%n", request.address);
+                        System.out.printf("I: DENIED (blacklist) address = %s\n", request.address);
                     }
                 } else {
                     allowed = true;
                     if (verbose) {
-                        System.out.printf("I: PASSED (not in blacklist) address = %s%n", request.address);
+                        System.out.printf("I: PASSED (not in blacklist) address = %s\n", request.address);
                     }
                 }
             }
@@ -179,9 +204,15 @@ public class ZAuth {
                 if (request.mechanism.equals("NULL") && !allowed) {
                     //  For NULL, we allow if the address wasn't blacklisted
                     if (verbose) {
-                        System.out.printf("I: ALLOWED (NULL)%n");
+                        System.out.printf("I: ALLOWED (NULL)\n");
                     }
                     allowed = true;
+                } else if (request.mechanism.equals("PLAIN")) {
+                    // For PLAIN, even a whitelisted address must authenticate
+                    allowed = authenticatePlain(request);
+                } else if (request.mechanism.equals("CURVE")) {
+                    // For CURVE, even a whitelisted address must authenticate
+                    // TODO: Handle CURVE authentication
                 }
             }
             
@@ -192,6 +223,28 @@ public class ZAuth {
             }
 
             return true;
+        }
+
+        private boolean authenticatePlain(ZAPRequest request) {
+            // Refresh the passwords map if the file changed
+            this.loadPasswords(false);
+
+            String password = this.passwords.get(request.username);
+            if (password != null && password.equals(request.password)) {
+                if (this.verbose) {
+                    System.out.printf("ZAUTH I: ALLOWED (PLAIN) username=%s password=%s\n",
+                                      request.username, request.password);
+                }
+
+                return true;
+            } else {
+                if (this.verbose) {
+                    System.out.printf("ZAUTH I: DENIED (PLAIN) username=%s password=%s\n",
+                                      request.username, request.password);
+                }
+
+                return false;
+            }
         }
 
         @Override
@@ -227,6 +280,37 @@ public class ZAuth {
                         break;
                     }
                 }
+            }
+        }
+
+        private void loadPasswords(boolean initial) {
+            if (!initial) {
+                long lastModified = this.passwords_file.lastModified();
+                long age = System.currentTimeMillis() - lastModified;
+                if (lastModified > this.passwords_modified && age > 1000) {
+                    // File has been modified and is stable, clear hashmap
+                    this.passwords.clear();
+                } else {
+                    return;
+                }
+            }
+
+            this.passwords_modified = this.passwords_file.lastModified();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(this.passwords_file));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    // Skip lines starting with "#" or that do not look like name=value data
+                    int equals = line.indexOf('=');
+                    if (line.charAt(0) == '#' || equals == -1 || equals == line.length() - 1) {
+                        continue;
+                    }
+
+                    this.passwords.put(line.substring(0, equals), line.substring(equals + 1, line.length()));
+                }
+                br.close();
+            } catch (Exception ex) {
+                // Ignore the exception, just don't read the file
             }
         }
     }
@@ -287,6 +371,26 @@ public class ZAuth {
         ZMsg msg = new ZMsg();
         msg.add("DENY");
         msg.add(address);
+        msg.send(pipe);
+        msg.destroy();
+    }
+
+    /**
+     * Configure PLAIN authentication for a given domain. PLAIN authentication
+     * uses a plain-text password file. To cover all domains, use "*". You can
+     * modify the password file at any time; it is reloaded automatically.
+     *
+     * @param domain
+     * @param filename
+     */
+    public void configurePlain(String domain, String filename) {
+        assert (domain != null);
+        assert (filename != null);
+
+        ZMsg msg = new ZMsg();
+        msg.add("PLAIN");
+        msg.add(domain);
+        msg.add(filename);
         msg.send(pipe);
         msg.destroy();
     }

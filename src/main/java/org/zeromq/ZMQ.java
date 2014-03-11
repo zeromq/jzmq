@@ -711,7 +711,7 @@ public class ZMQ {
         }
 
         /**
-         * @see #setReceiveTimeOut(long)
+         * @see #setReceiveTimeOut(int)
          * 
          * @return the Receive Timeout in milliseconds
          */
@@ -737,7 +737,7 @@ public class ZMQ {
         }
 
         /**
-         * @see #setSendTimeOut(long)
+         * @see #setSendTimeOut(int)
          * 
          * @return the Send Timeout. in milliseconds
          */
@@ -766,12 +766,51 @@ public class ZMQ {
         }
 
         /**
-         * @see #setIPv4only(long)
-         * 
+         * @see #setIPv4Only(boolean)
+         *
          * @return the IPv4 only socket.
          */
         public boolean getIPv4Only() {
             return getLongSockopt(IPV4ONLY) == 1;
+        }
+
+        /**
+         * @see #setPlainServer(boolean)
+         *
+         * @return if the socket is setup for PLAIN security
+         */
+        public boolean getPlainServer() {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                return getLongSockopt(PLAIN_SERVER) == 1;
+            }
+
+            return false;
+        }
+
+        /**
+         * @see #setPlainUsername(byte[])
+         *
+         * @return null terminated byte array in server charset
+         */
+        public byte[] getPlainUsername() {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                return getBytesSockopt(PLAIN_USERNAME);
+            }
+
+            return null;
+        }
+
+        /**
+         * @see #setPlainPassword(byte[])
+         *
+         * @return null terminated byte array in server charset
+         */
+        public byte[] getPlainPassword() {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                return getBytesSockopt(PLAIN_PASSWORD);
+            }
+
+            return null;
         }
 
         /**
@@ -1134,6 +1173,42 @@ public class ZMQ {
               
             setLongSockopt(XPUB_VERBOSE, verbose ? 1L : 0L);
         }
+
+        /**
+         * Sets if the socket is for a server using the PLAIN security mechanism.
+         * @see <a href="http://rfc.zeromq.org/spec:24">PLAIN RFC</a>
+         * @param plain whether or not to use PLAIN security
+         * @since 4.0.0
+         */
+        public void setPlainServer(boolean plain) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setLongSockopt(PLAIN_SERVER, plain ? 1L : 0L);
+            }
+        }
+
+        /**
+         * Sets the username used for the PLAIN security mechanism.
+         * @see <a href="http://rfc.zeromq.org/spec:24">PLAIN RFC</a>
+         * @param username null terminated string in server charset
+         * @since 4.0.0
+         */
+        public void setPlainUsername(byte[] username) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(PLAIN_USERNAME, username);
+            }
+        }
+
+        /**
+         * Sets the password used for the PLAIN security mechanism.
+         * @see <a href="http://rfc.zeromq.org/spec:24">PLAIN RFC</a>
+         * @param password null terminated string in server charset
+         * @since 4.0.0
+         */
+        public void setPlainPassword(byte[] password) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setBytesSockopt(PLAIN_PASSWORD, password);
+            }
+        }
         
         /**
          * Sets the domain for ZAP (ZMQ RFC 27) authentication.
@@ -1392,7 +1467,7 @@ public class ZMQ {
         /**
          * Receive a message as a String with the default Charset.
          *
-         * @deprecated use {@link recvStr(Charset)} instead.
+         * @deprecated use {@link #recvStr(Charset)} instead.
          * @return the message received, as a String; null on error.
          */
         @Deprecated
@@ -1413,7 +1488,7 @@ public class ZMQ {
         /**
          * Receive a message as a String with the default charset.
          *
-         * @deprecated use {@link recvStr(int, Charset)} instead.
+         * @deprecated use {@link #recvStr(int, Charset)} instead.
          * @param flags the flags to apply to the receive operation.
          * @return the message received, as a String; null on error.
          */
@@ -1545,6 +1620,9 @@ public class ZMQ {
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
         private static final int XPUB_VERBOSE = 40;
+        private static final int PLAIN_SERVER = 44;
+        private static final int PLAIN_USERNAME = 45;
+        private static final int PLAIN_PASSWORD = 46;
         private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
 
@@ -1657,7 +1735,7 @@ public class ZMQ {
          * 
          * Automatically grow the internal representation if needed.
          * 
-         * @param socket the Channel we are registering.
+         * @param channel the Channel we are registering.
          * @param events a mask composed by XORing POLLIN, POLLOUT and POLLERR.
          * @return the index identifying this Channel in the poll set.
          */
@@ -1683,7 +1761,6 @@ public class ZMQ {
          * Automatically grow the internal representation if needed.
          * 
          * @param item the PollItem we are registering.
-         * @param events a mask composed by XORing POLLIN, POLLOUT and POLLERR.
          * @return the index identifying this Socket in the poll set.
          */
         private int registerInternal(PollItem item) {
@@ -1734,7 +1811,7 @@ public class ZMQ {
         /**
          * Unregister a Channel for polling on the specified events.
          * 
-         * @param socket the Channel to be unregistered
+         * @param channel the Channel to be unregistered
          */
         public void unregister(SelectableChannel channel) {
             unregisterInternal(channel);
@@ -1844,15 +1921,16 @@ public class ZMQ {
         /**
          * Issue a poll call, using the specified timeout value.
          * <p>
-         * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds<i>, but prior to this the unit was
-         * <i>microseconds</i>.
+         * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds</i>,
+         * but prior to this the unit was <i>microseconds</i>.
          * 
-         * @param tout the timeout, as per zmq_poll (); if -1, it will block indefinitely until an event happens; if 0,
-         *            it will return immediately; otherwise, it will wait for at most that many
-         *            milliseconds/microseconds (see above).
+         * @param tout the timeout, as per zmq_poll if -1, it will block
+         *             indefinitely until an event happens; if 0, it will
+         *             return immediately; otherwise, it will wait for at most
+         *             that many milliseconds/microseconds (see above).
          * 
-         * @see http://api.zeromq.org/2-1:zmq-poll
-         * @see http://api.zeromq.org/3-0:zmq-poll
+         * @see <a href="http://api.zeromq.org/2-1:zmq-poll">2.1 docs</a>
+         * @see <a href="http://api.zeromq.org/3-0:zmq-poll">3.0 docs</a>
          * 
          * @return how many objects where signalled by poll ()
          */
@@ -1937,14 +2015,14 @@ public class ZMQ {
         /**
          * Issue a poll call on the specified 0MQ items.
          * <p>
-         * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds<i>, but prior to this the unit was
+         * Since ZeroMQ 3.0, the timeout parameter is in <i>milliseconds</i>, but prior to this the unit was
          * <i>microseconds</i>.
          * 
          * @param items an array of PollItem to poll.
          * @param timeout the maximum timeout in milliseconds/microseconds (see above).
-         * @return how many objects where signalled by poll ().
-         * @see http://api.zeromq.org/2-1:zmq-poll
-         * @see http://api.zeromq.org/3-0:zmq-poll
+         * @return how many objects where signalled by poll.
+         * @see <a href="http://api.zeromq.org/2-1:zmq-poll">2.1 docs</a>
+         * @see <a href="http://api.zeromq.org/3-0:zmq-poll">3.0 docs</a>
          */
         protected native static int run_poll(PollItem[] items, int count, long timeout);
 

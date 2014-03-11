@@ -186,6 +186,7 @@ Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env, jobject obj, jint o
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
     case ZMQ_CONFLATE:
+    case ZMQ_PLAIN_SERVER:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
@@ -241,6 +242,10 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
 {
     switch (option) {
     case ZMQ_IDENTITY:
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
+    case ZMQ_PLAIN_USERNAME:
+    case ZMQ_PLAIN_PASSWORD:
+#endif
         {
             void *s = get_socket (env, obj);
 
@@ -313,6 +318,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
     case ZMQ_CONFLATE:
+    case ZMQ_PLAIN_SERVER:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
@@ -359,6 +365,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
                 || (option == ZMQ_CONFLATE)
+                || (option == ZMQ_PLAIN_SERVER)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
             ) {
@@ -399,6 +406,8 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *
     case ZMQ_UNSUBSCRIBE:
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)    
     case ZMQ_ZAP_DOMAIN:
+    case ZMQ_PLAIN_USERNAME:
+    case ZMQ_PLAIN_PASSWORD:
 #endif
         {
             if (value == NULL) {

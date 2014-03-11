@@ -3,7 +3,7 @@ package org.zeromq;
 /**
  * ZeroMQ runtime exception.
  * 
- * @author Alois Belaska <alois.belaska@gmail.com>
+ * @author Alois Belaska &lt;alois.belaska@gmail.com&gt;
  */
 public class ZMQException extends RuntimeException {
     private static final long serialVersionUID = -978820750094924644L;
