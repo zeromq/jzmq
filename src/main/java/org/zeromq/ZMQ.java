@@ -1253,6 +1253,35 @@ public class ZMQ {
         }
 
         /**
+         * Indicate whether socket should only queue messages to completed connections.
+         *
+         * @return true if should only queue messages to completed connections.
+         * @since 3.2.0
+         */
+        public boolean getImmediate() {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0)) {
+                return getLongSockopt(IMMEDIATE) != 0L;
+            }
+            else {
+                return false;
+            }
+        }
+
+        /**
+         * Sets whether socket should only queue messages to completed connections.
+         *
+         * @param immediate A value of false is the default which means socket will not queue messages to
+         *            to incomplete connections. This will cause the socket to block if there are no other connections,
+         *            but will prevent queues from filling on pipes awaiting connection.
+         * @since 3.2.0
+         */
+        public void setImmediate(boolean immediate) {
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0)) {
+                setLongSockopt(IMMEDIATE, immediate ? 1L : 0L);
+            }
+        }
+
+        /**
          * Bind to network interface. Start listening for new connections.
          * 
          * @param addr the endpoint to bind to.
@@ -1619,6 +1648,7 @@ public class ZMQ {
         private static final int KEEPALIVECNT = 35;
         private static final int KEEPALIVEIDLE = 36;
         private static final int KEEPALIVEINTVL = 37;
+        private static final int IMMEDIATE = 39;
         private static final int XPUB_VERBOSE = 40;
         private static final int PLAIN_SERVER = 44;
         private static final int PLAIN_USERNAME = 45;

@@ -183,10 +183,12 @@ Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env, jobject obj, jint o
     case ZMQ_TCP_KEEPALIVE_CNT:
     case ZMQ_TCP_KEEPALIVE_INTVL:
     case ZMQ_IPV4ONLY:
+    case ZMQ_DELAY_ATTACH_ON_CONNECT:
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
     case ZMQ_CONFLATE:
     case ZMQ_PLAIN_SERVER:
+    case ZMQ_IMMEDIATE:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
@@ -312,6 +314,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_TCP_KEEPALIVE_INTVL:
     case ZMQ_IPV4ONLY:
     case ZMQ_ROUTER_MANDATORY:
+    case ZMQ_DELAY_ATTACH_ON_CONNECT:
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,2)
     case ZMQ_XPUB_VERBOSE:
@@ -319,6 +322,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
     case ZMQ_CONFLATE:
     case ZMQ_PLAIN_SERVER:
+    case ZMQ_IMMEDIATE:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
@@ -350,6 +354,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_TCP_KEEPALIVE_INTVL)
                 || (option == ZMQ_IPV4ONLY)
                 || (option == ZMQ_ROUTER_MANDATORY)
+                || (option == ZMQ_DELAY_ATTACH_ON_CONNECT)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,2)
                 || (option == ZMQ_XPUB_VERBOSE)
@@ -366,6 +371,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
                 || (option == ZMQ_CONFLATE)
                 || (option == ZMQ_PLAIN_SERVER)
+                || (option == ZMQ_IMMEDIATE)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
             ) {
