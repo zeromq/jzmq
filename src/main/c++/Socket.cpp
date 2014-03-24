@@ -183,6 +183,8 @@ Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env, jobject obj, jint o
     case ZMQ_TCP_KEEPALIVE_CNT:
     case ZMQ_TCP_KEEPALIVE_INTVL:
     case ZMQ_IPV4ONLY:
+#endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0) && ZMQ_VERSION < ZMQ_MAKE_VERSION(4,0,0)
     case ZMQ_DELAY_ATTACH_ON_CONNECT:
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
