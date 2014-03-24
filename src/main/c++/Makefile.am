@@ -3,6 +3,7 @@ jardir = $(datadir)/java
 
 JZMQ_JAVA_FILES = \
 	../java/org/zeromq/EmbeddedLibraryTools.java \
+	../java/org/zeromq/ZAuth.java \
 	../java/org/zeromq/ZContext.java \
 	../java/org/zeromq/ZDispatcher.java \
 	../java/org/zeromq/ZFrame.java \
