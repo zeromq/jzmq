@@ -874,3 +874,28 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_recv__I (JNIEnv *en
     } 
     return data;
 }
+
+JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_monitor (JNIEnv *env,
+                                                                    jobject obj,
+                                                                    jstring addr,
+                                                                    jint events)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0)
+    void *socket = get_socket (env, obj);
+
+    const char *c_addr = addr ? env->GetStringUTFChars (addr, NULL) : NULL;
+
+    int rc = zmq_socket_monitor(socket , c_addr, events);
+    int err = rc < 0 ? zmq_errno() : 0;
+
+    env->ReleaseStringUTFChars (addr, c_addr);
+
+    if (rc < 0) {
+        raise_exception (env, err);
+        return JNI_FALSE;
+    }
+    return JNI_TRUE;
+#else
+    return JNI_FALSE;
+#endif
+}
