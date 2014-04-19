@@ -692,15 +692,9 @@ JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Socket_send (JNIEnv *env,
         raise_exception (env, err);
         return JNI_FALSE;
     }
-
-    jbyte *data = env->GetByteArrayElements (msg, 0);
-    if (! data) {
-        raise_exception (env, EINVAL);
-        return JNI_FALSE;
-    }
-
-    memcpy (zmq_msg_data (&message), data + offset, length);
-    env->ReleaseByteArrayElements (msg, data, 0);
+    
+    void* pd = zmq_msg_data (&message);
+    env->GetByteArrayRegion(msg, offset, length, (jbyte*) pd);
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     rc = zmq_sendmsg (s, &message, flags);
 #else
