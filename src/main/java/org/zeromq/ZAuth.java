@@ -24,24 +24,24 @@ import org.zeromq.ZThread.IAttachedRunnable;
 public class ZAuth {
 
     private Socket pipe; //pipe to backend agent
+    private boolean verbose;
 
     /**
-     * A small class for working with ZAP requests and replies. This isn't
-     * exported in the JZMQ API just used internally in zauth to simplify
-     * working with RFC 27 requests and replies.
+     * A small class for working with ZAP requests and replies. 
      */
-    private static class ZAPRequest {
+    public static class ZAPRequest {
 
-        Socket handler; //socket we're talking to
-        String version;              //  Version number, must be "1.0"
-        String sequence;             //  Sequence number of request
-        String domain;               //  Server socket domain
-        String address;              //  Client IP address
-        String identity;             //  Server socket idenntity
-        String mechanism;            //  Security mechansim
-        String username;             //  PLAIN user name
-        String password;             //  PLAIN password, in clear text
-        String clientKey;           //  CURVE client public key in ASCII
+        public Socket handler;              //socket we're talking to
+        public String version;              //  Version number, must be "1.0"
+        public String sequence;             //  Sequence number of request
+        public String domain;               //  Server socket domain
+        public String address;              //  Client IP address
+        public String identity;             //  Server socket idenntity
+        public String mechanism;            //  Security mechansim
+        public String username;             //  PLAIN user name
+        public String password;             //  PLAIN password, in clear text
+        public String clientKey;            //  CURVE client public key in ASCII
+        public String principal;            //  GSSAPI principal
 
         static ZAPRequest recvRequest(Socket handler) {
             if (ZMQ.getMajorVersion() == 4) {
@@ -68,6 +68,8 @@ public class ZAuth {
                     self.password = request.popString();
                 } else if (self.mechanism.equals("CURVE")) {
                     // TODO: Handle CURVE authentication
+                } else if (self.mechanism.equals("GSSAPI")) {
+                    self.principal = request.popString();
                 }
 
                 request.destroy();
@@ -115,6 +117,11 @@ public class ZAuth {
         private boolean terminated; //did api ask us to quit?
         private File passwords_file;
         private long passwords_modified;
+        final private ZAuth auth; //our parent auth, used for authorization callbacks
+
+        private ZAuthAgent(ZAuth auth) {
+            this.auth = auth;
+        }
 
         /**
          * handle a message from the front end api
@@ -147,6 +154,9 @@ public class ZAuth {
                 reply.add("OK");
                 reply.send(pipe);
                 reply.destroy();
+            } else if (command.equals("GSSAPI")) {
+                //for now, we don't do anything with domains
+                String domain = msg.popString();
             } else if (command.equals("VERBOSE")) {
                 String verboseStr = msg.popString();
                 this.verbose = verboseStr.equals("true");
@@ -213,9 +223,15 @@ public class ZAuth {
                 } else if (request.mechanism.equals("CURVE")) {
                     // For CURVE, even a whitelisted address must authenticate
                     // TODO: Handle CURVE authentication
+                } else if (request.mechanism.equals("GSSAPI")) {
+                    // At this point, the request is authenticated, send to 
+                    //zauth callback for complete authorization
+                    allowed = auth.authenticateGSS(request);
+                } else {
+                    System.out.printf("Skipping unknown mechanism%n");
                 }
             }
-            
+
             if (allowed) {
                 ZAPRequest.reply(request, "200", "OK");
             } else {
@@ -267,6 +283,7 @@ public class ZAuth {
                 int rc = ZMQ.poll(pollItems, -1);
                 if (rc == -1) {
                     break; //interrupt
+
                 }
 
                 if (pollItems[0].isReadable()) {
@@ -321,7 +338,7 @@ public class ZAuth {
      * behaviour), and all PLAIN and CURVE connections are denied.
      */
     public ZAuth(ZContext ctx) {
-        pipe = ZThread.fork(ctx, new ZAuthAgent());
+        pipe = ZThread.fork(ctx, new ZAuthAgent(this));
         ZMsg msg = ZMsg.recvMsg(pipe);
         String response = msg.popString();
 
@@ -334,6 +351,9 @@ public class ZAuth {
      * @param verbose
      */
     public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+
+        //agent should also be verbose
         ZMsg msg = new ZMsg();
         msg.add("VERBOSE");
         msg.add(String.format("%b", verbose));
@@ -406,5 +426,30 @@ public class ZAuth {
 
         ZMsg reply = ZMsg.recvMsg(pipe);
         reply.destroy();
+    }
+
+    /*Configure GSSAPI authentication for a given domain. GSSAPI authentication
+     uses an underlying mechanism (usually Kerberos) to establish a secure
+     context and perform mutual authentication.  To cover all domains, use "*". */
+    public void configureGSSAPI(String domain) {
+        assert (domain != null);
+        ZMsg msg = new ZMsg();
+        msg.add("GSSAPI");
+        msg.add(domain);
+        msg.send(pipe);
+        msg.destroy();
+    }
+
+    /*
+     * Callback for authorizing an authenticated GSS connection.  Returns true 
+     * if the connection is authorized, false otherwise.  Default implementation 
+     * authorizes all authenticated connections.
+     */
+    protected boolean authenticateGSS(ZAPRequest request) {
+        if (verbose) {
+            System.out.printf("I: ALLOWED (GSSAPI allow any client) principal = %s identity = %s%n", request.principal, request.identity);
+        }
+
+        return true;
     }
 }
