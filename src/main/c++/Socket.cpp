@@ -422,8 +422,8 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setBytesSockopt (JNIEnv *
     case ZMQ_ZAP_DOMAIN:
     case ZMQ_PLAIN_USERNAME:
     case ZMQ_PLAIN_PASSWORD:
-    case ZMQ_GSSAPI_PRINCIPLE:
-    case ZMQ_GSSAPI_SERVICE_PRINCIPLE:
+    case ZMQ_GSSAPI_PRINCIPAL:
+    case ZMQ_GSSAPI_SERVICE_PRINCIPAL:
 #endif
         {
             if (value == NULL) {

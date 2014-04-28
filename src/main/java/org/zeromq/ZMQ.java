@@ -1315,15 +1315,15 @@ public class ZMQ {
             }   
         }
 
-        public void setGSSAPIPrinciple(byte[] principle) {
+        public void setGSSAPIPrincipal(byte[] principal) {
             if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
-                setBytesSockopt(GSSAPI_PRINCIPLE, principle);
+                setBytesSockopt(GSSAPI_PRINCIPAL, principal);
             }
         }
 
-        public void setGSSAPIServicePrinciple(byte[] principle) {
+        public void setGSSAPIServicePrincipal(byte[] principal) {
             if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
-                setBytesSockopt(GSSAPI_SERVICE_PRINCIPLE, principle);
+                setBytesSockopt(GSSAPI_SERVICE_PRINCIPAL, principal);
             }
         }
 
@@ -1769,9 +1769,9 @@ public class ZMQ {
         private static final int PLAIN_PASSWORD = 46;
         private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
-        private static final int GSSAPI_SERVER = 56;
-        private static final int GSSAPI_PRINCIPLE = 57;
-        private static final int GSSAPI_SERVICE_PRINCIPLE = 58;
+        private static final int GSSAPI_SERVER = 62;
+        private static final int GSSAPI_PRINCIPAL = 63;
+        private static final int GSSAPI_SERVICE_PRINCIPAL = 64;
 
     }
 

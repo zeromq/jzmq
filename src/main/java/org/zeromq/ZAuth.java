@@ -41,7 +41,7 @@ public class ZAuth {
         public String username;             //  PLAIN user name
         public String password;             //  PLAIN password, in clear text
         public String clientKey;            //  CURVE client public key in ASCII
-        public String principle;            //  GSSAPI principle
+        public String principal;            //  GSSAPI principal
 
         static ZAPRequest recvRequest(Socket handler) {
             if (ZMQ.getMajorVersion() == 4) {
@@ -69,7 +69,7 @@ public class ZAuth {
                 } else if (self.mechanism.equals("CURVE")) {
                     // TODO: Handle CURVE authentication
                 } else if (self.mechanism.equals("GSSAPI")) {
-                    self.principle = request.popString();
+                    self.principal = request.popString();
                 }
 
                 request.destroy();
@@ -447,7 +447,7 @@ public class ZAuth {
      */
     protected boolean authenticateGSS(ZAPRequest request) {
         if (verbose) {
-            System.out.printf("I: ALLOWED (GSSAPI allow any client) principle = %s identity = %s%n", request.principle, request.identity);
+            System.out.printf("I: ALLOWED (GSSAPI allow any client) principal = %s identity = %s%n", request.principal, request.identity);
         }
 
         return true;
