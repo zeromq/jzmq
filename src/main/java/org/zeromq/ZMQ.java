@@ -1304,25 +1304,25 @@ public class ZMQ {
          * See http://rfc.zeromq.org/spec:27 for more details.
          */
         public void setZAPDomain(byte[] domain) {
-            if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+            if(ZMQ.version_full() >= ZMQ.make_version(4, 1, 0)) {
                 setBytesSockopt(ZAP_DOMAIN, domain);
             }
         }
         
         public void setGSSAPIServer(boolean isServer) {
-            if(ZMQ.version_full() >= ZMQ.makeVersion(4, 0, 0)) {
+            if(ZMQ.version_full() >= ZMQ.makeVersion(4, 1, 0)) {
                 setLongSockopt(GSSAPI_SERVER, isServer ? 1L : 0L);
             }   
         }
 
         public void setGSSAPIPrincipal(byte[] principal) {
-            if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+            if(ZMQ.version_full() >= ZMQ.make_version(4, 1, 0)) {
                 setBytesSockopt(GSSAPI_PRINCIPAL, principal);
             }
         }
 
         public void setGSSAPIServicePrincipal(byte[] principal) {
-            if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+            if(ZMQ.version_full() >= ZMQ.make_version(4, 1, 0)) {
                 setBytesSockopt(GSSAPI_SERVICE_PRINCIPAL, principal);
             }
         }
