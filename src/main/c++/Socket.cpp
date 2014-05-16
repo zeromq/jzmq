@@ -800,7 +800,7 @@ Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobjec
     int read = zmq_recv(sock, buf + pos, rem, flags);
     if (read > 0) {
         read = read > rem ? rem : read;
-        env->CallVoidMethod(buffer, setPositionMID, read + pos);
+        env->CallObjectMethod(buffer, setPositionMID, read + pos);
         return read;
     }
     else if(read == -1) {
