@@ -73,6 +73,23 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_destroy (JNIEnv *env, jo
     }
 }
 
+JNIEXPORT jboolean JNICALL Java_org_zeromq_ZMQ_00024Context_setMaxSockets (JNIEnv * env, jobject obj, jint maxSockets)
+{
+    void *c = get_context (env, obj);
+    if (! c)
+        return JNI_FALSE;
+    int result = zmq_ctx_set (c, ZMQ_MAX_SOCKETS, maxSockets);
+    return result == 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_zeromq_ZMQ_00024Context_getMaxSockets (JNIEnv *env, jobject obj)
+{
+    void *c = get_context (env, obj);
+    if (! c)
+        return -1;
+
+    return zmq_ctx_get (c, ZMQ_MAX_SOCKETS);
+}
 
 /**
  * Make sure we have a valid pointer to Java's Context::contextHandle.

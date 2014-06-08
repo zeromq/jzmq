@@ -503,6 +503,16 @@ public class ZMQ {
         public void close() {
             term();
         }
+
+        /**
+         * Sets the maximum number of sockets allowed on the context
+         */
+        public native boolean setMaxSockets(int maxSockets);
+
+        /**
+         * The maximum number of sockets allowed on the context
+         */
+        public native int getMaxSockets();
     }
 
     /**
