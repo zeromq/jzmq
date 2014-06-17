@@ -75,21 +75,29 @@ Java_org_zeromq_ZMQ_00024Context_destroy (JNIEnv *env, jobject obj) {
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_ZMQ_00024Context_setMaxSockets (JNIEnv * env, jobject obj, jint maxSockets)
 {
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     void *c = get_context (env, obj);
     if (! c)
         return JNI_FALSE;
     int result = zmq_ctx_set (c, ZMQ_MAX_SOCKETS, maxSockets);
     return result == 0;
+#else
+    return JNI_FALSE;
+#endif
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_ZMQ_00024Context_getMaxSockets (JNIEnv *env, jobject obj)
 {
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     void *c = get_context (env, obj);
     if (! c)
         return -1;
 
     return zmq_ctx_get (c, ZMQ_MAX_SOCKETS);
+#else
+    return -1;
+#endif
 }
 
 /**
