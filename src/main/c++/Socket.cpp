@@ -48,20 +48,17 @@ Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
     socketHandleFID = env->GetFieldID(c, "socketHandle", "J");
 }
 
-static inline
-void *get_socket (JNIEnv *env, jobject obj)
+inline void *get_socket (JNIEnv *env, jobject obj)
 {
     return (void*) env->GetLongField (obj, socketHandleFID);
 }
 
-static inline
-void put_socket (JNIEnv *env, jobject obj, void *s)
+inline void put_socket (JNIEnv *env, jobject obj, void *s)
 {
     env->SetLongField (obj, socketHandleFID, (jlong) s);
 }
 
-static inline
-void *fetch_context (JNIEnv *env, jobject context)
+inline void *fetch_context (JNIEnv *env, jobject context)
 {
     return (void*) env->CallLongMethod (context, contextHandleMID);
 }
