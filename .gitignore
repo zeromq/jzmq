@@ -75,3 +75,4 @@ perf/*.dll
 .\#*
 *.jar
 INSTALL
+.checkstyle

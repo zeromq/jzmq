@@ -519,15 +519,11 @@ public class ZMQ {
      * Inner class: Socket.
      */
     public static class Socket implements Closeable {
-        static {
-            // if no embedded native library, revert to loading from java.library.path
-            if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
-                System.loadLibrary("jzmq");
-        }
-
         private static native void nativeInit();
 
         static {
+            if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
+                System.loadLibrary("jzmq");
             nativeInit();
         }
 
@@ -1395,6 +1391,18 @@ public class ZMQ {
             }
         }
 
+        public void setReqRelaxed(boolean isRelaxed) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setLongSockopt(REQ_RELAXED, isRelaxed ? 1L : 0L);
+            }
+        }
+
+        public void setReqCorrelate(boolean isCorrelate) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setLongSockopt(REQ_CORRELATE, isCorrelate ? 1L : 0L);
+            }
+        }
+
         /**
          * Bind to network interface. Start listening for new connections.
          * 
@@ -1777,6 +1785,8 @@ public class ZMQ {
         private static final int PLAIN_SERVER = 44;
         private static final int PLAIN_USERNAME = 45;
         private static final int PLAIN_PASSWORD = 46;
+        private static final int REQ_CORRELATE = 52;
+        private static final int REQ_RELAXED = 53;
         private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
         private static final int GSSAPI_SERVER = 62;
