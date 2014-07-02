@@ -772,7 +772,7 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
     }
     if(rc == -1) {
         int err = zmq_errno();
-        if(err == EAGAIN) {
+        if(err != EAGAIN) {
             raise_exception (env, err);
             return 0;
         }
@@ -806,7 +806,7 @@ Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobjec
     }
     else if(read == -1) {
         int err = zmq_errno();
-        if(err == EAGAIN) {
+        if(err != EAGAIN) {
             raise_exception (env, err);
             return 0;
         }
