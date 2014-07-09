@@ -1333,6 +1333,12 @@ public class ZMQ {
             }
         }
 
+        public void setGSSAPIPlainText(boolean isPlaintext) {
+            if(ZMQ.version_full() >= ZMQ.makeVersion(4, 1, 0)) {
+                setLongSockopt(GSSAPI_PLAINTEXT, isPlaintext ? 1L : 0L);
+            }   
+        }
+
         /**
          * Sets whether socket should keep only last received/to be sent message in its inbound/outbound queue. 
          *
@@ -1792,7 +1798,7 @@ public class ZMQ {
         private static final int GSSAPI_SERVER = 62;
         private static final int GSSAPI_PRINCIPAL = 63;
         private static final int GSSAPI_SERVICE_PRINCIPAL = 64;
-
+        private static final int GSSAPI_PLAINTEXT = 65;
     }
 
     public static class PollItem {
