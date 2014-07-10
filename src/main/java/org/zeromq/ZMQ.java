@@ -1408,6 +1408,23 @@ public class ZMQ {
                 setLongSockopt(REQ_CORRELATE, isCorrelate ? 1L : 0L);
             }
         }
+        
+        /**
+         * Sets whether the socket should automatically send an empty message 
+         * when a new connection is made or accepted. This may be set on
+         * REQ, DEALER, or ROUTER sockets connected to a ROUTER socket.
+         * The application must filter such empty messages.
+         *
+         * @param isProbeRouter if {@code true}, the socket will automatically 
+         * send an empty message when a new connection is made or
+         * accepted; if {@code false}, no such message will be sent
+         * @since 4.0.0
+         */
+        public void setProbeRouter(boolean isProbeRouter) {
+        	if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+        		setLongSockopt(PROBE_ROUTER, isProbeRouter ? 1L : 0L);
+        	}
+        }       
 
         /**
          * Bind to network interface. Start listening for new connections.
@@ -1791,6 +1808,7 @@ public class ZMQ {
         private static final int PLAIN_SERVER = 44;
         private static final int PLAIN_USERNAME = 45;
         private static final int PLAIN_PASSWORD = 46;
+        private static final int PROBE_ROUTER = 51;
         private static final int REQ_CORRELATE = 52;
         private static final int REQ_RELAXED = 53;
         private static final int CONFLATE = 54;
