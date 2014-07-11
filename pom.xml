@@ -217,7 +217,6 @@
 	  <pushChanges>false</pushChanges>
 	  <releaseProfiles>release</releaseProfiles>
 	  <tagNameFormat>v@{project.version}</tagNameFormat>
-	  <arguments>-Dos.distro=${os.distro} -Dzmq.version=${zmq.version}</arguments>
 	</configuration>
       </plugin>
       <plugin>
