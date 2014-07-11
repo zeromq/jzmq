@@ -23,9 +23,9 @@
   </description>
   <url>https://zeromq.org/</url>
   <scm>
-    <connection>scm:git:git@github.com:zeromq/jzmq.git</connection>
-    <developerConnection>scm:git:git@github.com:zeromq/jzmq.git</developerConnection>
-    <url>git@github.com:zeromq/jzmq.git</url>
+    <connection>scm:git:git://github.com/zeromq/jzmq.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/zeromq/jzmq.git</developerConnection>
+    <url>https://github.com/zeromq/jzmq</url>
   </scm>
   <licenses>
     <license>
