@@ -45,14 +45,14 @@ public class ZFrameTest {
         // Send five different frames, test ZFRAME_MORE
         for (int i = 0; i < 5; i++) {
             ZFrame f = new ZFrame("Hello".getBytes());
-            f.sendAndDestroy(output, ZMQ.SNDMORE);
-            assertEquals(0, f.size());
+            boolean rt = f.send(output, ZMQ.SNDMORE);
+            assertTrue(rt);
         }
 
         // Send same frame five times
         ZFrame f = new ZFrame("Hello".getBytes());
         for (int i = 0; i < 5; i++) {
-            f.sendAndKeep(output, ZMQ.SNDMORE);
+            f.send(output, ZMQ.SNDMORE);
         }
         assertEquals(5, f.size());
         ctx.destroy();
@@ -66,14 +66,12 @@ public class ZFrameTest {
         Socket input = ctx.createSocket(ZMQ.PAIR);
         input.connect("inproc://zframe.test");
 
-        ZFrame f = new ZFrame("Hello".getBytes());
+        ZFrame f = new ZFrame("Hello");
         ZFrame copy = f.duplicate();
-        assertTrue(copy.hasSameData(f));
+        assertTrue(copy.equals(f));
         f.destroy();
-        assertFalse(copy.hasSameData(f));
+        assertFalse(copy.equals(f));
         assertEquals(5, copy.size());
-        copy.destroy();
-        assertFalse(copy.hasSameData(f));
         ctx.destroy();
     }
 
@@ -88,14 +86,14 @@ public class ZFrameTest {
         // Send same frame five times
         ZFrame f = new ZFrame("Hello".getBytes());
         for (int i = 0; i < 5; i++) {
-            f.sendAndKeep(output, ZMQ.SNDMORE);
+            f.send(output, ZMQ.SNDMORE);
         }
 
         // Send END frame
         f = new ZFrame("NOT".getBytes());
         f.reset("END".getBytes());
         assertEquals("454E44", f.strhex());
-        f.sendAndDestroy(output);
+        f.send(output, 0);
 
         // Read and count until we receive END
         int frame_nbr = 0;
@@ -124,14 +122,14 @@ public class ZFrameTest {
 
         ZFrame f1 = new ZFrame("Hello");
         assertEquals(5, f1.getData().length);
-        f1.sendAndKeep(output);
+        f1.send(output, 0);
 
         ZFrame f2 = ZFrame.recvFrame(input);
         assertTrue(f2.hasData());
         assertEquals(5, f2.getData().length);
         assertTrue(f2.streq("Hello"));
         assertEquals(f2.toString(), "Hello");
-        assertTrue(f2.hasSameData(f1));
+        assertTrue(f2.equals(f1));
 
         ctx.destroy();
     }
