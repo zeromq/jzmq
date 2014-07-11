@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.zeromq</groupId>
   <artifactId>jzmq</artifactId>
-  <version>3.1.0-SNAPSHOT</version>
+  <version>3.1.0</version>
   <packaging>jar</packaging>
   <name>jzmq</name>
   <description>
@@ -26,6 +26,7 @@
     <connection>scm:git:git://github.com/zeromq/jzmq.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/zeromq/jzmq.git</developerConnection>
     <url>https://github.com/zeromq/jzmq</url>
+    <tag>v3.1.0</tag>
   </scm>
   <licenses>
     <license>
