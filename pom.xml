@@ -23,9 +23,9 @@
   </description>
   <url>https://zeromq.org/</url>
   <scm>
-    <connection>scm:git:git@github.com:zeromq/jzmq.git</connection>
-    <developerConnection>scm:git:git@github.com:zeromq/jzmq.git</developerConnection>
-    <url>git@github.com:zeromq/jzmq.git</url>
+    <connection>scm:git:git://github.com/zeromq/jzmq.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/zeromq/jzmq.git</developerConnection>
+    <url>https://github.com/zeromq/jzmq</url>
   </scm>
   <licenses>
     <license>
@@ -48,7 +48,7 @@
     <maven-deploy-plugin.version>2.6</maven-deploy-plugin.version>
     <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
     <maven-javadoc-plugin.version>2.7</maven-javadoc-plugin.version>
-    <maven-release-plugin.version>2.3.2</maven-release-plugin.version>
+    <maven-release-plugin.version>2.5</maven-release-plugin.version>
     <maven-scm-plugin.version>1.7</maven-scm-plugin.version>
     <maven-shade-plugin.version>1.4</maven-shade-plugin.version>
     <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
@@ -217,7 +217,6 @@
 	  <pushChanges>false</pushChanges>
 	  <releaseProfiles>release</releaseProfiles>
 	  <tagNameFormat>v@{project.version}</tagNameFormat>
-	  <arguments>-Dos.distro=${os.distro} -Dzmq.version=${zmq.version}</arguments>
 	</configuration>
       </plugin>
       <plugin>

@@ -1,5 +1,5 @@
-jzmq (4.0.0-1) precise; urgency=low
-  * 
+jzmq (3.1.0-1) precise; urgency=low
+  * Check changelog for updates
 
  -- Trevor Bernard <trevor.bernard@gmail.com>  Thu, 10 Oct 2013 13:07:44 -0300
 
