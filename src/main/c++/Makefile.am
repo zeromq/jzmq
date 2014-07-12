@@ -14,7 +14,8 @@ JZMQ_JAVA_FILES = \
 	../java/org/zeromq/ZMQQueue.java \
 	../java/org/zeromq/ZMQStreamer.java \
 	../java/org/zeromq/ZMsg.java \
-	../java/org/zeromq/ZThread.java
+	../java/org/zeromq/ZThread.java \
+	../java/org/zeromq/Utils.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \
