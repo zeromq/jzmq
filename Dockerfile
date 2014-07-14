@@ -35,7 +35,7 @@ RUN apt-get install -y automake
 #
 # - install libzmq-master
 #
-RUN git clone https://github.com/zeromq/libzmq.git
+RUN git clone --depth 1 https://github.com/zeromq/libzmq.git
 RUN cd libzmq && ./autogen.sh && ./configure && make && sudo make install && sudo ldconfig
 
 #
@@ -48,7 +48,7 @@ RUN cd zeromq-3.2.3 && ./configure && make && sudo make install && sudo ldconfig
 #
 # - install jzmq
 #
-RUN git clone https://github.com/zeromq/jzmq.git
+RUN git clone --depth 1 https://github.com/zeromq/jzmq.git
 RUN cd jzmq && ./autogen.sh && ./configure && make && sudo make install && sudo ldconfig
 
 #
