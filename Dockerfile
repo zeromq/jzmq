@@ -54,7 +54,7 @@ RUN cd jzmq && ./autogen.sh && ./configure && make && sudo make install && sudo 
 #
 # - set java.library.path
 #
-ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/share/java
+ENV LD_LIBRARY_PATH /usr/local/lib:/usr/local/share/java
 
 #
 # - remove defunct packages
