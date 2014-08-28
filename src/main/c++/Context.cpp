@@ -35,9 +35,8 @@ static void put_context (JNIEnv *env, jobject obj, void *s);
 /**
  * Called to construct a Java Context object.
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
-                                                                   jobject obj,
-                                                                   jint io_threads)
+JNIEXPORT void JNICALL
+Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env, jobject obj, jint io_threads)
 {
     void *c = get_context (env, obj);
     if (c)
@@ -56,8 +55,8 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_construct (JNIEnv *env,
 /**
  * Called to destroy a Java Context object.
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_destroy (JNIEnv *env, jobject obj)
-{
+JNIEXPORT void JNICALL
+Java_org_zeromq_ZMQ_00024Context_destroy (JNIEnv *env, jobject obj) {
     void *c = get_context (env, obj);
     if (! c)
         return;
@@ -73,12 +72,38 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Context_destroy (JNIEnv *env, jo
     }
 }
 
+JNIEXPORT jboolean JNICALL
+Java_org_zeromq_ZMQ_00024Context_setMaxSockets (JNIEnv * env, jobject obj, jint maxSockets)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+    void *c = get_context (env, obj);
+    if (! c)
+        return JNI_FALSE;
+    int result = zmq_ctx_set (c, ZMQ_MAX_SOCKETS, maxSockets);
+    return result == 0;
+#else
+    return JNI_FALSE;
+#endif
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_ZMQ_00024Context_getMaxSockets (JNIEnv *env, jobject obj)
+{
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
+    void *c = get_context (env, obj);
+    if (! c)
+        return -1;
+
+    return zmq_ctx_get (c, ZMQ_MAX_SOCKETS);
+#else
+    return -1;
+#endif
+}
 
 /**
  * Make sure we have a valid pointer to Java's Context::contextHandle.
  */
-static void ensure_context (JNIEnv *env,
-                            jobject obj)
+static void ensure_context (JNIEnv *env, jobject obj)
 {
     if (contextptrFID == NULL) {
         jclass cls = env->GetObjectClass (obj);
@@ -92,8 +117,7 @@ static void ensure_context (JNIEnv *env,
 /**
  * Get the value of Java's Context::contextHandle.
  */
-static void *get_context (JNIEnv *env,
-                          jobject obj)
+static void *get_context (JNIEnv *env, jobject obj)
 {
     ensure_context (env, obj);
     void *s = (void*) env->GetLongField (obj, contextptrFID);
@@ -104,9 +128,7 @@ static void *get_context (JNIEnv *env,
 /**
  * Set the value of Java's Context::contextHandle.
  */
-static void put_context (JNIEnv *env,
-                         jobject obj,
-                         void *s)
+static void put_context (JNIEnv *env, jobject obj, void *s)
 {
     ensure_context (env, obj);
     env->SetLongField (obj, contextptrFID, (jlong) s);

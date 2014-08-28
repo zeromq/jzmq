@@ -48,20 +48,17 @@ Java_org_zeromq_ZMQ_00024Socket_nativeInit (JNIEnv *env, jclass c)
     socketHandleFID = env->GetFieldID(c, "socketHandle", "J");
 }
 
-static inline
-void *get_socket (JNIEnv *env, jobject obj)
+inline void *get_socket (JNIEnv *env, jobject obj)
 {
     return (void*) env->GetLongField (obj, socketHandleFID);
 }
 
-static inline
-void put_socket (JNIEnv *env, jobject obj, void *s)
+inline void put_socket (JNIEnv *env, jobject obj, void *s)
 {
     env->SetLongField (obj, socketHandleFID, (jlong) s);
 }
 
-static inline
-void *fetch_context (JNIEnv *env, jobject context)
+inline void *fetch_context (JNIEnv *env, jobject context)
 {
     return (void*) env->CallLongMethod (context, contextHandleMID);
 }
@@ -328,6 +325,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_PLAIN_SERVER:
     case ZMQ_IMMEDIATE:
     case ZMQ_CURVE_SERVER:
+    case ZMQ_REQ_RELAXED:
+    case ZMQ_REQ_CORRELATE:
+    case ZMQ_PROBE_ROUTER:
 #endif
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
@@ -336,6 +336,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_RCVBUF:
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,1,0)
     case ZMQ_GSSAPI_SERVER:
+    case ZMQ_GSSAPI_PLAINTEXT:
 #endif
         {
             void *s = get_socket (env, obj);
@@ -381,9 +382,13 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_PLAIN_SERVER)
                 || (option == ZMQ_IMMEDIATE)
 		|| (option == ZMQ_CURVE_SERVER)
+                || (option == ZMQ_REQ_RELAXED)
+                || (option == ZMQ_REQ_CORRELATE)
+                || (option == ZMQ_PROBE_ROUTER)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,1,0)
                 || (option == ZMQ_GSSAPI_SERVER)
+                || (option == ZMQ_GSSAPI_PLAINTEXT)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
             ) {
@@ -776,7 +781,7 @@ Java_org_zeromq_ZMQ_00024Socket_recvZeroCopy (JNIEnv *env,
     }
     if(rc == -1) {
         int err = zmq_errno();
-        if(err == EAGAIN) {
+        if(err != EAGAIN) {
             raise_exception (env, err);
             return 0;
         }
@@ -810,7 +815,7 @@ Java_org_zeromq_ZMQ_00024Socket_recvByteBuffer (JNIEnv *env, jobject obj, jobjec
     }
     else if(read == -1) {
         int err = zmq_errno();
-        if(err == EAGAIN) {
+        if(err != EAGAIN) {
             raise_exception (env, err);
             return 0;
         }

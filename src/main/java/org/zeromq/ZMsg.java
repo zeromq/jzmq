@@ -14,12 +14,14 @@ import java.util.NoSuchElementException;
 import org.zeromq.ZMQ.Socket;
 
 /**
- * The ZMsg class provides methods to send and receive multipart messages across 0MQ sockets. This class provides a
- * list-like container interface, with methods to work with the overall container. ZMsg messages are composed of zero or
- * more ZFrame objects.
+ * The ZMsg class provides methods to send and receive multipart messages across
+ * 0MQ sockets. This class provides a list-like container interface, with
+ * methods to work with the overall container. ZMsg messages are composed of
+ * zero or more ZFrame objects.
  * 
  * <pre>
- * // Send a simple single-frame string message on a ZMQSocket &quot;output&quot; socket object
+ * // Send a simple single-frame string message on a ZMQSocket &quot;output&quot; socket
+ * // object
  * ZMsg.newStringMsg(&quot;Hello&quot;).send(output);
  * 
  * // Add several frames into one message
@@ -36,27 +38,31 @@ import org.zeromq.ZMQ.Socket;
  * }
  * </pre>
  * 
- * Based on <a href="http://github.com/zeromq/czmq/blob/master/src/zmsg.c">zmsg.c</a> in czmq
- * 
+ * Based on <a
+ * href="http://github.com/zeromq/czmq/blob/master/src/zmsg.c">zmsg.c</a> in
+ * czmq
  */
-public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
+public class ZMsg implements Deque<ZFrame>
+{
 
     /**
      * Hold internal list of ZFrame objects
      */
-    private ArrayDeque<ZFrame> frames;
+    private final ArrayDeque<ZFrame> frames;
 
     /**
      * Class Constructor
      */
-    public ZMsg() {
-        frames = new ArrayDeque<ZFrame>();
+    public ZMsg()
+    {
+        this.frames = new ArrayDeque<ZFrame>(4);
     }
 
     /**
      * Destructor. Explicitly destroys all ZFrames contains in the ZMsg
      */
-    public void destroy() {
+    public void destroy()
+    {
         if (frames == null)
             return;
         for (ZFrame f : frames) {
@@ -70,7 +76,8 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
      * 
      * @return number of bytes contained in all ZFrames in this ZMsg
      */
-    public long contentSize() {
+    public long contentSize()
+    {
         long size = 0;
         for (ZFrame f : frames) {
             size += f.size();
@@ -80,37 +87,34 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
 
     /**
      * Add a String as a new ZFrame to the end of list
-     * 
-     * @param str String to add to list
+     * @param str
+     *            String to add to list
      */
-    public void addString(String str) {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
-        frames.add(new ZFrame(str));
+    public void addString(String str)
+    {
+        this.add(str);
     }
 
     /**
      * Creates copy of this ZMsg. Also duplicates all frame content.
-     * 
-     * @return The duplicated ZMsg object, else null if this ZMsg contains an empty frame set
+     * @return The duplicated ZMsg object, else null if this ZMsg contains an
+     *         empty frame set
      */
-    public ZMsg duplicate() {
-        if (frames != null) {
-            ZMsg msg = new ZMsg();
-            for (ZFrame f : frames)
-                msg.add(f.duplicate());
-            return msg;
-        } else
-            return null;
+    public ZMsg duplicate()
+    {
+        ZMsg msg = new ZMsg();
+        for (ZFrame f : frames)
+            msg.add(f.duplicate());
+        return msg;
     }
 
     /**
-     * Push frame plus empty frame to front of message, before 1st frame. Message takes ownership of frame, will destroy
-     * it when message is sent.
-     * 
+     * Push frame plus empty frame to front of message, before 1st frame.
+     * Message takes ownership of frame, will destroy it when message is sent.
      * @param frame
      */
-    public void wrap(ZFrame frame) {
+    public void wrap(ZFrame frame)
+    {
         if (frame != null) {
             push(new ZFrame(""));
             push(frame);
@@ -118,12 +122,13 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
     }
 
     /**
-     * Pop frame off front of message, caller now owns frame. If next frame is empty, pops and destroys that empty frame
-     * (e.g. useful when unwrapping ROUTER socket envelopes)
-     * 
+     * Pop frame off front of message, caller now owns frame. If next frame is
+     * empty, pops and destroys that empty frame (e.g. useful when unwrapping
+     * ROUTER socket envelopes)
      * @return Unwrapped frame
      */
-    public ZFrame unwrap() {
+    public ZFrame unwrap()
+    {
         if (size() == 0)
             return null;
         ZFrame f = pop();
@@ -137,20 +142,23 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
 
     /**
      * Send message to 0MQ socket.
-     * 
-     * @param socket 0MQ socket to send ZMsg on.
+     * @param socket
+     *            0MQ socket to send ZMsg on.
      */
-    public void send(Socket socket) {
+    public void send(Socket socket)
+    {
         send(socket, false);
     }
 
     /**
-     * Send message to 0MQ socket, destroys contents after sending if destroy param is set to true. If the message has
-     * no frames, sends nothing but still destroy()s the ZMsg object
-     * 
-     * @param socket 0MQ socket to send ZMsg on.
+     * Send message to 0MQ socket, destroys contents after sending if destroy
+     * param is set to true. If the message has no frames, sends nothing but
+     * still destroy()s the ZMsg object
+     * @param socket
+     *            0MQ socket to send ZMsg on.
      */
-    public void send(Socket socket, boolean destroy) {
+    public void send(Socket socket, boolean destroy)
+    {
         if (socket == null)
             throw new IllegalArgumentException("socket is null");
         if (frames.size() == 0)
@@ -158,7 +166,7 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
         Iterator<ZFrame> i = frames.iterator();
         while (i.hasNext()) {
             ZFrame f = i.next();
-            f.sendAndKeep(socket, (i.hasNext()) ? ZMQ.SNDMORE : 0);
+            f.send(socket, (i.hasNext()) ? ZMQ.SNDMORE : 0);
         }
         if (destroy) {
             destroy();
@@ -169,23 +177,25 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
      * Receives message from socket. Does a blocking recv, if
      * you want not to block then use the ZLoop class or ZMQ.Poller to check for socket input before receiving or
      * recvMsg with flag ZMQ.DONTWAIT.
-     * 
      * @param socket
      * @return ZMsg object or null if the recv was interrupted
      */
-    public static ZMsg recvMsg(Socket socket) {
+    public static ZMsg recvMsg(Socket socket)
+    {
         return recvMsg(socket, 0);
     }
 
     /**
-     * Receives message from socket. Does a blocking recv, if
-     * you want not to block then use the ZLoop class or ZMQ.Poller to check for socket input before receiving.
-     * 
+     * Receives message from socket, returns ZMsg object or null if the recv was
+     * interrupted. Does a blocking recv, if you want not to block then use the
+     * ZLoop class or ZMQ.Poller to check for socket input before receiving.
      * @param socket
-     * @param flag see ZMQ constants
-     * @return the ZMsg object or null of the recv was interrupted
+     * @param flag
+     *            see ZMQ constants
+     * @return
      */
-    public static ZMsg recvMsg(Socket socket, int flag) {
+    public static ZMsg recvMsg(Socket socket, int flag)
+    {
         if (socket == null)
             throw new IllegalArgumentException("socket is null");
 
@@ -206,16 +216,17 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
     }
 
     /**
-     * Save message to an open data output stream.
-     * 
-     * Data saved as: 4 bytes: number of frames For every frame: 4 bytes: byte size of frame data + n bytes: frame byte
-     * data
-     * 
-     * @param msg ZMsg to save
-     * @param file DataOutputStream
+     * Save message to an open data output stream. Data saved as: 4 bytes:
+     * number of frames For every frame: 4 bytes: byte size of frame data + n
+     * bytes: frame byte data
+     * @param msg
+     *            ZMsg to save
+     * @param file
+     *            DataOutputStream
      * @return True if saved OK, else false
      */
-    public static boolean save(ZMsg msg, DataOutputStream file) {
+    public static boolean save(ZMsg msg, DataOutputStream file)
+    {
         if (msg == null)
             return false;
 
@@ -231,18 +242,20 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
                 }
             }
             return true;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return false;
         }
     }
 
     /**
      * Load / append a ZMsg from an open DataInputStream
-     * 
-     * @param file DataInputStream connected to file
+     * @param file
+     *            DataInputStream connected to file
      * @return ZMsg object
      */
-    public static ZMsg load(DataInputStream file) {
+    public static ZMsg load(DataInputStream file)
+    {
         if (file == null)
             return null;
         ZMsg rcvMsg = new ZMsg();
@@ -259,18 +272,20 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
                 }
             }
             return rcvMsg;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return null;
         }
     }
 
     /**
      * Create a new ZMsg from one or more Strings
-     * 
-     * @param strings Strings to add as frames.
+     * @param strings
+     *            Strings to add as frames.
      * @return ZMsg object
      */
-    public static ZMsg newStringMsg(String... strings) {
+    public static ZMsg newStringMsg(String... strings)
+    {
         ZMsg msg = new ZMsg();
         for (String data : strings) {
             msg.addString(data);
@@ -279,7 +294,8 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -302,7 +318,8 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         if (frames == null || frames.size() == 0)
             return 0;
 
@@ -314,10 +331,11 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
     }
 
     /**
-     * Dump the message in human readable format. This should only be used for debugging and tracing, inefficient in
-     * handling large messages.
+     * Dump the message in human readable format. This should only be used for
+     * debugging and tracing, inefficient in handling large messages.
      **/
-    public void dump(Appendable out) {
+    public void dump(Appendable out)
+    {
         try {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -327,7 +345,8 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
             }
             out.append(sw.getBuffer());
             sw.close();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException("Message dump exception " + super.toString(), e);
         }
     }
@@ -335,7 +354,8 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
     /**
      * Convert the message to a string, for use in debugging.
      */
-    public String toString() {
+    public String toString()
+    {
         StringBuilder sb = new StringBuilder();
         dump(sb);
         return sb.toString();
@@ -343,220 +363,245 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
 
     // ********* Convenience Deque methods for common data types *** //
 
-    public void addFirst(String stringValue) {
+    public void addFirst(String stringValue)
+    {
         addFirst(new ZFrame(stringValue));
     }
 
-    public void addFirst(byte[] data) {
+    public void addFirst(byte[] data)
+    {
         addFirst(new ZFrame(data));
     }
 
-    public void addLast(String stringValue) {
+    public void addLast(String stringValue)
+    {
         addLast(new ZFrame(stringValue));
     }
 
-    public void addLast(byte[] data) {
+    public void addLast(byte[] data)
+    {
         addLast(new ZFrame(data));
     }
 
     // ********* Convenience Queue methods for common data types *** //
 
-    public void push(String str) {
+    public void push(String str)
+    {
         push(new ZFrame(str));
     }
 
-    public void push(byte[] data) {
+    public void push(byte[] data)
+    {
         push(new ZFrame(data));
     }
 
-    public boolean add(String stringValue) {
+    public boolean add(String stringValue)
+    {
         return add(new ZFrame(stringValue));
     }
 
-    public boolean add(byte[] data) {
+    public boolean add(byte[] data)
+    {
         return add(new ZFrame(data));
     }
 
     // ********* Implement Iterable Interface *************** //
     @Override
-    public Iterator<ZFrame> iterator() {
+    public Iterator<ZFrame> iterator()
+    {
         // TODO Auto-generated method stub
         return frames.iterator();
     }
 
     // ********* Implement Deque Interface ****************** //
     @Override
-    public boolean addAll(Collection<? extends ZFrame> arg0) {
+    public boolean addAll(Collection<? extends ZFrame> arg0)
+    {
         return frames.addAll(arg0);
     }
 
     @Override
-    public void clear() {
+    public void clear()
+    {
         frames.clear();
 
     }
 
     @Override
-    public boolean containsAll(Collection<?> arg0) {
+    public boolean containsAll(Collection<?> arg0)
+    {
         return frames.containsAll(arg0);
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty()
+    {
         return frames.isEmpty();
     }
 
     @Override
-    public boolean removeAll(Collection<?> arg0) {
+    public boolean removeAll(Collection<?> arg0)
+    {
         return frames.removeAll(arg0);
     }
 
     @Override
-    public boolean retainAll(Collection<?> arg0) {
+    public boolean retainAll(Collection<?> arg0)
+    {
         return frames.retainAll(arg0);
     }
 
     @Override
-    public Object[] toArray() {
+    public Object[] toArray()
+    {
         return frames.toArray();
     }
 
     @Override
-    public <T> T[] toArray(T[] arg0) {
+    public <T> T[] toArray(T[] arg0)
+    {
         return frames.toArray(arg0);
     }
 
     @Override
-    public boolean add(ZFrame e) {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
+    public boolean add(ZFrame e)
+    {
         return frames.add(e);
     }
 
     @Override
-    public void addFirst(ZFrame e) {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
+    public void addFirst(ZFrame e)
+    {
         frames.addFirst(e);
     }
 
     @Override
-    public void addLast(ZFrame e) {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
+    public void addLast(ZFrame e)
+    {
         frames.addLast(e);
-
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(Object o)
+    {
         return frames.contains(o);
     }
 
     @Override
-    public Iterator<ZFrame> descendingIterator() {
+    public Iterator<ZFrame> descendingIterator()
+    {
         return frames.descendingIterator();
     }
 
     @Override
-    public ZFrame element() {
+    public ZFrame element()
+    {
         return frames.element();
     }
 
     @Override
-    public ZFrame getFirst() {
+    public ZFrame getFirst()
+    {
         try {
             return frames.getFirst();
-        } catch (NoSuchElementException e) {
+        }
+        catch (NoSuchElementException e) {
             return null;
         }
     }
 
     @Override
-    public ZFrame getLast() {
+    public ZFrame getLast()
+    {
         try {
             return frames.getLast();
-        } catch (NoSuchElementException e) {
+        }
+        catch (NoSuchElementException e) {
             return null;
         }
     }
 
     @Override
-    public boolean offer(ZFrame e) {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
+    public boolean offer(ZFrame e)
+    {
         return frames.offer(e);
     }
 
     @Override
-    public boolean offerFirst(ZFrame e) {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
+    public boolean offerFirst(ZFrame e)
+    {
         return frames.offerFirst(e);
     }
 
     @Override
-    public boolean offerLast(ZFrame e) {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
+    public boolean offerLast(ZFrame e)
+    {
         return frames.offerLast(e);
     }
 
     @Override
-    public ZFrame peek() {
+    public ZFrame peek()
+    {
         return frames.peek();
     }
 
     @Override
-    public ZFrame peekFirst() {
+    public ZFrame peekFirst()
+    {
         try {
             return frames.peekFirst();
-        } catch (NoSuchElementException e) {
+        }
+        catch (NoSuchElementException e) {
             return null;
         }
     }
 
     @Override
-    public ZFrame peekLast() {
+    public ZFrame peekLast()
+    {
         try {
             return frames.peekLast();
-        } catch (NoSuchElementException e) {
+        }
+        catch (NoSuchElementException e) {
             return null;
         }
     }
 
     @Override
-    public ZFrame poll() {
+    public ZFrame poll()
+    {
         return frames.poll();
     }
 
     @Override
-    public ZFrame pollFirst() {
+    public ZFrame pollFirst()
+    {
         return frames.pollFirst();
     }
 
     @Override
-    public ZFrame pollLast() {
+    public ZFrame pollLast()
+    {
         return frames.pollLast();
     }
 
     @Override
-    public ZFrame pop() {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
+    public ZFrame pop()
+    {
         try {
             return frames.pop();
-        } catch (NoSuchElementException e) {
+        }
+        catch (NoSuchElementException e) {
             return null;
         }
     }
 
     /**
      * Pop a ZFrame and return the toString() representation of it.
-     * 
      * @return toString version of pop'ed frame, or null if no frame exists.
      */
-    public String popString() {
+    public String popString()
+    {
         ZFrame frame = pop();
         if (frame == null)
             return null;
@@ -565,52 +610,60 @@ public class ZMsg implements Iterable<ZFrame>, Deque<ZFrame> {
     }
 
     @Override
-    public void push(ZFrame e) {
-        if (frames == null)
-            frames = new ArrayDeque<ZFrame>();
+    public void push(ZFrame e)
+    {
         frames.push(e);
     }
 
     @Override
-    public ZFrame remove() {
+    public ZFrame remove()
+    {
         return frames.remove();
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(Object o)
+    {
         return frames.remove(o);
     }
 
     @Override
-    public ZFrame removeFirst() {
+    public ZFrame removeFirst()
+    {
         try {
             return frames.removeFirst();
-        } catch (NoSuchElementException e) {
+        }
+        catch (NoSuchElementException e) {
             return null;
         }
     }
 
     @Override
-    public boolean removeFirstOccurrence(Object o) {
+    public boolean removeFirstOccurrence(Object o)
+    {
         return frames.removeFirstOccurrence(o);
     }
 
     @Override
-    public ZFrame removeLast() {
+    public ZFrame removeLast()
+    {
         try {
             return frames.removeLast();
-        } catch (NoSuchElementException e) {
+        }
+        catch (NoSuchElementException e) {
             return null;
         }
     }
 
     @Override
-    public boolean removeLastOccurrence(Object o) {
+    public boolean removeLastOccurrence(Object o)
+    {
         return frames.removeLastOccurrence(o);
     }
 
     @Override
-    public int size() {
+    public int size()
+    {
         return frames.size();
     }
 

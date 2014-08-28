@@ -503,21 +503,27 @@ public class ZMQ {
         public void close() {
             term();
         }
+
+        /**
+         * Sets the maximum number of sockets allowed on the context
+         */
+        public native boolean setMaxSockets(int maxSockets);
+
+        /**
+         * The maximum number of sockets allowed on the context
+         */
+        public native int getMaxSockets();
     }
 
     /**
      * Inner class: Socket.
      */
     public static class Socket implements Closeable {
-        static {
-            // if no embedded native library, revert to loading from java.library.path
-            if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
-                System.loadLibrary("jzmq");
-        }
-
         private static native void nativeInit();
 
         static {
+            if (!EmbeddedLibraryTools.LOADED_EMBEDDED_LIBRARY)
+                System.loadLibrary("jzmq");
             nativeInit();
         }
 
@@ -1369,6 +1375,12 @@ public class ZMQ {
             }
         }
 
+        public void setGSSAPIPlainText(boolean isPlaintext) {
+            if(ZMQ.version_full() >= ZMQ.makeVersion(4, 1, 0)) {
+                setLongSockopt(GSSAPI_PLAINTEXT, isPlaintext ? 1L : 0L);
+            }   
+        }
+
         /**
          * Sets whether socket should keep only last received/to be sent message in its inbound/outbound queue. 
          *
@@ -1463,8 +1475,6 @@ public class ZMQ {
 	 * @param key The public one
 	 * @since 4.0.0
 	 */
-	public void makeIntoCurveServer(byte[] key) {
-	    setCurveServer(true);
 	    setCurveServerKey(key);
 	}
 
@@ -1510,6 +1520,34 @@ public class ZMQ {
 		setCurveClientPublicKey(keyPair.publicKey);
 	    }
 	}
+        public void setReqRelaxed(boolean isRelaxed) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setLongSockopt(REQ_RELAXED, isRelaxed ? 1L : 0L);
+            }
+        }
+
+        public void setReqCorrelate(boolean isCorrelate) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+                setLongSockopt(REQ_CORRELATE, isCorrelate ? 1L : 0L);
+            }
+        }
+        
+        /**
+         * Sets whether the socket should automatically send an empty message 
+         * when a new connection is made or accepted. This may be set on
+         * REQ, DEALER, or ROUTER sockets connected to a ROUTER socket.
+         * The application must filter such empty messages.
+         *
+         * @param isProbeRouter if {@code true}, the socket will automatically 
+         * send an empty message when a new connection is made or
+         * accepted; if {@code false}, no such message will be sent
+         * @since 4.0.0
+         */
+        public void setProbeRouter(boolean isProbeRouter) {
+        	if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+        		setLongSockopt(PROBE_ROUTER, isProbeRouter ? 1L : 0L);
+        	}
+        }       
 
         /**
          * Bind to network interface. Start listening for new connections.
@@ -1899,11 +1937,15 @@ public class ZMQ {
 	private static final int CURVE_PUBLIC_KEY = 48;
 	private static final int CURVE_SECRET_KEY = 49;
 	private static final int CURVE_SERVER_KEY = 50;
+        private static final int PROBE_ROUTER = 51;
+        private static final int REQ_CORRELATE = 52;
+        private static final int REQ_RELAXED = 53;
         private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
         private static final int GSSAPI_SERVER = 62;
         private static final int GSSAPI_PRINCIPAL = 63;
         private static final int GSSAPI_SERVICE_PRINCIPAL = 64;
+        private static final int GSSAPI_PLAINTEXT = 65;
     }
 
     public static class PollItem {

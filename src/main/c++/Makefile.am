@@ -18,7 +18,7 @@ JZMQ_JAVA_FILES = \
 	../java/org/zeromq/ZLoop.java \
 	../java/org/zeromq/ZCurveKeyPair.java \
 	../java/org/zeromq/ZDispatcher.java \
-	../java/org/zeromq/EmbeddedLibraryTools.java
+	../java/org/zeromq/Utils.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \
