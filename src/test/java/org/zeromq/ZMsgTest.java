@@ -14,7 +14,9 @@ import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ZMsgTest {
 
@@ -202,5 +204,34 @@ public class ZMsgTest {
         // Empty message (Not very useful)
         ZMsg msg3 = ZMsg.newStringMsg();
         assertTrue(msg3.isEmpty());
+    }
+
+    @Test
+    public void testClosedContext() {
+        ZContext ctx = new ZContext();
+
+        Socket output = ctx.createSocket(ZMQ.PAIR);
+        output.bind("inproc://zmsg.test");
+        Socket input = ctx.createSocket(ZMQ.PAIR);
+        input.connect("inproc://zmsg.test");
+        
+        ZMsg msg = ZMsg.newStringMsg("Foo", "Bar");
+        msg.send(output);
+        
+        ZMsg msg2 = ZMsg.recvMsg(input);
+        assertEquals("Foo", msg2.popString());
+        assertEquals("Bar", msg2.popString());
+        msg2.destroy();
+        
+        msg.send(output);
+        msg.destroy();
+        ctx.close();
+        
+        try {
+            assertNull(ZMsg.recvMsg(input));
+        } catch (ZMQException e) {
+            fail();
+        }
+        
     }
 }

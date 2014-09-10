@@ -275,7 +275,15 @@ public class ZFrame
     public static ZFrame recvFrame(Socket socket, int flags)
     {
         ZFrame f = new ZFrame();
-        f.recv(socket, flags);
+        try {
+            f.recv(socket, flags);
+        } catch (ZMQException e) {
+            if (e.getErrorCode() == ZMQ.Error.ENOTSOCK.getCode()
+                    || e.getErrorCode() == ZMQ.Error.ETERM.getCode())
+                f = null;
+            else
+                throw (ZMQException) new ZMQException(e.getMessage(), e.getErrorCode()).initCause(e);
+        }
         return f;
     }
 }
