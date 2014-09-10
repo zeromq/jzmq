@@ -59,7 +59,7 @@ public class ZMsgTest {
 
         msg.destroy();
         msg2.destroy();
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ZMsgTest {
         assertEquals(60, msg.contentSize());
         msg.destroy();
 
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
