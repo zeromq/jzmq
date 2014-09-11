@@ -814,7 +814,11 @@ public class ZMQTest {
         
         assertTrue(socket.monitor("inproc://monitor.socket", ZMQ.EVENT_DISCONNECTED));
         monitor.connect("inproc://monitor.socket");
-        
+
+        byte[] req ="request".getBytes();
+        helper.send(req, 100);
+        assertArrayEquals(socket.recv(100), req);
+
         helper.close();
         event = Event.recv(monitor);
         assertNotNull("No event was received", event);
