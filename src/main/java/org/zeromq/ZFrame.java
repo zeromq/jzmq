@@ -278,11 +278,14 @@ public class ZFrame
         try {
             f.recv(socket, flags);
         } catch (ZMQException e) {
-            if (e.getErrorCode() == ZMQ.Error.ENOTSOCK.getCode()
-                    || e.getErrorCode() == ZMQ.Error.ETERM.getCode())
-                f = null;
-            else
-                throw (ZMQException) new ZMQException(e.getMessage(), e.getErrorCode()).initCause(e);
+            switch (ZMQ.Error.findByCode(e.getErrorCode())) {
+                case ETERM:
+                case ENOTSOCK:
+                    f = null;
+                    break;
+                default:
+                    throw new ZMQException(e);
+            }
         }
         return f;
     }
