@@ -228,7 +228,7 @@ public class ZMsgTest {
         ctx.close();
         
         try {
-            assertNull(ZMsg.recvMsg(input));
+            assertNull("Expected null message", ZMsg.recvMsg(input));
         } catch (ZMQException e) {
             fail();
         }
