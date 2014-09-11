@@ -98,6 +98,10 @@ Java_org_zeromq_ZMQ_00024Poller_run_1poll (JNIEnv *env, jclass cls, jobjectArray
             env->DeleteLocalRef (s_0mq);
         }
     }
+    else if (rc < 0)
+    {
+        raise_exception (env, zmq_errno());
+    }
 
     delete [] pitem;
     return rc;
