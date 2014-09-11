@@ -605,7 +605,20 @@ public class ZMQTest {
         
         context.term();
     }
-    
+
+    @Test(expected = ZMQException.class)
+    public void testPollingInvalidSockets() {
+        Context context = ZMQ.context(1);
+        Poller poller = new ZMQ.Poller(1);
+        Socket socketOne = context.socket(ZMQ.SUB);
+
+        poller.register(socketOne, ZMQ.Poller.POLLIN);
+        socketOne.close();
+        poller.poll(100);
+
+        context.term();
+    }
+
     @Test
     public void testEventConnected() {
         if (ZMQ.version_full() < ZMQ.make_version(3, 2, 2)) // Monitor added in 3.2.2
