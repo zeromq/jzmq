@@ -53,7 +53,7 @@
     <maven-scm-plugin.version>1.7</maven-scm-plugin.version>
     <maven-shade-plugin.version>1.4</maven-shade-plugin.version>
     <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
-    <junit.version>4.8.2</junit.version>
+    <junit.version>4.11</junit.version>
     <native.arch>${os.arch}</native.arch>
     <native.distro />
     <native.zmq.version />
