@@ -40,7 +40,7 @@ JZMQ_HPP_FILES = \
 JZMQ_CLASS_FILES = org/zeromq/*.class
 
 $(jarfile):
-	$(JAVAC) -d . $(JZMQ_JAVA_FILES)
+	$(JAVAC) $(JAVACFLAGS) -d . $(JZMQ_JAVA_FILES)
 	$(JAR) cf $(JARFLAGS) $@ $(JZMQ_CLASS_FILES)
 
 jar_DATA = $(jarfile)

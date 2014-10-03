@@ -11,7 +11,7 @@ JZMQ_PERF_JAVA_FILES = \
 JZMQ_PERF_CLASS_FILES = *.class
 
 $(jarfile): 
-	$(JAVAC) -classpath $(top_builddir)/src/main/java -d . $(JZMQ_PERF_JAVA_FILES)
+	$(JAVAC) $(JAVACFLAGS) -classpath $(top_builddir)/src/main/java -d . $(JZMQ_PERF_JAVA_FILES)
 	$(JAR) cf $(JARFLAGS) $@ $(JZMQ_PERF_CLASS_FILES)
 
 jar_DATA = $(jarfile)

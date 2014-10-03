@@ -93,6 +93,7 @@ AC_CHECK_LIB([zmq], [zmq_init],
 test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac -encoding ut8)
 test "x$JAVAC" = x && AC_MSG_ERROR([cannot find javac])
 AC_SUBST(JAVAC)
+AC_SUBST(JAVACFLAGS)
 
 test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, javah)
 test "x$JAVAH" = x && AC_MSG_ERROR([cannot find javah])
