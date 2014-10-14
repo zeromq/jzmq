@@ -72,13 +72,13 @@ BUILT_SOURCES = \
 	$(JZMQ_H_FILES)
 
 CLEANFILES = \
-	-rf org \
 	$(JZMQ_H_FILES) \
-	$(JZMQ_CLASS_FILES) \
 	$(jarfile) \
 	$(javac_stamp) \
 	$(javah_stamp)
 
+clean-local:
+	rm -rf org
 
 $(JZMQ_H_FILES): $(javah_stamp)
 $(javah_stamp): $(javac_stamp)
