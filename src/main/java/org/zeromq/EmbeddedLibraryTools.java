@@ -103,59 +103,67 @@ public class EmbeddedLibraryTools {
     }
 
     private static boolean loadEmbeddedLibrary() {
+        URL zmqLibLoc = searchForNativeLibrary("libzmq");
+        URL jniLibLoc = searchForNativeLibrary("libjzmq");
 
-        boolean usingEmbedded = false;
+        // attempt to load ZMQ from the JAR as well; static linking does not work on all platforms (e.g. MacOS X).
+        // we allow this one to fail because not every case will package it
+        tryLoadEmbedded(zmqLibLoc);
 
+        // now try to load the JNI bindings, which may depend upon external ZMQ, or the above loaded lib
+        return tryLoadEmbedded(jniLibLoc);
+    }
+
+    private static URL searchForNativeLibrary(String baseName) {
         // attempt to locate embedded native library within JAR at following location:
-        // /NATIVE/${os.arch}/${os.name}/libjzmq.[so|dylib|dll]
+        // /NATIVE/${os.arch}/${os.name}/$baseName.[so|dylib|dll]
         String[] allowedExtensions = new String[] { "so", "dylib", "dll" };
         StringBuilder url = new StringBuilder();
         url.append("/NATIVE/");
         url.append(getCurrentPlatformIdentifier());
-        url.append("/libjzmq.");
+        url.append("/" + baseName + ".");
         URL nativeLibraryUrl = null;
+
         // loop through extensions, stopping after finding first one
         for (String ext : allowedExtensions) {
             nativeLibraryUrl = ZMQ.class.getResource(url.toString() + ext);
             if (nativeLibraryUrl != null)
                 break;
         }
+        return nativeLibraryUrl;
+    }
 
-        if (nativeLibraryUrl != null) {
+    private static boolean tryLoadEmbedded(URL nativeLibraryUrl) {
+        if (nativeLibraryUrl == null) {
+            return false;
+        }
 
-            // native library found within JAR, extract and load
+        // native library found within JAR, extract and load
+        try {
+            final File libfile = File.createTempFile("libjzmq-", ".lib");
+            libfile.deleteOnExit(); // just in case
 
-            try {
+            final InputStream in = nativeLibraryUrl.openStream();
+            final OutputStream out = new BufferedOutputStream(new FileOutputStream(libfile));
 
-                final File libfile = File.createTempFile("libjzmq-", ".lib");
-                libfile.deleteOnExit(); // just in case
+            int len = 0;
+            byte[] buffer = new byte[8192];
+            while ((len = in.read(buffer)) > -1)
+                out.write(buffer, 0, len);
+            out.close();
+            in.close();
 
-                final InputStream in = nativeLibraryUrl.openStream();
-                final OutputStream out = new BufferedOutputStream(new FileOutputStream(libfile));
+            System.load(libfile.getAbsolutePath());
 
-                int len = 0;
-                byte[] buffer = new byte[8192];
-                while ((len = in.read(buffer)) > -1)
-                    out.write(buffer, 0, len);
-                out.close();
-                in.close();
-
-                System.load(libfile.getAbsolutePath());
-
-                if (!libfile.delete()) {
-                    throw new IllegalStateException("unable to delete " + libfile);
-                }
-
-                usingEmbedded = true;
-
-            } catch (IOException x) {
-                // mission failed, do nothing
+            if (!libfile.delete()) {
+                throw new IllegalStateException("unable to delete " + libfile);
             }
 
-        } // nativeLibraryUrl exists
-
-        return usingEmbedded;
-
+            return true;
+        } catch (IOException x) {
+            // failed, force external loading
+            return false;
+        }
     }
 
     private EmbeddedLibraryTools() {
