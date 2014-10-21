@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -18,7 +20,16 @@ public class EmbeddedLibraryTools {
 
     public static final boolean LOADED_EMBEDDED_LIBRARY;
 
+    private static final File jniLibDir;
+
     static {
+        try {
+            Path jniLibPath = Files.createTempDirectory("jniloader");
+            jniLibDir = jniLibPath.toFile();
+            jniLibDir.deleteOnExit();
+        } catch (IOException e) {
+            throw new RuntimeException("failed to set up jniloader directory", e);
+        }
         LOADED_EMBEDDED_LIBRARY = loadEmbeddedLibrary();
     }
 
@@ -35,7 +46,6 @@ public class EmbeddedLibraryTools {
     }
 
     public static Collection<String> getEmbeddedLibraryList() {
-
         final Collection<String> result = new ArrayList<String>();
         final Collection<String> files = catalogClasspath();
 
@@ -46,7 +56,6 @@ public class EmbeddedLibraryTools {
         }
 
         return result;
-
     }
 
     private static void catalogArchive(final File jarfile, final Collection<String> files) {
@@ -103,59 +112,60 @@ public class EmbeddedLibraryTools {
     }
 
     private static boolean loadEmbeddedLibrary() {
+        URL zmqLibLoc = searchForNativeLibrary("zmq");
+        URL jniLibLoc = searchForNativeLibrary("jzmq");
 
-        boolean usingEmbedded = false;
+        // attempt to load ZMQ from the JAR as well; static linking does not work on all platforms (e.g. MacOS X).
+        // we allow this one to fail because not every case will package it
+        tryLoadEmbedded(zmqLibLoc, System.mapLibraryName("zmq"), true);
 
+        // now try to load the JNI bindings, which may depend upon external ZMQ, or the above loaded lib
+        return tryLoadEmbedded(jniLibLoc, System.mapLibraryName("jzmq"));
+    }
+
+    private static URL searchForNativeLibrary(String baseName) {
         // attempt to locate embedded native library within JAR at following location:
-        // /NATIVE/${os.arch}/${os.name}/libjzmq.[so|dylib|dll]
-        String[] allowedExtensions = new String[] { "so", "dylib", "dll" };
+        // /NATIVE/${os.arch}/${os.name}/$baseName.[so|dylib|dll]
         StringBuilder url = new StringBuilder();
         url.append("/NATIVE/");
         url.append(getCurrentPlatformIdentifier());
-        url.append("/libjzmq.");
-        URL nativeLibraryUrl = null;
-        // loop through extensions, stopping after finding first one
-        for (String ext : allowedExtensions) {
-            nativeLibraryUrl = ZMQ.class.getResource(url.toString() + ext);
-            if (nativeLibraryUrl != null)
-                break;
+        url.append("/");
+        url.append(System.mapLibraryName(baseName));
+        return ZMQ.class.getResource(url.toString());
+    }
+
+    private static boolean tryLoadEmbedded(URL nativeLibraryUrl, String targetName) {
+        return tryLoadEmbedded(nativeLibraryUrl, targetName, false);
+    }
+
+    private static boolean tryLoadEmbedded(URL nativeLibraryUrl, String targetName, boolean preload) {
+        if (nativeLibraryUrl == null) {
+            return false;
         }
 
-        if (nativeLibraryUrl != null) {
+        // native library found within JAR, extract and load
+        try {
+            final File libfile = new File(jniLibDir, targetName);
 
-            // native library found within JAR, extract and load
+            final InputStream in = nativeLibraryUrl.openStream();
+            final OutputStream out = new BufferedOutputStream(new FileOutputStream(libfile));
 
-            try {
+            int len = 0;
+            byte[] buffer = new byte[8192];
+            while ((len = in.read(buffer)) > -1)
+                out.write(buffer, 0, len);
+            out.close();
+            in.close();
 
-                final File libfile = File.createTempFile("libjzmq-", ".lib");
-                libfile.deleteOnExit(); // just in case
-
-                final InputStream in = nativeLibraryUrl.openStream();
-                final OutputStream out = new BufferedOutputStream(new FileOutputStream(libfile));
-
-                int len = 0;
-                byte[] buffer = new byte[8192];
-                while ((len = in.read(buffer)) > -1)
-                    out.write(buffer, 0, len);
-                out.close();
-                in.close();
-
+            if (!preload) {
                 System.load(libfile.getAbsolutePath());
-
-                if (!libfile.delete()) {
-                    throw new IllegalStateException("unable to delete " + libfile);
-                }
-
-                usingEmbedded = true;
-
-            } catch (IOException x) {
-                // mission failed, do nothing
             }
 
-        } // nativeLibraryUrl exists
-
-        return usingEmbedded;
-
+            return true;
+        } catch (IOException x) {
+            // failed, force external loading
+            return false;
+        }
     }
 
     private EmbeddedLibraryTools() {
