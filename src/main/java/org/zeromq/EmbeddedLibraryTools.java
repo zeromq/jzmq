@@ -140,7 +140,6 @@ public class EmbeddedLibraryTools {
 
     private static boolean tryLoadEmbedded(URL nativeLibraryUrl, String targetName, boolean preload) {
         if (nativeLibraryUrl == null) {
-            System.err.println("could not find " + targetName);
             return false;
         }
 
