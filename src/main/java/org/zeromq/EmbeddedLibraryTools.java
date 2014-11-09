@@ -50,10 +50,9 @@ public class EmbeddedLibraryTools {
     }
 
     private static void catalogArchive(final File jarfile, final Collection<String> files) {
-
+        JarFile j = null;
         try {
-
-            final JarFile j = new JarFile(jarfile);
+            j = new JarFile(jarfile);
             final Enumeration<JarEntry> e = j.entries();
             while (e.hasMoreElements()) {
                 final JarEntry entry = e.nextElement();
@@ -64,6 +63,11 @@ public class EmbeddedLibraryTools {
 
         } catch (IOException x) {
             System.err.println(x.toString());
+        } finally {
+            try {
+                j.close();
+            } catch(Exception e) {
+            }
         }
 
     }
