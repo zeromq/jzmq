@@ -1,6 +1,9 @@
 jarfile = zmq.jar
 jardir = $(datadir)/java
 
+javac_stamp = javac_stamp
+javah_stamp = javah_stamp
+
 JZMQ_JAVA_FILES = \
 	../java/org/zeromq/EmbeddedLibraryTools.java \
 	../java/org/zeromq/ZAuth.java \
@@ -39,8 +42,11 @@ JZMQ_HPP_FILES = \
 
 JZMQ_CLASS_FILES = org/zeromq/*.class
 
-$(jarfile):
+$(javac_stamp): $(JZMQ_JAVA_FILES)
 	$(JAVAC) $(JAVACFLAGS) -d . $(JZMQ_JAVA_FILES)
+	@touch $@
+
+$(jarfile): $(javac_stamp)
 	$(JAR) cf $(JARFLAGS) $@ $(JZMQ_CLASS_FILES)
 
 jar_DATA = $(jarfile)
@@ -66,14 +72,18 @@ BUILT_SOURCES = \
 	$(JZMQ_H_FILES)
 
 CLEANFILES = \
-	-rf org \
 	$(JZMQ_H_FILES) \
-	$(JZMQ_CLASS_FILES) \
-	$(jarfile)
+	$(jarfile) \
+	$(javac_stamp) \
+	$(javah_stamp)
 
+clean-local:
+	rm -rf org
 
-$(JZMQ_H_FILES): $(jarfile)
+$(JZMQ_H_FILES): $(javah_stamp)
+$(javah_stamp): $(javac_stamp)
 	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ
+	@touch $@
 
 $(srcdir)/ZMQ.cpp: \
 	$(JZMQ_H_FILES) \
