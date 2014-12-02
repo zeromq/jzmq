@@ -69,6 +69,7 @@ This package contains Java Bindings for ZeroMQ related development libraries and
 # libraries
 %{_libdir}/libjzmq.so*
 /usr/share/java/zmq.jar
+/usr/share/perf/zmq-perf.jar
 
 %files devel
 %defattr(-,root,root,-)
