@@ -15,6 +15,11 @@ public class ZMQException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    public ZMQException(ZMQException cause) {
+        super(cause.getMessage(), cause);
+        this.errorCode = cause.errorCode;
+    }
+
     /**
      * @return error code
      */

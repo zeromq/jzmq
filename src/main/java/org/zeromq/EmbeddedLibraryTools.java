@@ -24,10 +24,13 @@ public class EmbeddedLibraryTools {
 
     public static String getCurrentPlatformIdentifier() {
         String osName = System.getProperty("os.name");
-        if (osName.toLowerCase().indexOf("windows") > -1) {
+        if (osName.toLowerCase().contains("windows")) {
             osName = "Windows";
+        } else if (osName.toLowerCase().contains("mac os x")) {
+            osName = "Darwin";
+        } else {
+            osName = osName.replaceAll("\\s+", "_");
         }
-
         return System.getProperty("os.arch") + "/" + osName;
     }
 
@@ -47,10 +50,9 @@ public class EmbeddedLibraryTools {
     }
 
     private static void catalogArchive(final File jarfile, final Collection<String> files) {
-
+        JarFile j = null;
         try {
-
-            final JarFile j = new JarFile(jarfile);
+            j = new JarFile(jarfile);
             final Enumeration<JarEntry> e = j.entries();
             while (e.hasMoreElements()) {
                 final JarEntry entry = e.nextElement();
@@ -61,6 +63,11 @@ public class EmbeddedLibraryTools {
 
         } catch (IOException x) {
             System.err.println(x.toString());
+        } finally {
+            try {
+                j.close();
+            } catch(Exception e) {
+            }
         }
 
     }
@@ -86,6 +93,10 @@ public class EmbeddedLibraryTools {
 
     private static void catalogFiles(final int prefixlen, final File root, final Collection<String> files) {
         final File[] ff = root.listFiles();
+        if (ff == null) {
+            throw new IllegalStateException("invalid path listed: " + root);
+        }
+
         for (final File f : ff) {
             if (f.isDirectory()) {
                 catalogFiles(prefixlen, f, files);
@@ -135,7 +146,9 @@ public class EmbeddedLibraryTools {
 
                 System.load(libfile.getAbsolutePath());
 
-                libfile.delete();
+                if (!libfile.delete()) {
+                    throw new IllegalStateException("unable to delete " + libfile);
+                }
 
                 usingEmbedded = true;
 
@@ -150,6 +163,5 @@ public class EmbeddedLibraryTools {
     }
 
     private EmbeddedLibraryTools() {
-    };
-
+    }
 }

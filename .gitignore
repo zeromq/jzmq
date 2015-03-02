@@ -25,6 +25,7 @@ src/main/c++/org_zeromq_*.h
 lib/
 target/
 .classpath
+.idea
 .project
 .settings/
 build-stamp

@@ -1767,7 +1767,7 @@ public class ZMQ {
          * 
          * @return the message received, as an array of bytes; null on error.
          */
-        public final byte[] recv() {
+        public byte[] recv() {
             return recv(0);
         }
 

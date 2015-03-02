@@ -93,6 +93,7 @@ AC_CHECK_LIB([zmq], [zmq_init],
 test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac -encoding ut8)
 test "x$JAVAC" = x && AC_MSG_ERROR([cannot find javac])
 AC_SUBST(JAVAC)
+AC_SUBST(JAVACFLAGS)
 
 test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, javah)
 test "x$JAVAH" = x && AC_MSG_ERROR([cannot find javah])
@@ -117,14 +118,3 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 
 AC_OUTPUT(Makefile src/main/c++/Makefile src/main/perf/Makefile)
-
-#  On Linux patch libtool to delete hardcoded paths (rpath).
-case "${host_os}" in
-    *linux*)
-        sed < libtool > libtool-2 \
-        's/^hardcode_libdir_flag_spec.*$'/'hardcode_libdir_flag_spec=" "/'
-        mv libtool-2 libtool
-        chmod 755 libtool
-        ;;
-esac
-

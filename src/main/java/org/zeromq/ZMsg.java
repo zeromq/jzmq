@@ -203,9 +203,10 @@ public class ZMsg implements Deque<ZFrame>
 
         while (true) {
             ZFrame f = ZFrame.recvFrame(socket, flag);
-            if (f == null) {
+            if (f == null || !f.hasData()) {
                 // If receive failed or was interrupted
                 msg.destroy();
+                msg = null;
                 break;
             }
             msg.add(f);
