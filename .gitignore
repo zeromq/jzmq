@@ -77,3 +77,5 @@ perf/*.dll
 *.jar
 INSTALL
 .checkstyle
+javac_stamp
+javah_stamp
