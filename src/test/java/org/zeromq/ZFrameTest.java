@@ -5,6 +5,7 @@ import org.zeromq.ZMQ.Socket;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -55,7 +56,7 @@ public class ZFrameTest {
             f.send(output, ZMQ.SNDMORE);
         }
         assertEquals(5, f.size());
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -72,7 +73,7 @@ public class ZFrameTest {
         f.destroy();
         assertFalse(copy.equals(f));
         assertEquals(5, copy.size());
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -107,9 +108,9 @@ public class ZFrameTest {
         }
         assertEquals(6, frame_nbr);
         f = ZFrame.recvFrame(input, ZMQ.DONTWAIT);
-        assertTrue(!f.hasData());
+        assertNull(f);
 
-        ctx.destroy();
+        ctx.close();
     }
 
     @Test
@@ -131,6 +132,6 @@ public class ZFrameTest {
         assertEquals(f2.toString(), "Hello");
         assertTrue(f2.equals(f1));
 
-        ctx.destroy();
+        ctx.close();
     }
 }

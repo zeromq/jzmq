@@ -276,15 +276,15 @@ public class ZFrame
     {
         ZFrame f = new ZFrame();
         try {
-            f.recv(socket, flags);
+            byte[] data = f.recv(socket, flags);
+            if (data == null) {
+                f = null;
+            }
         } catch (ZMQException e) {
-            switch (ZMQ.Error.findByCode(e.getErrorCode())) {
-                case ETERM:
-                case ENOTSOCK:
-                    f = null;
-                    break;
-                default:
-                    throw new ZMQException(e);
+            if (ZMQ.Error.findByCode(e.getErrorCode()) == ZMQ.Error.ETERM) {
+                f = null;
+            } else {
+                throw e;
             }
         }
         return f;
