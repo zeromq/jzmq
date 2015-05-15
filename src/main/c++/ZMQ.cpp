@@ -144,6 +144,12 @@ Java_org_zeromq_ZMQ_ENOTSOCK (JNIEnv *env, jclass cls)
     return ENOTSOCK;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_ZMQ_EAGAIN (JNIEnv *env, jclass cls)
+{
+    return EAGAIN;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_ZMQ_run_1proxy (JNIEnv *env, jclass cls, jobject frontend_, jobject backend_, jobject capture_)
 {
