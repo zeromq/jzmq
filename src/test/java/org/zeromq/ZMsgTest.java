@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -227,9 +228,10 @@ public class ZMsgTest {
         ctx.close();
         
         try {
-            ZMsg.recvMsg(input);
-            fail("Expected ZMQException when context is closed");
+            assertNull("Expected null message", ZMsg.recvMsg(input));
         } catch (ZMQException e) {
+            fail();
         }
+        
     }
 }
