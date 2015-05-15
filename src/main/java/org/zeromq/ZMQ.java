@@ -360,6 +360,8 @@ public class ZMQ {
 
     protected static native long ENOTSOCK();
 
+    protected static native long EAGAIN();
+
     private static native void run_proxy(Socket frontend, Socket backend, Socket capture);
 
     /**
@@ -393,7 +395,9 @@ public class ZMQ {
 
         ETERM(ETERM()),
 
-        ENOTSOCK(ENOTSOCK());
+        ENOTSOCK(ENOTSOCK()),
+
+        EAGAIN(EAGAIN());
 
         private final long code;
 
