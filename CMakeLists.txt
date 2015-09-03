@@ -65,6 +65,7 @@ set(java-sources
 	org/zeromq/ZMsg.java
 	org/zeromq/ZLoop.java
 	org/zeromq/ZThread.java
+	org/zeromq/ZCurveKeyPair.java
 )
 set(java-classes
 	org/zeromq/ZMQ.class
@@ -80,6 +81,7 @@ set(java-classes
 	org/zeromq/EmbeddedLibraryTools.class
 	org/zeromq/App.class
 	org/zeromq/ZContext.class
+	org/zeromq/ZCurvePair.class
 	org/zeromq/ZDispatcher.class
 	org/zeromq/ZDispatcher$$1.class
 	org/zeromq/ZDispatcher$$SocketDispatcher$$1.class
@@ -103,6 +105,7 @@ set(javah-headers
 	org_zeromq_ZMQ.h
 	org_zeromq_ZMQ_Error.h
 	org_zeromq_ZMQ_Context.h
+	org_zeromq_ZMQ_ZCurveKeyPair.h
 	org_zeromq_ZMQ_Socket.h
 	org_zeromq_ZMQ_PollItem.h
 	org_zeromq_ZMQ_Poller.h	

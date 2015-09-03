@@ -1,5 +1,6 @@
 before_install:
  - sudo add-apt-repository ppa:trevorbernard/zeromq -y
+ - sudo add-apt-repository ppa:shnatsel/dnscrypt -y
  - sudo apt-get update -y
  - sudo apt-get install libzmq3-dev libpgm-dev make build-essential pkg-config libtool automake -y
  - git clone git://github.com/jedisct1/libsodium.git

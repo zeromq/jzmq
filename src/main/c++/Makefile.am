@@ -18,6 +18,9 @@ JZMQ_JAVA_FILES = \
 	../java/org/zeromq/ZMQStreamer.java \
 	../java/org/zeromq/ZMsg.java \
 	../java/org/zeromq/ZThread.java \
+	../java/org/zeromq/ZLoop.java \
+	../java/org/zeromq/ZCurveKeyPair.java \
+	../java/org/zeromq/ZDispatcher.java \
 	../java/org/zeromq/Utils.java
 
 JZMQ_CPP_FILES = \
@@ -35,12 +38,55 @@ JZMQ_H_FILES = \
 	org_zeromq_ZMQ_Event.h \
 	org_zeromq_ZMQ_PollItem.h \
 	org_zeromq_ZMQ_Poller.h \
+	org_zeromq_ZMQ_ZCurveKeyPair.h \
 	org_zeromq_ZMQ_Socket.h
 
 JZMQ_HPP_FILES = \
 	util.hpp
 
-JZMQ_CLASS_FILES = org/zeromq/*.class
+JZMQ_CLASS_FILES = \
+	org/zeromq/EmbeddedLibraryTools.class \
+	org/zeromq/ZAuth$$1.class \
+	org/zeromq/ZAuth$$ZAPRequest.class \
+	org/zeromq/ZAuth$$ZAuthAgent.class \
+	org/zeromq/Zauth.class \
+	org/zeromq/ZContext.class \
+	org/zeromq/ZCurveKeyPair.class \
+	org/zeromq/ZDispatcher.class \
+	org/zeromq/ZDispatcher$$1.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$1.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$2.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher$$ZMessageBuffer.class \
+	org/zeromq/ZDispatcher$$SocketDispatcher.class \
+	org/zeromq/ZDispatcher$$ZMessageHandler.class \
+	org/zeromq/ZDispatcher$$ZSender.class \
+	org/zeromq/ZDispatcher.class \
+	org/zeromq/ZFrame.class \
+	org/zeromq/ZLoop$$IZLoopHandler.class \
+	org/zeromq/ZLoop$$SPoller.class \
+	org/zeromq/ZLoop$$STimer.class \
+	org/zeromq/ZLoop.class \
+	org/zeromq/ZMQ$$Context.class \
+	org/zeromq/ZMQ$$Error.class \
+	org/zeromq/ZMQ$$Event.class \
+	org/zeromq/ZMQ$$PollItem.class \
+	org/zeromq/ZMQ$$Poller.class \
+	org/zeromq/ZMQ$$Socket.class \
+	org/zeromq/.class \
+	org/zeromq/.class \
+	org/zeromq/.class \
+	org/zeromq/.class \
+	org/zeromq/.class \
+	org/zeromq/.class \
+	org/zeromq/ZMQException.class \
+	org/zeromq/ZMQForwarder.class \
+	org/zeromq/ZMQQueue.class \
+	org/zeromq/ZMQStreamer.class \
+	org/zeromq/ZMsg.class \
+	org/zeromq/ZThread$$IAttachedRunnable.class \
+	org/zeromq/ZThread$$IDetachedRunnable.class \
+	org/zeromq/ZThread$$ShimThread.class \
+	org/zeromq/ZThread.class
 
 $(javac_stamp): $(JZMQ_JAVA_FILES)
 	$(JAVAC) $(JAVACFLAGS) -d . $(JZMQ_JAVA_FILES)
@@ -82,7 +128,10 @@ clean-local:
 
 $(JZMQ_H_FILES): $(javah_stamp)
 $(javah_stamp): $(javac_stamp)
-	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ
+	## This is the classpath in master
+	## $(CLASSPATH_ENV) $(JAVAH) -jni -classpath . org.zeromq.ZMQ
+	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath ../java org.zeromq.ZMQ
+	$(CLASSPATH_ENV) $(JAVAH) -jni -classpath ../java org.zeromq.ZCurveKeyPair
 	@touch $@
 
 $(srcdir)/ZMQ.cpp: \

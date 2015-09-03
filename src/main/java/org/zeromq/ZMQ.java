@@ -952,6 +952,48 @@ public class ZMQ {
             return getLongSockopt(EVENTS);
         }
 
+	// Q: Do CURVE sockets actually support getting these options after they've been set?
+
+	/**
+	 * Has this been marked as a CURVE server?
+	 *
+	 * @return True if it's a server, false if not
+	 * @since 4.0.0
+	 */
+	public boolean getCurveServer() {
+	    return getLongSockopt(CURVE_SERVER) != 0;
+	}
+
+	/**
+	 * CURVE sockets must have the public key of the server associated with them.
+	 * 
+	 * @return That key
+	 * @since 4.0.0
+	 */
+	public byte[] getCurveServerKey() {
+	    return getBytesSockopt(CURVE_SERVER_KEY);
+	}
+
+	/**
+	 * Only for CURVE clients
+	 *
+	 * @return The client-side long-term public key
+	 * @since 4.0.0
+	 */
+	public byte[] getCurveClientPublicKey() {
+	    return getBytesSockopt(CURVE_PUBLIC_KEY);
+	}
+
+	/**
+	 * Only for CURVE clients
+	 *
+	 * @return The client-side long-term private key
+	 * @since 4.0.0
+	 */
+	public byte[] getCurveClientPrivateKey() {
+	    return getBytesSockopt(CURVE_SECRET_KEY);
+	}
+
         /**
          * The 'ZMQ_LINGER' option shall retrieve the period for pending outbound messages to linger in memory after
          * closing the socket. Value of -1 means infinite. Pending messages will be kept until they are fully
@@ -1401,6 +1443,87 @@ public class ZMQ {
             }
         }
 
+	/**
+	 * Flag the socket as a CURVE server
+	 * @param on true to make this plan to work as a server, false for clients
+	 * (defaults to client)
+	 * @see #setServerKey(long)
+	 * @see #makeIntoCurveServer(byte[])
+	 * Q: I this the version it was added to zmq, or to here?
+	 * @since 4.0.0
+	 */
+	public void setCurveServer(boolean on) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setLongSockopt(CURVE_SERVER, on ? 1L : 0L);
+	    }
+	}
+
+	/**
+	 * Set the long-term public key associated with the server.
+	 * Which could very well be this.
+	 * @param key The public one.
+	 * @see #makeIntoCurveServer(byte[])
+	 * @see #makeIntoCurveClient(ZCurveKeyPair, byte[])
+	 * @since 4.0.0
+	 */
+	public void setCurveServerKey(byte[] key) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setBytesSockopt(CURVE_SERVER_KEY, key);
+	    }
+	}
+
+	/**
+	 * Make this into a CURVE-encrypted server
+	 * Really just a slightly higher-level convenience function around setting
+	 * the socket options manually.
+	 * @param key The public one
+	 * @since 4.0.0
+	 */
+	    setCurveServerKey(key);
+	}
+
+	/**
+	 * Set the long-term private key associated with this client socket.
+	 * @param key The private one.
+	 * @see #makeIntoCurveClient(ZCurveKeyPair, byte[])
+	 * @since 4.0.0
+	 */
+	public void setCurveClientPrivateKey(byte[] key) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setBytesSockopt(CURVE_SECRET_KEY, key);
+	    }
+	}
+
+	/**
+	 * Set the long-term public key associated with this client socket.
+	 * @param key The public one.
+	 * Q: What on earth is wrong with the next line? (And all the
+	 * similar ones that are causing basically the same warning?)
+	 * @see ZMQ.Socket#makeIntoCurveClient(ZCurveKeyPair, byte[])
+	 * @since 4.0.0
+	 */
+	public void setCurveClientPublicKey(byte[] key) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		setBytesSockopt(CURVE_PUBLIC_KEY, key);
+	    }
+	}
+
+	/**
+	 * Configure this as a CURVE client.
+	 * @param keyPair The long-term keypair associated with this
+	 * @param serverKey The server's long-term public key
+	 * @since 4.0.0
+	 */
+	public void makeIntoCurveClient(ZCurveKeyPair keyPair, byte[] serverKey) {
+	    if(ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
+		// Mostly redundant. But allow for socket re-use.
+		// TODO: Verify that that actually works.
+		//setCurveServer(false);
+		setCurveServerKey(serverKey);
+		setCurveClientPrivateKey(keyPair.privateKey);
+		setCurveClientPublicKey(keyPair.publicKey);
+	    }
+	}
         public void setReqRelaxed(boolean isRelaxed) {
             if (ZMQ.version_full() >= ZMQ.make_version(4, 0, 0)) {
                 setLongSockopt(REQ_RELAXED, isRelaxed ? 1L : 0L);
@@ -1542,7 +1665,7 @@ public class ZMQ {
          * @param offset
          * @param len
          * @param flags
-         * @return
+         * @return true on success, false on failure
          */
         public native boolean send(byte[] msg, int offset, int len, int flags);
 
@@ -1552,7 +1675,7 @@ public class ZMQ {
          * @param buffer
          * @param len
          * @param flags
-         * @return
+         * @return true on success, false on failure
          */
         public native boolean sendZeroCopy(ByteBuffer buffer, int len, int flags);
 
@@ -1580,7 +1703,7 @@ public class ZMQ {
         }
 
         /**
-         * Send a String.
+         * Send a String as one message frame.
          * 
          * @param msg the message to send, as a String.
          * @return true if send was successful, false otherwise.
@@ -1735,7 +1858,7 @@ public class ZMQ {
          * @param option ID of the option to set.
          * @return The socket option value (as a long).
          */
-        protected native long getLongSockopt(int option);
+        public native long getLongSockopt(int option);
 
         /**
          * Get the socket option value, as a byte array.
@@ -1743,15 +1866,17 @@ public class ZMQ {
          * @param option ID of the option to set.
          * @return The socket option value (as a byte array).
          */
-        protected native byte[] getBytesSockopt(int option);
+        public native byte[] getBytesSockopt(int option);
 
         /**
          * Set the socket option value, given as a long.
+         * public so future API changes that use the socket 
+	 * options don't require actual library rebuilding.
          * 
          * @param option ID of the option to set.
          * @param optval value (as a long) to set the option to.
          */
-        protected native void setLongSockopt(int option, long optval);
+        public native void setLongSockopt(int option, long optval);
 
         /**
          * Set the socket option value, given as a byte array.
@@ -1759,7 +1884,7 @@ public class ZMQ {
          * @param option ID of the option to set.
          * @param optval value (as a byte array) to set the option to.
          */
-        protected native void setBytesSockopt(int option, byte[] optval);
+        public native void setBytesSockopt(int option, byte[] optval);
 
         /**
          * Get the underlying socket handle. This is private because it is only accessed from JNI, where Java access
@@ -1812,6 +1937,10 @@ public class ZMQ {
         private static final int PLAIN_SERVER = 44;
         private static final int PLAIN_USERNAME = 45;
         private static final int PLAIN_PASSWORD = 46;
+	private static final int CURVE_SERVER = 47;
+	private static final int CURVE_PUBLIC_KEY = 48;
+	private static final int CURVE_SECRET_KEY = 49;
+	private static final int CURVE_SERVER_KEY = 50;
         private static final int PROBE_ROUTER = 51;
         private static final int REQ_CORRELATE = 52;
         private static final int REQ_RELAXED = 53;
