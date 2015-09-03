@@ -136,7 +136,9 @@ public class ZFrame
         System.arraycopy(this.data, 0, copy, 0, length);
         ZFrame frame = new ZFrame();
         frame.data = copy;
-        frame.buffer = this.buffer.duplicate();
+        if (this.buffer != null) {
+            frame.buffer = this.buffer.duplicate();
+        }
         frame.more = this.more;
         return frame;
     }
