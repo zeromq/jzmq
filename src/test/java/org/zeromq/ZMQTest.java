@@ -1,20 +1,23 @@
 package org.zeromq;
 
+import org.junit.Test;
+import org.zeromq.ZMQ.Context;
+import org.zeromq.ZMQ.Event;
+import org.zeromq.ZMQ.Poller;
+import org.zeromq.ZMQ.Socket;
+
+import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
-import org.zeromq.ZMQ.Context;
-import org.zeromq.ZMQ.Event;
-import org.zeromq.ZMQ.Poller;
-import org.zeromq.ZMQ.Socket;
 
 /**
  * @author Cliff Evans
@@ -864,6 +867,81 @@ public class ZMQTest {
         
         socket.close();
         monitor.close();
+        context.term();
+    }
+
+    @Test
+    public void testCurveZ85Keys() {
+        if (ZMQ.getFullVersion() < ZMQ.makeVersion(4, 0, 0))
+            return;
+
+        final Charset utf8 = Charset.forName("UTF-8");
+        final String endpoint = "tcp://127.0.0.1:5000";
+        final byte[] req_pk = "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID".getBytes(utf8);
+        final byte[] req_sk = "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs".getBytes(utf8);
+        final byte[] rep_pk = "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7".getBytes(utf8);
+        final byte[] rep_sk = "JTKVSB%%)wK0E.X)V>+}o?pNmC{O&4W4b!Ni{Lh6".getBytes(utf8);
+
+        ZMQ.Context context = ZMQ.context(1);
+
+        ZMQ.Socket rep = context.socket(ZMQ.REP);
+        rep.setCurveServer(true);
+        rep.setCurveSecretKey(rep_sk);
+        rep.bind(endpoint);
+
+        ZMQ.Socket req = context.socket(ZMQ.REQ);
+        req.setCurvePublicKey(req_pk);
+        req.setCurveSecretKey(req_sk);
+        req.setCurveServerKey(rep_pk);
+        req.connect(endpoint);
+
+        final String sent = "Hello World";
+        req.send(sent);
+        final String received = rep.recvStr(utf8);
+        assertEquals(sent, received);
+
+        req.close();
+        rep.close();
+        context.term();
+    }
+
+    @Test
+    public void testCurveBinaryKeys() {
+        if (ZMQ.getFullVersion() < ZMQ.makeVersion(4, 0, 0))
+            return;
+
+        final Charset utf8 = Charset.forName("UTF-8");
+        final String endpoint = "tcp://127.0.0.1:5000";
+
+        final byte[] req_pk = DatatypeConverter.parseHexBinary(
+                "BB88471D65E2659B30C55A5321CEBB5AAB2B70A398645C26DCA2B2FCB43FC518");
+        final byte[] req_sk = DatatypeConverter.parseHexBinary(
+                "7BB864B489AFA3671FBE69101F94B38972F24816DFB01B51656B3FEC8DFD0888");
+        final byte[] rep_pk = DatatypeConverter.parseHexBinary(
+                "54FCBA24E93249969316FB617C872BB0C1D1FF14800427C594CBFACF1BC2D652");
+        final byte[] rep_sk = DatatypeConverter.parseHexBinary(
+                "8E0BDD697628B91D8F245587EE95C5B04D48963F79259877B49CD9063AEAD3B7");
+
+        ZMQ.Context context = ZMQ.context(1);
+
+        ZMQ.Socket rep = context.socket(ZMQ.REP);
+        rep.setCurveServer(true);
+        rep.setCurveSecretKey(rep_sk);
+        rep.bind(endpoint);
+
+        ZMQ.Socket req = context.socket(ZMQ.REQ);
+        req.setCurvePublicKey(req_pk);
+        req.setCurveSecretKey(req_sk);
+        req.setCurveServerKey(rep_pk);
+        req.connect(endpoint);
+
+        final String sent = "Hello World";
+        req.send(sent);
+        final String received = rep.recvStr(utf8);
+        assertEquals(sent, received);
+
+        req.close();
+        rep.close();
         context.term();
     }
 }
