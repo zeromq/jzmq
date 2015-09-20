@@ -2383,4 +2383,52 @@ public class ZMQ {
             return Event.recv(socket, 0);
         }
     }
+
+    /**
+     * Class that interfaces the generation of CURVE key pairs
+     */
+    public static class Curve {
+        /**
+         * A container for a public and a corresponding secret key
+         */
+        public static class KeyPair {
+            public final String publicKey;
+            public final String secretKey;
+
+            public KeyPair(final String publicKey, final String secretKey) {
+                this.publicKey = publicKey;
+                this.secretKey = secretKey;
+            }
+        }
+
+        /**
+         * Returns a newly generated random keypair consisting of a public key
+         * and a secret key.
+         *
+         * <p>The keys are encoded using {@link #z85Encode}.</p>
+         *
+         * @return Randomly generated {@link KeyPair}
+         */
+        public native static KeyPair generateKeyPair();
+
+        /**
+         * The function shall decode given key encoded as Z85 string into byte array.
+         *
+         * <p>The decoding shall follow the ZMQ RFC 32 specification.</p>
+         *
+         * @param key Key to be decoded
+         * @return The resulting key as byte array
+         */
+        public native static byte[] z85Decode(String key);
+
+        /**
+         * The function shall encode the binary block specified into a string.
+         *
+         * <p>The encoding shall follow the ZMQ RFC 32 specification.</p>
+         *
+         * @param key Key to be encoded
+         * @return The resulting key as String in Z85
+         */
+        public native static String z85Encode(byte[] key);
+    }
 }
