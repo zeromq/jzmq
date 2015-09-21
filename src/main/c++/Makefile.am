@@ -26,7 +26,8 @@ JZMQ_CPP_FILES = \
 	Socket.cpp \
 	Poller.cpp \
 	Event.cpp \
-	util.cpp
+	util.cpp \
+	Curve.cpp
 
 JZMQ_H_FILES = \
 	org_zeromq_ZMQ.h \
@@ -35,7 +36,9 @@ JZMQ_H_FILES = \
 	org_zeromq_ZMQ_Event.h \
 	org_zeromq_ZMQ_PollItem.h \
 	org_zeromq_ZMQ_Poller.h \
-	org_zeromq_ZMQ_Socket.h
+	org_zeromq_ZMQ_Socket.h \
+	org_zeromq_ZMQ_Curve.h \
+	org_zeromq_ZMQ_Curve_KeyPair.h
 
 JZMQ_HPP_FILES = \
 	util.hpp

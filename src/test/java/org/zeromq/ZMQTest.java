@@ -1,5 +1,6 @@
 package org.zeromq;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Event;
@@ -877,10 +878,14 @@ public class ZMQTest {
 
         final Charset utf8 = Charset.forName("UTF-8");
         final String endpoint = "tcp://127.0.0.1:5000";
-        final byte[] req_pk = "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID".getBytes(utf8);
-        final byte[] req_sk = "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs".getBytes(utf8);
-        final byte[] rep_pk = "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7".getBytes(utf8);
-        final byte[] rep_sk = "JTKVSB%%)wK0E.X)V>+}o?pNmC{O&4W4b!Ni{Lh6".getBytes(utf8);
+
+        final ZMQ.Curve.KeyPair req_key = ZMQ.Curve.generateKeyPair();
+        final ZMQ.Curve.KeyPair rep_key = ZMQ.Curve.generateKeyPair();
+
+        final byte[] req_pk = req_key.publicKey.getBytes(utf8);
+        final byte[] req_sk = req_key.secretKey.getBytes(utf8);
+        final byte[] rep_pk = rep_key.publicKey.getBytes(utf8);
+        final byte[] rep_sk = rep_key.secretKey.getBytes(utf8);
 
         ZMQ.Context context = ZMQ.context(1);
 
@@ -943,5 +948,30 @@ public class ZMQTest {
         req.close();
         rep.close();
         context.term();
+    }
+
+    @Test
+    public void testKeyEncode() {
+        final String expected = "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID";
+        final String actual = ZMQ.Curve.z85Encode(DatatypeConverter.parseHexBinary(
+                "BB88471D65E2659B30C55A5321CEBB5AAB2B70A398645C26DCA2B2FCB43FC518"));
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testKeyDecode() {
+        final byte[] expected = DatatypeConverter.parseHexBinary(
+                "BB88471D65E2659B30C55A5321CEBB5AAB2B70A398645C26DCA2B2FCB43FC518");
+        final byte[] actual = ZMQ.Curve.z85Decode("Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
+        Assert.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testKeyEncodeDecode() {
+        for (int i = 0; i < 100; i++) {
+            final ZMQ.Curve.KeyPair pair = ZMQ.Curve.generateKeyPair();
+            Assert.assertEquals(pair.publicKey, ZMQ.Curve.z85Encode(ZMQ.Curve.z85Decode(pair.publicKey)));
+            Assert.assertEquals(pair.secretKey, ZMQ.Curve.z85Encode(ZMQ.Curve.z85Decode(pair.secretKey)));
+        }
     }
 }
