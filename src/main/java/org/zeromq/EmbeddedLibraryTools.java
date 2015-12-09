@@ -146,9 +146,7 @@ public class EmbeddedLibraryTools {
 
                 System.load(libfile.getAbsolutePath());
 
-                if (!libfile.delete()) {
-                    throw new IllegalStateException("unable to delete " + libfile);
-                }
+                libfile.delete();
 
                 usingEmbedded = true;
 
