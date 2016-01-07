@@ -200,6 +200,8 @@ jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
     <ClCompile Include="..\..\..\src\main\c++\Socket.cpp" />
     <ClCompile Include="..\..\..\src\main\c++\util.cpp" />
     <ClCompile Include="..\..\..\src\main\c++\ZMQ.cpp" />
+    <ClCompile Include="..\..\..\src\main\c++\Curve.cpp" />
+    <ClCompile Include="..\..\..\src\main\c++\Event.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQ.java">
