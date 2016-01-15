@@ -738,6 +738,17 @@ public class ZMQ {
         }
 
         /**
+         * Returns the endpoint address represented by the last bind operation. This is useful for
+         * determining the port that was assigned by the operating system in instances where the bind
+         * address contains wildcards, such as tcp://*:*.
+         *
+         * @return the last endpoint.
+         */
+        public byte[] getLastEndpoint() {
+            return getBytesSockopt(LAST_ENDPOINT);
+        }
+
+        /**
          * @see #setRate(long)
          * 
          * @return the Rate.
@@ -1865,6 +1876,7 @@ public class ZMQ {
         private static final int RCVTIMEO = 27;
         private static final int SNDTIMEO = 28;
         private static final int IPV4ONLY = 31;
+        private static final int LAST_ENDPOINT = 32;
         private static final int ROUTER_MANDATORY = 33;
         private static final int KEEPALIVE = 34;
         private static final int KEEPALIVECNT = 35;
