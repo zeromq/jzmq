@@ -243,6 +243,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_zeromq_ZMQ_00024Socket_getBytesSockopt (JN
 {
     switch (option) {
     case ZMQ_IDENTITY:
+    case ZMQ_LAST_ENDPOINT:
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,0,0)
     case ZMQ_PLAIN_USERNAME:
     case ZMQ_PLAIN_PASSWORD:
