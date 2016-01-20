@@ -745,7 +745,11 @@ public class ZMQ {
          * @return the last endpoint.
          */
         public byte[] getLastEndpoint() {
-            return getBytesSockopt(LAST_ENDPOINT);
+            if (ZMQ.version_full() >= ZMQ.make_version(3, 2, 0)) {
+                return getBytesSockopt(LAST_ENDPOINT);
+            } else {
+                return null;
+            }
         }
 
         /**
