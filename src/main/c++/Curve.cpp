@@ -18,6 +18,7 @@
 */
 
 #include <zmq.h>
+#include <zmq_utils.h>
 #include <assert.h>
 #include "jzmq.hpp"
 #include "util.hpp"
@@ -67,7 +68,7 @@ Java_org_zeromq_ZMQ_00024Curve_z85Decode(JNIEnv *env, jclass cls, jstring key)
 
     uint8_t out_key [32];
 
-    if (NULL == zmq_z85_decode (out_key, in_key)) {
+    if (NULL == zmq_z85_decode (out_key, (char *)in_key)) {
         env->ReleaseStringUTFChars (key, in_key);
         return NULL;
     }
