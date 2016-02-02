@@ -55,8 +55,8 @@
     <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
     <junit.version>4.11</junit.version>
     <native.arch>${os.arch}</native.arch>
-    <native.distro />
-    <native.zmq.version />
+    <native.distro/>
+    <native.zmq.version/>
     <native.path.resolved>${native.path}</native.path.resolved>
     <native.library-path.resolved>${native.library-path}</native.library-path.resolved>
   </properties>
@@ -64,52 +64,52 @@
     <profile>
       <id>Linux</id>
       <activation>
-	<property>
-	  <name>os.name</name>
-	  <value>Linux</value>
-	</property>
+        <property>
+          <name>os.name</name>
+          <value>Linux</value>
+        </property>
       </activation>
       <properties>
-	<native.os>${os.name}</native.os>
-	<native.path>src/main/c++/.libs/libjzmq.so</native.path>
-	<!-- Use platform-specific path separators here: -->
-	<native.library-path>src/main/c++/.libs/</native.library-path>
+        <native.os>${os.name}</native.os>
+        <native.path>src/main/c++/.libs/libjzmq.so</native.path>
+        <!-- Use platform-specific path separators here: -->
+        <native.library-path>src/main/c++/.libs/</native.library-path>
       </properties>
     </profile>
     <profile>
       <id>Windows</id>
       <activation>
-	<os>
-	  <family>windows</family>
-	</os>
+        <os>
+          <family>windows</family>
+        </os>
       </activation>
       <properties>
-	<native.os>Windows</native.os>
-	<native.path>lib/jzmq.dll</native.path>
-	<!-- Use platform-specific path separators here: -->
-	<native.library-path>lib</native.library-path>
+        <native.os>Windows</native.os>
+        <native.path>lib/jzmq.dll</native.path>
+        <!-- Use platform-specific path separators here: -->
+        <native.library-path>lib</native.library-path>
       </properties>
     </profile>
     <profile>
       <id>Mac</id>
       <activation>
-	<os>
-	  <family>mac</family>
-	</os>
+        <os>
+          <family>mac</family>
+        </os>
       </activation>
       <properties>
-	<native.os>${os.name}</native.os>
-	<native.path>src/main/c++/.libs/libjzmq.dylib</native.path>
-	<!-- Use platform-specific path separators here: -->
-	<native.library-path>src/main/c++/.libs/</native.library-path>
+        <native.os>${os.name}</native.os>
+        <native.path>src/main/c++/.libs/libjzmq.dylib</native.path>
+        <!-- Use platform-specific path separators here: -->
+        <native.library-path>src/main/c++/.libs/</native.library-path>
       </properties>
     </profile>
     <profile>
       <id>os-distro</id>
       <activation>
-	<property>
-	  <name>os.distro</name>
-	</property>
+        <property>
+          <name>os.distro</name>
+        </property>
       </activation>
       <properties>
         <native.distro>-${os.distro}</native.distro>
@@ -118,9 +118,9 @@
     <profile>
       <id>zmq-version</id>
       <activation>
-	<property>
-	  <name>zmq.version</name>
-	</property>
+        <property>
+          <name>zmq.version</name>
+        </property>
       </activation>
       <properties>
         <native.zmq.version>-${zmq.version}</native.zmq.version>
@@ -129,8 +129,8 @@
     <profile>
       <id>release</id>
       <properties>
-	<native.path.resolved>..${file.separator}..${file.separator}${native.path}</native.path.resolved>
-	<native.library-path.resolved>..${file.separator}..${file.separator}${native.library-path}</native.library-path.resolved>
+        <native.path.resolved>..${file.separator}..${file.separator}${native.path}</native.path.resolved>
+        <native.library-path.resolved>..${file.separator}..${file.separator}${native.library-path}</native.library-path.resolved>
       </properties>
     </profile>
     <profile>
@@ -172,136 +172,136 @@
         </executions>
       </plugin>
       <plugin>
-	<artifactId>maven-assembly-plugin</artifactId>
-	<version>${maven-assembly-plugin.version}</version>
-	<configuration>
-	  <descriptors>
-	    <!-- Assembly contents are defined in this file -->
-	    <descriptor>nativejar.xml</descriptor>
-	  </descriptors>
-	</configuration>
-	<executions>
-	  <execution>
-	    <id>make-assembly</id>
-	    <phase>package</phase>
-	    <goals>
-	      <goal>single</goal>
-	    </goals>
-	  </execution>
-	</executions>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven-assembly-plugin.version}</version>
+        <configuration>
+          <descriptors>
+            <!-- Assembly contents are defined in this file -->
+            <descriptor>nativejar.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
-	<groupId>org.codehaus.mojo</groupId>
-	<artifactId>buildnumber-maven-plugin</artifactId>
-	<version>${maven-buildnumber-plugin.version}</version>
-	<executions>
-	  <execution>
-	    <phase>validate</phase>
-	    <goals>
-	      <goal>create</goal>
-	    </goals>
-	  </execution>
-	</executions>
-	<configuration>
-	  <doCheck>false</doCheck>
-	  <doUpdate>false</doUpdate>
-	  <timestampPropertyName>buildTimestamp</timestampPropertyName>
-	  <timestampFormat>{0,date,yyyy-MM-dd HH:mm Z}</timestampFormat>
-	</configuration>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>${maven-buildnumber-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doCheck>false</doCheck>
+          <doUpdate>false</doUpdate>
+          <timestampPropertyName>buildTimestamp</timestampPropertyName>
+          <timestampFormat>{0,date,yyyy-MM-dd HH:mm Z}</timestampFormat>
+        </configuration>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-release-plugin</artifactId>
-	<version>${maven-release-plugin.version}</version>
-	<configuration>
-	  <localCheckout>true</localCheckout>
-	  <pushChanges>false</pushChanges>
-	  <releaseProfiles>release</releaseProfiles>
-	  <tagNameFormat>v@{project.version}</tagNameFormat>
-	</configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>${maven-release-plugin.version}</version>
+        <configuration>
+          <localCheckout>true</localCheckout>
+          <pushChanges>false</pushChanges>
+          <releaseProfiles>release</releaseProfiles>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+        </configuration>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-scm-plugin</artifactId>
-	<version>${maven-scm-plugin.version}</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <version>${maven-scm-plugin.version}</version>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-jar-plugin</artifactId>
-	<version>${maven-jar-plugin.version}</version>
-	<inherited>true</inherited>
-	<configuration>
-	  <archive>
-	    <manifest>
-	      <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-	    </manifest>
-	    <manifestEntries>
-	      <Implementation-Version>${buildNumber} ${buildTimestamp}</Implementation-Version>
-	    </manifestEntries>
-	  </archive>
-	</configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven-jar-plugin.version}</version>
+        <inherited>true</inherited>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Version>${buildNumber} ${buildTimestamp}</Implementation-Version>
+            </manifestEntries>
+          </archive>
+        </configuration>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-surefire-plugin</artifactId>
-    <version>2.16</version>
-	<configuration>
-	  <forkMode>once</forkMode>
-	  <argLine>-Djava.library.path=${native.library-path.resolved}</argLine>
-	</configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.16</version>
+        <configuration>
+          <forkMode>once</forkMode>
+          <argLine>-Djava.library.path=${native.library-path.resolved}</argLine>
+        </configuration>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-shade-plugin</artifactId>
-	<version>${maven-shade-plugin.version}</version>
-	<executions>
-	  <execution>
-	    <phase>package</phase>
-	    <goals>
-	      <goal>shade</goal>
-	    </goals>
-	    <configuration>
-	      <transformers>
-		<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-		  <manifestEntries>
-		    <Main-Class>org.zeromq.App</Main-Class>
-		  </manifestEntries>
-		</transformer>
-	      </transformers>
-	    </configuration>
-	  </execution>
-	</executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${maven-shade-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <manifestEntries>
+                    <Main-Class>org.zeromq.App</Main-Class>
+                  </manifestEntries>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-deploy-plugin</artifactId>
-	<version>${maven-deploy-plugin.version}</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>${maven-deploy-plugin.version}</version>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-source-plugin</artifactId>
-	<version>${maven-source-plugin.version}</version>
-	<executions>
-	  <execution>
-	    <id>attach-sources</id>
-	    <goals>
-	      <goal>jar</goal>
-	    </goals>
-	  </execution>
-	</executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${maven-source-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-javadoc-plugin</artifactId>
-	<version>${maven-javadoc-plugin.version}</version>
-	<executions>
-	  <execution>
-	    <id>attach-javadoc</id>
-	    <goals>
-	      <goal>jar</goal>
-	    </goals>
-	  </execution>
-	</executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${maven-javadoc-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>attach-javadoc</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
