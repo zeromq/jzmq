@@ -7,10 +7,9 @@
     <version>7</version>
   </parent>
   <groupId>org.zeromq</groupId>
-  <artifactId>jzmq</artifactId>
+  <artifactId>jzmq-parent</artifactId>
   <version>3.1.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>jzmq</name>
+  <packaging>pom</packaging>
   <description>
     The 0MQ lightweight messaging kernel is a library which extends
     the standard socket interfaces with features traditionally
@@ -40,99 +39,17 @@
       <name>The ØMQ project</name>
     </developer>
   </developers>
+  <modules>
+    <module>jzmq</module>
+    <module>jzmq-core</module>
+    <module>jzmq-jni</module>
+  </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
-    <maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
-    <maven-buildnumber-plugin.version>1.0</maven-buildnumber-plugin.version>
-    <maven-deploy-plugin.version>2.6</maven-deploy-plugin.version>
-    <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
-    <maven-javadoc-plugin.version>2.7</maven-javadoc-plugin.version>
-    <maven-release-plugin.version>2.5</maven-release-plugin.version>
-    <maven-scm-plugin.version>1.7</maven-scm-plugin.version>
-    <maven-shade-plugin.version>1.4</maven-shade-plugin.version>
-    <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
-    <junit.version>4.11</junit.version>
-    <native.arch>${os.arch}</native.arch>
-    <native.distro/>
-    <native.zmq.version/>
-    <native.path.resolved>${native.path}</native.path.resolved>
-    <native.library-path.resolved>${native.library-path}</native.library-path.resolved>
   </properties>
   <profiles>
-    <profile>
-      <id>Linux</id>
-      <activation>
-        <property>
-          <name>os.name</name>
-          <value>Linux</value>
-        </property>
-      </activation>
-      <properties>
-        <native.os>${os.name}</native.os>
-        <native.path>src/main/c++/.libs/libjzmq.so</native.path>
-        <!-- Use platform-specific path separators here: -->
-        <native.library-path>src/main/c++/.libs/</native.library-path>
-      </properties>
-    </profile>
-    <profile>
-      <id>Windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <properties>
-        <native.os>Windows</native.os>
-        <native.path>lib/jzmq.dll</native.path>
-        <!-- Use platform-specific path separators here: -->
-        <native.library-path>lib</native.library-path>
-      </properties>
-    </profile>
-    <profile>
-      <id>Mac</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <properties>
-        <native.os>${os.name}</native.os>
-        <native.path>src/main/c++/.libs/libjzmq.dylib</native.path>
-        <!-- Use platform-specific path separators here: -->
-        <native.library-path>src/main/c++/.libs/</native.library-path>
-      </properties>
-    </profile>
-    <profile>
-      <id>os-distro</id>
-      <activation>
-        <property>
-          <name>os.distro</name>
-        </property>
-      </activation>
-      <properties>
-        <native.distro>-${os.distro}</native.distro>
-      </properties>
-    </profile>
-    <profile>
-      <id>zmq-version</id>
-      <activation>
-        <property>
-          <name>zmq.version</name>
-        </property>
-      </activation>
-      <properties>
-        <native.zmq.version>-${zmq.version}</native.zmq.version>
-      </properties>
-    </profile>
-    <profile>
-      <id>release</id>
-      <properties>
-        <native.path.resolved>..${file.separator}..${file.separator}${native.path}</native.path.resolved>
-        <native.library-path.resolved>..${file.separator}..${file.separator}${native.library-path}</native.library-path.resolved>
-      </properties>
-    </profile>
     <profile>
       <id>deploy-local-maven</id>
       <distributionManagement>
@@ -151,158 +68,68 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
+      <version>4.11</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>${maven-assembly-plugin.version}</version>
-        <configuration>
-          <descriptors>
-            <!-- Assembly contents are defined in this file -->
-            <descriptor>nativejar.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>${maven-buildnumber-plugin.version}</version>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>create</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <doCheck>false</doCheck>
-          <doUpdate>false</doUpdate>
-          <timestampPropertyName>buildTimestamp</timestampPropertyName>
-          <timestampFormat>{0,date,yyyy-MM-dd HH:mm Z}</timestampFormat>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>${maven-release-plugin.version}</version>
-        <configuration>
-          <localCheckout>true</localCheckout>
-          <pushChanges>false</pushChanges>
-          <releaseProfiles>release</releaseProfiles>
-          <tagNameFormat>v@{project.version}</tagNameFormat>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-plugin</artifactId>
-        <version>${maven-scm-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>${maven-jar-plugin.version}</version>
-        <inherited>true</inherited>
-        <configuration>
-          <archive>
-            <manifest>
-              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-            </manifest>
-            <manifestEntries>
-              <Implementation-Version>${buildNumber} ${buildTimestamp}</Implementation-Version>
-            </manifestEntries>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.16</version>
-        <configuration>
-          <forkMode>once</forkMode>
-          <argLine>-Djava.library.path=${native.library-path.resolved}</argLine>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>${maven-shade-plugin.version}</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>org.zeromq.App</Main-Class>
-                  </manifestEntries>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <version>${maven-deploy-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>${maven-source-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${maven-javadoc-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>attach-javadoc</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.4</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>1.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-scm-plugin</artifactId>
+          <version>1.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.3.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.16</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>1.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.6</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>
