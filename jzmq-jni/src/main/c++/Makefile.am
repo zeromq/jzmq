@@ -7,10 +7,7 @@ javah_stamp = javah_stamp
 JZMQ_JAVA_FILES = \
 	../java/org/zeromq/EmbeddedLibraryTools.java \
 	../java/org/zeromq/ZMQ.java \
-	../java/org/zeromq/ZMQException.java \
-	../java/org/zeromq/ZMQForwarder.java \
-	../java/org/zeromq/ZMQQueue.java \
-	../java/org/zeromq/ZMQStreamer.java
+	../java/org/zeromq/ZMQException.java
 
 JZMQ_CPP_FILES = \
 	ZMQ.cpp \
