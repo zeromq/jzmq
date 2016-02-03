@@ -16,10 +16,12 @@ before_install:
  - sudo make install
  - sudo ldconfig
  - cd ..
+ - cd jzmq-jni
  - ./autogen.sh
  - ./configure
  - make
  - sudo make install
+ - cd ..
 install: mvn install --quiet -DskipTests=true -Dgpg.skip=true
 language: java
 
