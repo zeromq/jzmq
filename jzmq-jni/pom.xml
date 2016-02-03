@@ -13,57 +13,11 @@
   <packaging>jar</packaging>
 
   <properties>
-    <native.arch>${os.arch}</native.arch>
     <native.distro/>
     <native.zmq.version/>
-    <native.path.resolved>${native.path}</native.path.resolved>
-    <native.library-path.resolved>${native.library-path}</native.library-path.resolved>
   </properties>
 
   <profiles>
-    <profile>
-      <id>Linux</id>
-      <activation>
-        <property>
-          <name>os.name</name>
-          <value>Linux</value>
-        </property>
-      </activation>
-      <properties>
-        <native.os>${os.name}</native.os>
-        <native.path>src/main/c++/.libs/libjzmq.so</native.path>
-        <!-- Use platform-specific path separators here: -->
-        <native.library-path>src/main/c++/.libs/</native.library-path>
-      </properties>
-    </profile>
-    <profile>
-      <id>Windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <properties>
-        <native.os>Windows</native.os>
-        <native.path>lib/jzmq.dll</native.path>
-        <!-- Use platform-specific path separators here: -->
-        <native.library-path>lib</native.library-path>
-      </properties>
-    </profile>
-    <profile>
-      <id>Mac</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <properties>
-        <native.os>${os.name}</native.os>
-        <native.path>src/main/c++/.libs/libjzmq.dylib</native.path>
-        <!-- Use platform-specific path separators here: -->
-        <native.library-path>src/main/c++/.libs/</native.library-path>
-      </properties>
-    </profile>
     <profile>
       <id>os-distro</id>
       <activation>
@@ -173,14 +127,6 @@
               <Implementation-Version>${buildNumber} ${buildTimestamp}</Implementation-Version>
             </manifestEntries>
           </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <forkMode>once</forkMode>
-          <argLine>-Djava.library.path=${native.library-path.resolved}</argLine>
         </configuration>
       </plugin>
       <plugin>

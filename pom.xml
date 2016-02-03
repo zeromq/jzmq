@@ -42,14 +42,58 @@
   <modules>
     <module>jzmq</module>
     <module>jzmq-core</module>
+    <module>jzmq-devices</module>
     <module>jzmq-jni</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
+    <native.arch>${os.arch}</native.arch>
+    <native.path.resolved>${native.path}</native.path.resolved>
+    <native.library-path.resolved>${native.library-path}</native.library-path.resolved>
   </properties>
   <profiles>
+    <profile>
+      <id>JNI-Config-For-Linux</id>
+      <activation>
+        <property>
+          <name>os.name</name>
+          <value>Linux</value>
+        </property>
+      </activation>
+      <properties>
+        <native.os>${os.name}</native.os>
+        <native.path>${session.executionRootDirectory}/jzmq-jni/src/main/c++/.libs/libjzmq.so</native.path>
+        <native.library-path>${session.executionRootDirectory}/jzmq-jni/src/main/c++/.libs/</native.library-path>
+      </properties>
+    </profile>
+    <profile>
+      <id>JNI-Config-For-Windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <native.os>Windows</native.os>
+        <native.path>${session.executionRootDirectory}/jzmq-jni/lib/jzmq.dll</native.path>
+        <native.library-path>${session.executionRootDirectory}/jzmq-jni/lib</native.library-path>
+      </properties>
+    </profile>
+    <profile>
+      <id>JNI-Config-For-Mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <native.os>${os.name}</native.os>
+        <native.path>${session.executionRootDirectory}/jzmq-jni/src/main/c++/.libs/libjzmq.dylib</native.path>
+        <native.library-path>${session.executionRootDirectory}/jzmq-jni/src/main/c++/.libs/</native.library-path>
+      </properties>
+    </profile>
     <profile>
       <id>deploy-local-maven</id>
       <distributionManagement>
@@ -108,6 +152,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.16</version>
+          <configuration>
+            <forkCount>1</forkCount>
+            <reuseForks>true</reuseForks>
+            <argLine>-Djava.library.path=${native.library-path.resolved}</argLine>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

@@ -9,17 +9,13 @@
   </parent>
 
   <groupId>org.zeromq</groupId>
-  <artifactId>jzmq</artifactId>
+  <artifactId>jzmq-devices</artifactId>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
       <groupId>org.zeromq</groupId>
-      <artifactId>jzmq-core</artifactId>
-      <version>3.1.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.zeromq</groupId>
-      <artifactId>jzmq-devices</artifactId>
+      <artifactId>jzmq-jni</artifactId>
       <version>3.1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
