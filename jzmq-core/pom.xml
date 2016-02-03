@@ -11,4 +11,12 @@
   <groupId>org.zeromq</groupId>
   <artifactId>jzmq-core</artifactId>
   <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.zeromq</groupId>
+      <artifactId>jzmq-jni</artifactId>
+      <version>3.1.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 </project>
