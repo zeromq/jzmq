@@ -64,8 +64,8 @@
       </activation>
       <properties>
         <native.os>${os.name}</native.os>
-        <native.path>${session.executionRootDirectory}/jzmq-jni/src/main/c++/.libs/libjzmq.so</native.path>
-        <native.library-path>${session.executionRootDirectory}/jzmq-jni/src/main/c++/.libs/</native.library-path>
+        <native.path>${root.directory}/jzmq-jni/src/main/c++/.libs/libjzmq.so</native.path>
+        <native.library-path>${root.directory}/jzmq-jni/src/main/c++/.libs/</native.library-path>
       </properties>
     </profile>
     <profile>
@@ -77,8 +77,8 @@
       </activation>
       <properties>
         <native.os>Windows</native.os>
-        <native.path>${session.executionRootDirectory}/jzmq-jni/lib/jzmq.dll</native.path>
-        <native.library-path>${session.executionRootDirectory}/jzmq-jni/lib</native.library-path>
+        <native.path>${root.directory}/jzmq-jni/lib/jzmq.dll</native.path>
+        <native.library-path>${root.directory}/jzmq-jni/lib</native.library-path>
       </properties>
     </profile>
     <profile>
@@ -90,8 +90,8 @@
       </activation>
       <properties>
         <native.os>${os.name}</native.os>
-        <native.path>${session.executionRootDirectory}/jzmq-jni/src/main/c++/.libs/libjzmq.dylib</native.path>
-        <native.library-path>${session.executionRootDirectory}/jzmq-jni/src/main/c++/.libs/</native.library-path>
+        <native.path>${root.directory}/jzmq-jni/src/main/c++/.libs/libjzmq.dylib</native.path>
+        <native.library-path>${root.directory}/jzmq-jni/src/main/c++/.libs/</native.library-path>
       </properties>
     </profile>
     <profile>
@@ -119,6 +119,23 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.commonjava.maven.plugins</groupId>
+          <artifactId>directory-maven-plugin</artifactId>
+          <version>0.1</version>
+          <executions>
+            <execution>
+              <id>directories</id>
+              <goals>
+                <goal>highest-basedir</goal>
+              </goals>
+              <phase>initialize</phase>
+              <configuration>
+                <property>root.directory</property>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
