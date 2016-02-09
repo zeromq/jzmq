@@ -13,10 +13,13 @@ Building and Installing JZMQ
 To build you need to have the libzmq library already installed, then you run:
 
 ```bash
+cd jzmq-jni/
 ./autogen.sh
 ./configure
 make
 make install
+cd ..
+mvn package
 ```
 
 Avoiding JNI
