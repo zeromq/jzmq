@@ -1,3 +1,8 @@
+addons:
+# hostname monkeying needed for openjdk, see travis-ci/travis-ci#5227 for details
+  hosts:
+    - myshorthost
+  hostname: myshorthost
 before_install:
  - sudo add-apt-repository ppa:trevorbernard/zeromq -y
  - sudo apt-get update -y
@@ -30,3 +35,4 @@ script: mvn test
 jdk:
  - openjdk6
  - openjdk7
+ - oraclejdk8
