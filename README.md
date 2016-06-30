@@ -22,6 +22,12 @@ cd ..
 mvn package
 ```
 
+If you hope to install to your local maven, then you should run:
+
+```
+mvn install -Dgpg.skip=true
+```
+
 Avoiding JNI
 ------------
 
