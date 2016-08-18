@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Arrays;
 
 /**
  * ZeroMQ JNI Bindings.
@@ -1569,6 +1570,25 @@ public class ZMQ {
                 }
             }
             throw new ZMQException("Could not bind socket to random port.", (int) ZMQ.EADDRINUSE());
+        }
+
+        /**
+         * Bind to network interface to a random port. Start listenting for new connections.
+         * The main difference from bindToRandomPort is that it allows system to pick up the right port.
+         * For this reason return type is a string and its responsibility of a caller to parse into
+         * the right integer type (e.g. for vmci transport it should be long).
+         *
+         * @param addr the endpoint to bind to.
+         */
+        public String bindToSystemRandomPort(String addr) {
+            if (ZMQ.version_full() < ZMQ.make_version(3, 2, 0))
+                throw new UnsupportedOperationException();
+
+            bind(String.format("%s:*", addr));
+            byte[] endpoint_bytes = getBytesSockopt(LAST_ENDPOINT); // NULL-terminated
+            String endpoint_str = new String(Arrays.copyOf(endpoint_bytes, endpoint_bytes.length - 1));
+            String port = endpoint_str.substring(endpoint_str.lastIndexOf(":") + 1);
+            return port;
         }
 
         /**
