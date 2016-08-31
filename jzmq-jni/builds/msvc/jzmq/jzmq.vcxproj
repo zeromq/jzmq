@@ -83,7 +83,7 @@
     <PreBuildEvent>
       <Message>Compiling Java classes</Message>
       <Command>
-javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\ZMQForwarder.java ..\..\..\src\main\java\org\zeromq\ZMQQueue.java ..\..\..\src\main\java\org\zeromq\Utils.java ..\..\..\src\main\java\org\zeromq\ZMQStreamer.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java ..\..\..\src\main\java\org\zeromq\ZContext.java ..\..\..\src\main\java\org\zeromq\ZDispatcher.java ..\..\..\src\main\java\org\zeromq\ZFrame.java ..\..\..\src\main\java\org\zeromq\ZMsg.java
+javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java
       </Command>
     </PreBuildEvent>
     <ClCompile>
@@ -111,7 +111,7 @@ jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
     <PreBuildEvent>
       <Message>Compiling Java classes</Message>
       <Command>
-javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\ZMQForwarder.java ..\..\..\src\main\java\org\zeromq\ZMQQueue.java ..\..\..\src\main\java\org\zeromq\Utils.java ..\..\..\src\main\java\org\zeromq\ZMQStreamer.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java ..\..\..\src\main\java\org\zeromq\ZContext.java ..\..\..\src\main\java\org\zeromq\ZDispatcher.java ..\..\..\src\main\java\org\zeromq\ZFrame.java ..\..\..\src\main\java\org\zeromq\ZMsg.java
+javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java 
       </Command>
     </PreBuildEvent>
     <ClCompile>
@@ -137,8 +137,8 @@ jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
     <PreBuildEvent>
       <Message>Compiling Java classes</Message>
       <Command>
-          copy ..\config.hpp ..\..\..\src\main\c++\
-          javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\ZMQForwarder.java ..\..\..\src\main\java\org\zeromq\ZMQQueue.java ..\..\..\src\main\java\org\zeromq\Utils.java ..\..\..\src\main\java\org\zeromq\ZMQStreamer.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java ..\..\..\src\main\java\org\zeromq\ZContext.java ..\..\..\src\main\java\org\zeromq\ZDispatcher.java ..\..\..\src\main\java\org\zeromq\ZFrame.java ..\..\..\src\main\java\org\zeromq\ZMsg.java
+          copy ..\config.hpp "..\..\..\src\main\c++\"
+          javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java
       </Command>
     </PreBuildEvent>
     <ClCompile>
@@ -168,8 +168,8 @@ jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
     <PreBuildEvent>
       <Message>Compiling Java classes</Message>
       <Command>
-          copy ..\config.hpp ..\..\..\src\main\c++\
-          javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\ZMQForwarder.java ..\..\..\src\main\java\org\zeromq\ZMQQueue.java ..\..\..\src\main\java\org\zeromq\Utils.java ..\..\..\src\main\java\org\zeromq\ZMQStreamer.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java ..\..\..\src\main\java\org\zeromq\ZContext.java ..\..\..\src\main\java\org\zeromq\ZDispatcher.java ..\..\..\src\main\java\org\zeromq\ZFrame.java ..\..\..\src\main\java\org\zeromq\ZMsg.java
+          copy ..\config.hpp "..\..\..\src\main\c++\"
+          javac ..\..\..\src\main\java\org\zeromq\ZMQ.java ..\..\..\src\main\java\org\zeromq\ZMQException.java ..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java ..\..\..\src\main\java\org\zeromq\App.java
       </Command>
     </PreBuildEvent>
     <ClCompile>
@@ -247,94 +247,6 @@ jar -cvf ..\..\..\lib\zmq.jar org\zeromq\*.class
       </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQException.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQException.h;%(Outputs)</Outputs>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQForwarder.java">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQForwarder
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQForwarder
-      </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQForwarder.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQForwarder.h;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQForwarder
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQForwarder
-      </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQForwarder.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQForwarder.h;%(Outputs)</Outputs>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQQueue.java">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQQueue
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQQueue
-      </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQQueue.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQQueue.h;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQQueue
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQQueue
-      </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQQueue.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQQueue.h;%(Outputs)</Outputs>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\Utils.java">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.Utils
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.Utils
-      </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_Utils.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_Utils.h;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.Utils
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.Utils
-      </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_Utils.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_Utils.h;%(Outputs)</Outputs>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\main\java\org\zeromq\ZMQStreamer.java">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating JNI header</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQStreamer
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQStreamer
-      </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating JNI header</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating JNI header</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQStreamer
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-          javah -jni -classpath ..\..\..\src\main\java -d ..\..\..\src\main\c++ org.zeromq.ZMQStreamer
-      </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">org_zeromq_ZMQSrteamer.h;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\main\java\org\zeromq\EmbeddedLibraryTools.java">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating JNI header</Message>
