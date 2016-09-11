@@ -69,6 +69,18 @@ public class ZMQTest {
         }
     }
 
+    /**
+     * Test method for {@link org.zeromq.ZMQ.Socket#bindToSystemRandomPort(String)}.
+     */
+    @Test
+    public void testBindToSystemRandomPort() {
+        ZMQ.Context context = ZMQ.context(1);
+        ZMQ.Socket sock = context.socket(ZMQ.DEALER);
+
+        sock.bindToSystemRandomPort("tcp://127.0.0.1");
+        sock.close();
+    }
+
     @Test
     public void testReqRep() {
         ZMQ.Context context = ZMQ.context(1);
@@ -633,7 +645,7 @@ public class ZMQTest {
         
         Socket helper = context.socket(ZMQ.REQ);
         int port = helper.bindToRandomPort("tcp://127.0.0.1");
-        
+
         Socket socket = context.socket(ZMQ.REP);
         Socket monitor = context.socket(ZMQ.PAIR);
         monitor.setReceiveTimeOut(100);
@@ -737,7 +749,7 @@ public class ZMQTest {
                 
         Socket helper = context.socket(ZMQ.REP);
         int port = helper.bindToRandomPort("tcp://127.0.0.1");
-        
+
         Socket socket = context.socket(ZMQ.REP);
         Socket monitor = context.socket(ZMQ.PAIR);
         monitor.setReceiveTimeOut(100);
@@ -773,7 +785,7 @@ public class ZMQTest {
         
         assertTrue(socket.monitor("inproc://monitor.socket", ZMQ.EVENT_ACCEPTED));
         monitor.connect("inproc://monitor.socket");
-        
+
         int port = socket.bindToRandomPort("tcp://127.0.0.1");
 
         helper.connect("tcp://127.0.0.1:" + port);
@@ -825,7 +837,7 @@ public class ZMQTest {
         Socket monitor = context.socket(ZMQ.PAIR);
         Socket helper = context.socket(ZMQ.REQ);
         monitor.setReceiveTimeOut(100);
-        
+
         int port = socket.bindToRandomPort("tcp://127.0.0.1");
         helper.connect("tcp://127.0.0.1:" + port);
         
