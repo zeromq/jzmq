@@ -1,11 +1,6 @@
 package org.zeromq;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +15,9 @@ public class EmbeddedLibraryTools {
 
     static {
         LOADED_EMBEDDED_LIBRARY = loadEmbeddedLibrary();
+    }
+
+    private EmbeddedLibraryTools() {
     }
 
     public static String getCurrentPlatformIdentifier() {
@@ -66,7 +64,7 @@ public class EmbeddedLibraryTools {
         } finally {
             try {
                 j.close();
-            } catch(Exception e) {
+            } catch (Exception e) {
             }
         }
 
@@ -112,54 +110,51 @@ public class EmbeddedLibraryTools {
 
         // attempt to locate embedded native library within JAR at following location:
         // /NATIVE/${os.arch}/${os.name}/libjzmq.[so|dylib|dll]
-        String[] allowedExtensions = new String[] { "so", "dylib", "dll" };
+        String[] allowedExtensions = new String[]{"so", "dylib", "dll"};
+        String[] libs;
+        final String libsFromProps = System.getProperty("jzmq.libs");
+        if (libsFromProps == null)
+            libs = new String[]{"libsodium", "libzmq", "libjzmq"};
+        else
+            libs = libsFromProps.split(",");
         StringBuilder url = new StringBuilder();
         url.append("/NATIVE/");
-        url.append(getCurrentPlatformIdentifier());
-        url.append("/libjzmq.");
-        URL nativeLibraryUrl = null;
-        // loop through extensions, stopping after finding first one
-        for (String ext : allowedExtensions) {
-            nativeLibraryUrl = ZMQ.class.getResource(url.toString() + ext);
-            if (nativeLibraryUrl != null)
-                break;
-        }
-
-        if (nativeLibraryUrl != null) {
-
-            // native library found within JAR, extract and load
-
-            try {
-
-                final File libfile = File.createTempFile("libjzmq-", ".lib");
-                libfile.deleteOnExit(); // just in case
-
-                final InputStream in = nativeLibraryUrl.openStream();
-                final OutputStream out = new BufferedOutputStream(new FileOutputStream(libfile));
-
-                int len = 0;
-                byte[] buffer = new byte[8192];
-                while ((len = in.read(buffer)) > -1)
-                    out.write(buffer, 0, len);
-                out.close();
-                in.close();
-
-                System.load(libfile.getAbsolutePath());
-
-                libfile.delete();
-
-                usingEmbedded = true;
-
-            } catch (IOException x) {
-                // mission failed, do nothing
+        url.append(getCurrentPlatformIdentifier()).append("/");
+        for (String lib : libs) {
+            URL nativeLibraryUrl = null;
+            // loop through extensions, stopping after finding first one
+            for (String ext : allowedExtensions) {
+                nativeLibraryUrl = ZMQ.class.getResource(url.toString() + lib + "." + ext);
+                if (nativeLibraryUrl != null)
+                    break;
             }
 
-        } // nativeLibraryUrl exists
+            if (nativeLibraryUrl != null) {
+                // native library found within JAR, extract and load
+                try {
 
+                    final File libfile = File.createTempFile(lib, ".lib");
+                    libfile.deleteOnExit(); // just in case
+
+                    final InputStream in = nativeLibraryUrl.openStream();
+                    final OutputStream out = new BufferedOutputStream(new FileOutputStream(libfile));
+
+                    int len = 0;
+                    byte[] buffer = new byte[8192];
+                    while ((len = in.read(buffer)) > -1)
+                        out.write(buffer, 0, len);
+                    out.close();
+                    in.close();
+                    System.load(libfile.getAbsolutePath());
+
+                    usingEmbedded = true;
+
+                } catch (IOException x) {
+                    // mission failed, do nothing
+                }
+
+            } // nativeLibraryUrl exists
+        }
         return usingEmbedded;
-
-    }
-
-    private EmbeddedLibraryTools() {
     }
 }
