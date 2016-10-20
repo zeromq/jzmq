@@ -114,6 +114,10 @@ public class ZMQ {
      * Flag to specify the receiving part of the PUB or XPUB socket. Allows
      */
     public static final int XSUB = 10;
+    /**
+     * Flag to specify the receiving part of the PUB or XPUB socket. Allows
+     */
+    public static final int STREAM = 11;
 
     /**
      * Flag to specify a STREAMER device.
