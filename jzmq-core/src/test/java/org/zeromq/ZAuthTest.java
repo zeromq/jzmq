@@ -18,7 +18,7 @@ import org.junit.Test;
 public class ZAuthTest {
 
 	private static final boolean VERBOSE_MODE = false;
-	private static final String CERTIFICATE_FOLDER=".curve";
+	private static final String CERTIFICATE_FOLDER="curve";
 	
 	@Before
 	public void init() {
@@ -48,7 +48,12 @@ public class ZAuthTest {
 		    //  Whitelist our address; any other address will be rejected
 		    auth.allow("127.0.0.1");
 		    auth.configurePlain("*", "passwords");
-		        
+		    // Make sure the ZAP-Request to configure plain got through before the sockets start working...
+		    // This usually works without sleeping, but there is a chance the ZAP-Request is not handled before
+		    // the sockets read/write and then it will throw a nullpointer cause the configuration didn't run already
+		    // TODO: Look deeper into that issue 
+		    TestUtils.sleep(100);
+		    
 		    //  Create and bind server socket
 		    ZMQ.Socket server = ctx.createSocket(ZMQ.PUSH);
 		    server.setPlainServer(true);
@@ -152,6 +157,9 @@ public class ZAuthTest {
 		    //  or some out-of-band process).
 		    ZCert client_cert = new ZCert();
 		    client_cert.setMeta("name", "Client test certificate");
+		    // wait a second before overwriting a cert, otherwise the certstore won't see that the file actually changed and will deny
+		    // if creating new files, this is not needed
+		    TestUtils.sleep(1000);
 		    client_cert.savePublic(CERTIFICATE_FOLDER+"/testcert.pub");
 		    
 		    ZCert server_cert = new ZCert();
@@ -186,6 +194,7 @@ public class ZAuthTest {
 		}
 		finally {
 			ctx.close();	 
+			TestUtils.cleanupDir(CERTIFICATE_FOLDER);
 		}
 	    		
 	}
@@ -236,19 +245,15 @@ public class ZAuthTest {
 		    // add a timeout so that the client won't wait forever (since it is not connected)
 		    client.setReceiveTimeOut(1000);
 		    
-
-
-		    
 		    //  Send a single message from server to client
 		    boolean sendSuccessful = server.send("Hello");
-		    assert(sendSuccessful);
-		    
 		    // the timeout will leave the recvStr-method with null as result
 		    String message = client.recvStr(0,Charset.defaultCharset());
 		    assert(message == null);
 		}
 		finally {
-			ctx.close();	 
+			ctx.close();	
+			TestUtils.cleanupDir(CERTIFICATE_FOLDER);			
 		}
 	}
 	
