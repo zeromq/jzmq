@@ -298,7 +298,6 @@ public class ZAuth {
         		return true;
         	} else {
         		if (this.certStore!=null) {
-        			this.certStore.checkAndReload();
         			if (this.certStore.containsPublicKey(request.clientKey)) {
         				// login allowed
         				if (verbose) {
