@@ -17,6 +17,7 @@ import org.junit.Test;
  */
 public class ZAuthTest {
 
+	private static final boolean VERBOSE_MODE = false;
 	private static final String CERTIFICATE_FOLDER=".curve";
 	
 	@Before
@@ -43,7 +44,7 @@ public class ZAuthTest {
 		    //  core over a protocol called ZAP).
 			ZAuth auth = new ZAuth(ctx);
 		    //  Get some indication of what the authenticator is deciding
-		    auth.setVerbose(true);
+		    auth.setVerbose(VERBOSE_MODE);
 		    //  Whitelist our address; any other address will be rejected
 		    auth.allow("127.0.0.1");
 		    auth.configurePlain("*", "passwords");
@@ -59,6 +60,10 @@ public class ZAuthTest {
 		    client.setPlainUsername("admin".getBytes());
 		    client.setPlainPassword("secret".getBytes());
 		    client.connect("tcp://127.0.0.1:9000");
+		    
+		    // added some timeouts to prevent blocking during tests
+		    client.setReceiveTimeOut(1000);
+		    server.setSendTimeOut(1000);	    
 		    
 		    //  Send a single message from server to client
 		    server.send("Hello");
@@ -85,7 +90,7 @@ public class ZAuthTest {
 		    //  core over a protocol called ZAP).
 			ZAuth auth = new ZAuth(ctx);
 		    //  Get some indication of what the authenticator is deciding
-		    auth.setVerbose(true);
+		    auth.setVerbose(VERBOSE_MODE);
 		    //  Whitelist our address; any other address will be rejected
 		    auth.allow("127.0.0.1");
 		    auth.configureCurve(ZAuth.CURVE_ALLOW_ANY);
@@ -111,13 +116,15 @@ public class ZAuthTest {
 		    client.setCurveServerKey(server_cert.getPublicKey());
 		    client.connect("tcp://127.0.0.1:9000");
 		    
+		    // added some timeouts to prevent blocking during tests
+		    client.setReceiveTimeOut(1000);
+		    server.setSendTimeOut(1000);
+		    
 		    //  Send a single message from server to client
 		    server.send("Hello");
 		    String message = client.recvStr(0,Charset.defaultCharset());
 		    
-		    if (message.equals("Hello")) {
-		    	System.out.println("Strawhouse test OK");
-		    }
+		    assert(message.equals("Hello"));
 		}
 		finally {
 			ctx.close();	
@@ -134,7 +141,7 @@ public class ZAuthTest {
 		    //  core over a protocol called ZAP).
 			ZAuth auth = new ZAuth(ctx);
 		    //  Get some indication of what the authenticator is deciding
-		    auth.setVerbose(true);
+		    auth.setVerbose(VERBOSE_MODE);
 		    //  Whitelist our address; any other address will be rejected
 		    auth.allow("127.0.0.1");
 		    //  Tell authenticator to use the certificate store in .curve
@@ -163,7 +170,11 @@ public class ZAuthTest {
 		    client.setCurveSecretKey(client_cert.getSecretKey());
 		    client.setCurveServerKey(server_cert.getPublicKey());
 		    client.connect("tcp://127.0.0.1:9000");
-		    client.setReceiveTimeOut(100);
+
+		    // added some timeouts to prevent blocking during tests
+		    client.setReceiveTimeOut(1000);
+		    server.setSendTimeOut(1000);
+
 		    
 		    //  Send a single message from server to client
 		    boolean sendSuccessful = server.send("Hello");
@@ -188,7 +199,7 @@ public class ZAuthTest {
 		    //  core over a protocol called ZAP).
 			ZAuth auth = new ZAuth(ctx);
 		    //  Get some indication of what the authenticator is deciding
-		    auth.setVerbose(true);
+		    auth.setVerbose(VERBOSE_MODE);
 		    //  Whitelist our address; any other address will be rejected
 		    auth.allow("127.0.0.1");
 		    //  Tell authenticator to use the certificate store in .curve
@@ -212,6 +223,8 @@ public class ZAuthTest {
 		    server.setCurvePublicKey(server_cert.getPublicKey());
 		    server.setCurveSecretKey(server_cert.getSecretKey());
 		    server.bind("tcp://*:9000");
+		    // added timeout to prevent blocking during tests
+		    server.setSendTimeOut(1000);
 		    
 		    //  Create and connect client socket
 		    ZMQ.Socket client = ctx.createSocket(ZMQ.PULL);
@@ -220,7 +233,10 @@ public class ZAuthTest {
 		    client.setCurveServerKey(server_cert.getPublicKey());
 		    client.connect("tcp://127.0.0.1:9000");
 		    // add a timeout so that the client won't wait forever (since it is not connected)
-		    client.setReceiveTimeOut(100);
+		    client.setReceiveTimeOut(1000);
+		    
+
+
 		    
 		    //  Send a single message from server to client
 		    boolean sendSuccessful = server.send("Hello");
