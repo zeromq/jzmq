@@ -123,7 +123,7 @@ public class ZAuthTest {
 		    //  Send a single message from server to client
 		    server.send("Hello");
 		    String message = client.recvStr(0,Charset.defaultCharset());
-		    
+		    assert(message != null);
 		    assert(message.equals("Hello"));
 		}
 		finally {
@@ -181,6 +181,7 @@ public class ZAuthTest {
 		    assert(sendSuccessful);
 		    
 		    String message = client.recvStr(0,Charset.defaultCharset());
+		    assert(message != null);
 		    assert(message.equals("Hello"));
 		}
 		finally {
