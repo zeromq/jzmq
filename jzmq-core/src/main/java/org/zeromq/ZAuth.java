@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import org.zeromq.ZMQ.PollItem;
 import org.zeromq.ZMQ.Poller;
 import org.zeromq.ZMQ.Socket;
@@ -22,7 +23,8 @@ import org.zeromq.ZThread.IAttachedRunnable;
  * @author cbusbey (at) connamara (dot) com
  */
 public class ZAuth {
-
+	public static final String CURVE_ALLOW_ANY = "*";
+	
     private Socket pipe; //pipe to backend agent
     private boolean verbose;
 
@@ -67,7 +69,9 @@ public class ZAuth {
                     self.username = request.popString();
                     self.password = request.popString();
                 } else if (self.mechanism.equals("CURVE")) {
-                    // TODO: Handle CURVE authentication
+                	ZFrame frame = request.pop();
+                	byte[] clientPublicKey = frame.getData();
+                	self.clientKey = ZMQ.Curve.z85Encode(clientPublicKey);
                 } else if (self.mechanism.equals("GSSAPI")) {
                     self.principal = request.popString();
                 }
@@ -118,6 +122,10 @@ public class ZAuth {
         private File passwords_file;
         private long passwords_modified;
         final private ZAuth auth; //our parent auth, used for authorization callbacks
+        private boolean allow_any;
+        private ZCertStore certStore = null;
+        
+        
 
         private ZAuthAgent(ZAuth auth) {
             this.auth = auth;
@@ -132,14 +140,23 @@ public class ZAuth {
             ZMsg msg = ZMsg.recvMsg(pipe);
 
             String command = msg.popString();
+            if (verbose) {
+            	System.out.printf("ZAuth: API command=%s\n",command);
+            }
             if (command == null) {
                 return false; //interrupted
             }
             if (command.equals("ALLOW")) {
                 String address = msg.popString();
+                if (verbose) {
+                	System.out.printf("ZAuth: - whitelisting ipaddress=%s\n", address);
+                }
                 whitelist.put(address, "OK");
             } else if (command.equals("DENY")) {
                 String address = msg.popString();
+                if (verbose) {
+                	System.out.printf("ZAuth: - blacklisting ipaddress=%s\n", address);
+                }            	
                 blacklist.put(address, "OK");
             } else if (command.equals("PLAIN")) {
                 // For now we don't do anything with domains
@@ -154,6 +171,16 @@ public class ZAuth {
                 reply.add("OK");
                 reply.send(pipe);
                 reply.destroy();
+            } else if (command.equals("CURVE")) {
+                //  If location is CURVE_ALLOW_ANY, allow all clients. Otherwise
+                //  treat location as a directory that holds the certificates.            	
+            	String location = msg.popString();
+            	if (location.equals(CURVE_ALLOW_ANY)){
+            		allow_any=true;
+            	} else {
+            		this.certStore = new ZCertStore(location);
+            		this.allow_any = false;
+            	}
             } else if (command.equals("GSSAPI")) {
                 //for now, we don't do anything with domains
                 String domain = msg.popString();
@@ -222,7 +249,7 @@ public class ZAuth {
                     allowed = authenticatePlain(request);
                 } else if (request.mechanism.equals("CURVE")) {
                     // For CURVE, even a whitelisted address must authenticate
-                    // TODO: Handle CURVE authentication
+                	allowed = authenticateCurve(request);
                 } else if (request.mechanism.equals("GSSAPI")) {
                     // At this point, the request is authenticated, send to 
                     //zauth callback for complete authorization
@@ -261,6 +288,33 @@ public class ZAuth {
 
                 return false;
             }
+        }
+        
+        private boolean authenticateCurve(ZAPRequest request) {
+        	if (this.allow_any) {
+        		if (this.verbose) {
+        			System.out.println("zauth: - allowed (CURVE allow any client)");
+        		}
+        		return true;
+        	} else {
+        		if (this.certStore!=null) {
+        			this.certStore.checkAndReload();
+        			if (this.certStore.containsPublicKey(request.clientKey)) {
+        				// login allowed
+        				if (verbose) {
+        					System.out.printf("zauth: - allowed (CURVE) client_key=%s\n",request.clientKey);	
+        				}
+        				return true;
+        			} else {
+        				// login not allowed. couldn't find certificate
+        				if (verbose) {
+        					System.out.printf("zauth: - denied (CURVE) client_key=%s\n",request.clientKey);	
+        				}
+        				return false;
+        			}
+        		}
+        	}
+        	return false;
         }
 
         @Override
@@ -415,6 +469,22 @@ public class ZAuth {
         msg.destroy();
     }
 
+    /**
+     * Configure CURVE authentication 
+     *
+     * @param location Can be ZAuth.CURVE_ALLOW_ANY or a directory with public-keys that will be accepted
+     */
+    public void configureCurve(String location) {
+        assert (location != null);
+
+        ZMsg msg = new ZMsg();
+        msg.add("CURVE");
+        msg.add(location);
+        msg.send(pipe);
+        msg.destroy();
+    }
+    
+    
     /**
      * Destructor.
      */
