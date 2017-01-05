@@ -48,9 +48,9 @@ public class ZAuthTest {
 		    //  Whitelist our address; any other address will be rejected
 		    auth.allow("127.0.0.1");
 		    auth.configurePlain("*", "passwords");
-		    // Make sure the ZAP-Request to configure plain got through before the sockets start working...
-		    // This usually works without sleeping, but there is a chance the ZAP-Request is not handled before
-		    // the sockets read/write and then it will throw a nullpointer cause the configuration didn't run already
+		    // Make sure the ZAuthAgent's command to configure plain-mechanism got through before the sockets start working...
+		    // This usually works without sleeping, but there is a chance the command is not handled before
+		    // the sockets read/write and then it will throw an error cause the configuration didn't run already
 		    // TODO: Look deeper into that issue 
 		    TestUtils.sleep(100);
 		    
@@ -99,6 +99,11 @@ public class ZAuthTest {
 		    //  Whitelist our address; any other address will be rejected
 		    auth.allow("127.0.0.1");
 		    auth.configureCurve(ZAuth.CURVE_ALLOW_ANY);
+		    // Make sure the ZAuthAgent's command to configure plain-mechanism got through before the sockets start working...
+		    // This usually works without sleeping, but there is a chance the command is not handled before
+		    // the sockets read/write and then it will throw an error cause the configuration didn't run already
+		    // TODO: Look deeper into that issue 
+		    TestUtils.sleep(100);
 
 		    //  We need two certificates, one for the client and one for
 		    //  the server. The client must know the server's public key
@@ -151,6 +156,12 @@ public class ZAuthTest {
 		    auth.allow("127.0.0.1");
 		    //  Tell authenticator to use the certificate store in .curve
 		    auth.configureCurve(CERTIFICATE_FOLDER);
+		    // Make sure the ZAuthAgent's command to configure plain-mechanism got through before the sockets start working...
+		    // This usually works without sleeping, but there is a chance the command is not handled before
+		    // the sockets read/write and then it will throw an error cause the configuration didn't run already
+		    // TODO: Look deeper into that issue 
+		    TestUtils.sleep(100);
+		    
 
 		    //  We'll generate a new client certificate and save the public part
 		    //  in the certificate store (in practice this would be done by hand
@@ -214,6 +225,11 @@ public class ZAuthTest {
 		    auth.allow("127.0.0.1");
 		    //  Tell authenticator to use the certificate store in .curve
 		    auth.configureCurve(CERTIFICATE_FOLDER);
+		    // Make sure the ZAuthAgent's command to configure plain-mechanism got through before the sockets start working...
+		    // This usually works without sleeping, but there is a chance the command is not handled before
+		    // the sockets read/write and then it will throw an error cause the configuration didn't run already
+		    // TODO: Look deeper into that issue 
+		    TestUtils.sleep(100);
 
 		    //  We'll generate a new client certificate and save the public part
 		    //  in the certificate store (in practice this would be done by hand
