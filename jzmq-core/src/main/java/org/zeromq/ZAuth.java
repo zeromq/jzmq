@@ -165,6 +165,11 @@ public class ZAuth {
                 // If the file doesn't exist we'll get an empty map
                 String filename = msg.popString();
                 this.passwords_file = new File(filename);
+
+                if (verbose) {
+            		System.out.println("ZAuth: - activated plain-mechanism with password-file:"+this.passwords_file.getAbsolutePath());
+            	}
+
                 this.loadPasswords(true);
 
                 ZMsg reply = new ZMsg();
