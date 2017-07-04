@@ -663,7 +663,19 @@ public class ZMQ {
 
             return getLongSockopt(HWM);
         }
-
+      
+        /**
+        * @see #setRouterHandover(long)
+        *
+        * @return the number of messages for handover.
+        */
+        public long getRouterHandover() {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 1, 0))
+                return -1L;
+            else
+                return getLongSockopt(56);
+        }
+      
         /**
          * @see #setSwap(long)
          * 
@@ -1066,7 +1078,23 @@ public class ZMQ {
 
             setLongSockopt(HWM, hwm);
         }
-
+      
+        /**
+        * Get the Swap. The 'ZMQ_SWAP' option shall set the disk offload (swap) size for the specified 'socket'. A
+        * socket which has 'ZMQ_SWAP' set to a non-zero value may exceed its high water mark; in this case outstanding
+        * messages shall be offloaded to storage on disk rather than held in memory.
+        *          * @param swap The value of 'ZMQ_SWAP' defines the maximum size of the swap space in bytes.
+        */
+       public void setRouterHandover(long handover) {
+           if (ZMQ.version_full() >= ZMQ.make_version(4, 1, 0))
+               return;
+           else
+           {
+               setLongSockopt(56, handover);
+               return;
+           }
+        }
+      
         /**
          * Get the Swap. The 'ZMQ_SWAP' option shall set the disk offload (swap) size for the specified 'socket'. A
          * socket which has 'ZMQ_SWAP' set to a non-zero value may exceed its high water mark; in this case outstanding
@@ -1924,6 +1952,7 @@ public class ZMQ {
         private static final int REQ_RELAXED = 53;
         private static final int CONFLATE = 54;
         private static final int ZAP_DOMAIN = 55;
+        private static final int ROUTER_HANDOVER = 56;
         private static final int GSSAPI_SERVER = 62;
         private static final int GSSAPI_PRINCIPAL = 63;
         private static final int GSSAPI_SERVICE_PRINCIPAL = 64;
