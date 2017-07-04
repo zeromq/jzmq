@@ -648,6 +648,7 @@ public class ZMQ {
         public long getRcvHWM() {
             if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return -1;
+          
             return getLongSockopt(RCVHWM);
         }
 
