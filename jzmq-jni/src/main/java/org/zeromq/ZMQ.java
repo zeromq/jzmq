@@ -648,7 +648,6 @@ public class ZMQ {
         public long getRcvHWM() {
             if (ZMQ.version_full() < ZMQ.make_version(3, 0, 0))
                 return -1;
-
             return getLongSockopt(RCVHWM);
         }
 
@@ -1080,19 +1079,17 @@ public class ZMQ {
         }
       
         /**
-        * Get the Swap. The 'ZMQ_SWAP' option shall set the disk offload (swap) size for the specified 'socket'. A
-        * socket which has 'ZMQ_SWAP' set to a non-zero value may exceed its high water mark; in this case outstanding
-        * messages shall be offloaded to storage on disk rather than held in memory.
-        *          * @param swap The value of 'ZMQ_SWAP' defines the maximum size of the swap space in bytes.
+        * For use ROUTER_HANDOVER
+        * @param handover the number of handover
         */
-       public void setRouterHandover(long handover) {
-           if (ZMQ.version_full() >= ZMQ.make_version(4, 1, 0))
-               return;
-           else
-           {
-               setLongSockopt(56, handover);
-               return;
-           }
+        public void setRouterHandover(long handover) {
+            if (ZMQ.version_full() >= ZMQ.make_version(4, 1, 0))
+                return;
+            else
+            {
+                setLongSockopt(56, handover);
+                return;
+            }
         }
       
         /**
