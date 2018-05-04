@@ -95,10 +95,6 @@ test "x$JAVAC" = x && AC_MSG_ERROR([cannot find javac])
 AC_SUBST(JAVAC)
 AC_SUBST(JAVACFLAGS)
 
-test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, javah)
-test "x$JAVAH" = x && AC_MSG_ERROR([cannot find javah])
-AC_SUBST(JAVAH)
-
 test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar)
 test "x$JAR" = x && AC_MSG_ERROR([cannot find jar])
 AC_SUBST(JAR)
