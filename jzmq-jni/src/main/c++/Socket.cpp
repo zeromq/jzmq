@@ -603,15 +603,21 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_disconnect (JNIEnv *env,
 }
 
 typedef struct _jzmq_zerocopy_t {
-    JNIEnv *env;
+    JavaVM *jvm;
     jobject ref_buffer;
 } jzmq_zerocopy_t;
 
 static
 void s_delete_ref (void *ptr, void *hint)
 {
+   
     jzmq_zerocopy_t *free_hint = (jzmq_zerocopy_t *)hint;
-    free_hint->env->DeleteGlobalRef(free_hint->ref_buffer);
+   
+    // jenv should only be used form an attached thread, using jvm is needed
+    // not detaching causes a memory leak, but only a minor one / since thread are freed
+    JNIEnv* jenv = 0;
+    free_hint->jvm->AttachCurrentThread((void **)&jenv, NULL);
+    jenv->DeleteGlobalRef(free_hint->ref_buffer);
     delete free_hint;
 }
 
@@ -622,7 +628,7 @@ jboolean s_zerocopy_init (JNIEnv *env, zmq_msg_t *message, jobject obj, jint len
     jobject ref_buffer = env->NewGlobalRef(obj);
     jzmq_zerocopy_t *free_hint = new jzmq_zerocopy_t;
 
-    free_hint->env = env;
+    env->GetJavaVM(&free_hint->jvm);
     free_hint->ref_buffer = ref_buffer;
 
     jbyte* buf = (jbyte*) env->GetDirectBufferAddress(ref_buffer);
