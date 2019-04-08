@@ -148,7 +148,9 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_destroy (JNIEnv *env, job
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env, jobject obj, jint option)
 {
-    switch (option) {
+
+	
+	switch (option) {
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,0,0)
     case ZMQ_BACKLOG:
     case ZMQ_MAXMSGSIZE:
@@ -189,6 +191,9 @@ Java_org_zeromq_ZMQ_00024Socket_getLongSockopt (JNIEnv *env, jobject obj, jint o
     case ZMQ_PLAIN_SERVER:
     case ZMQ_IMMEDIATE:
 #endif
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,1,0)
+    case ZMQ_ROUTER_HANDOVER:
+#endif		    
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
     case ZMQ_RECOVERY_IVL:
@@ -335,6 +340,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
     case ZMQ_AFFINITY:
     case ZMQ_RATE:
     case ZMQ_RECOVERY_IVL:
+    case ZMQ_ROUTER_HANDOVER:	
     case ZMQ_SNDBUF:
     case ZMQ_RCVBUF:
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,1,0)
@@ -387,11 +393,12 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_setLongSockopt (JNIEnv *e
                 || (option == ZMQ_REQ_RELAXED)
                 || (option == ZMQ_REQ_CORRELATE)
                 || (option == ZMQ_PROBE_ROUTER)
-                || (option == ZMQ_CURVE_SERVER)
+                || (option == ZMQ_CURVE_SERVER)	
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4,1,0)
                 || (option == ZMQ_GSSAPI_SERVER)
                 || (option == ZMQ_GSSAPI_PLAINTEXT)
+		|| (option == ZMQ_ROUTER_HANDOVER)
 #endif
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(2,1,0)
             ) {
