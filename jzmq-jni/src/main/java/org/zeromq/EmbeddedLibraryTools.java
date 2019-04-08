@@ -25,7 +25,7 @@ public class EmbeddedLibraryTools {
         if (osName.toLowerCase().contains("windows")) {
             osName = "Windows";
         } else if (osName.toLowerCase().contains("mac os x")) {
-            osName = "Darwin";
+            osName = "Mac OS X";
         } else {
             osName = osName.replaceAll("\\s+", "_");
         }
