@@ -6,6 +6,10 @@ project (JZMQ)
 find_package (Java REQUIRED)
 find_package (JNI REQUIRED)
 
+
+set(ZMQ_C_INCLUDE_PATH "" CACHE PATH "Path to ZMQ Header files")
+set(ZMQ_C_LIB_PATH "" CACHE PATH "Path to ZMQ library")
+
 find_program (JNI_JAVAH
   NAMES javah
 	HINTS ${_JAVA_HINTS}
@@ -19,7 +23,6 @@ find_program (JNI_JAVAH
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 message(FATAL_ERROR "CMake generation is not allowed within the source directory!
 Remove the CMakeCache.txt file and try again from another folder, e.g.:
-
    del CMakeCache.txt
    mkdir build
    cd build
@@ -54,20 +57,22 @@ add_definitions(
 set(java-sources
 	org/zeromq/ZMQ.java
 	org/zeromq/ZMQException.java
-	org/zeromq/ZMQForwarder.java
-	org/zeromq/ZMQQueue.java
-	org/zeromq/ZMQStreamer.java
+	../../../../jzmq-devices/src/main/java/org/zeromq/ZMQForwarder.java
+	../../../../jzmq-devices/src/main/java/org/zeromq/ZMQQueue.java
+	../../../../jzmq-devices/src/main/java/org/zeromq/ZMQStreamer.java
 	org/zeromq/EmbeddedLibraryTools.java
 	org/zeromq/App.java
-	org/zeromq/ZContext.java
-	org/zeromq/ZDispatcher.java
-	org/zeromq/ZFrame.java
-	org/zeromq/ZMsg.java
-	org/zeromq/ZLoop.java
-	org/zeromq/ZThread.java
+	../../../../jzmq-core/src/main/java/org/zeromq/ZContext.java
+	../../../../jzmq-core/src/main/java/org/zeromq/Utils.java
+	../../../../jzmq-core/src/main/java/org/zeromq/ZDispatcher.java
+	../../../../jzmq-core/src/main/java/org/zeromq/ZFrame.java
+	../../../../jzmq-core/src/main/java/org/zeromq/ZMsg.java
+	../../../../jzmq-core/src/main/java/org/zeromq/ZLoop.java
+	../../../../jzmq-core/src/main/java/org/zeromq/ZThread.java
 )
 set(java-classes
 	org/zeromq/ZMQ.class
+	org/zeromq/Utils.class
 	org/zeromq/ZMQ$$Context.class
 	org/zeromq/ZMQ$$Socket.class
 	org/zeromq/ZMQ$$PollItem.class
@@ -118,7 +123,7 @@ set(cxx-sources
 include_directories(
         src
         src/main/java
-	${CMAKE_CURRENT_BINARY_DIR}
+	    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 #-----------------------------------------------------------------------------
@@ -128,16 +133,11 @@ add_definitions(
 	-DZMQ_HAVE_OPENPGM
 )
 include_directories(
-#	/zeromq/zeromq-2.1.10/include
-#	c:/zeromq/zeromq-3.3.0/include
-	c:/zeromq/zeromq-3.2.2/include
+	${ZMQ_C_INCLUDE_PATH}
 	${JNI_INCLUDE_DIRS}
 )
 link_directories(
-#	/zeromq/zeromq-2.1.10/build/lib
-#	/zeromq/zeromq-2.1.10/build64/lib
-#	c:/zeromq/zeromq-3.3.0/lib
-	c:/zeromq/zeromq-3.2.2/lib
+	${ZMQ_C_LIB_PATH}
 )
 
 #-----------------------------------------------------------------------------
@@ -203,7 +203,7 @@ add_library(jzmq SHARED ${sources})
 target_link_libraries(jzmq libzmq.lib)
 
 set(docs
-        AUTHORS
+    AUTHORS
 	COPYING
 	COPYING.LESSER
 	ChangeLog
@@ -225,9 +225,6 @@ ENDIF()
 include (InstallRequiredSystemLibraries)
 set (CPACK_PACKAGE_VENDOR "Miru Limited")
 set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
-#set (CPACK_PACKAGE_VERSION_MAJOR "2")
-#set (CPACK_PACKAGE_VERSION_MINOR "1")
-#set (CPACK_PACKAGE_VERSION_PATCH "10")
 set (CPACK_PACKAGE_VERSION_MAJOR "3")
 set (CPACK_PACKAGE_VERSION_MINOR "2")
 set (CPACK_PACKAGE_VERSION_PATCH "2")
