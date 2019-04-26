@@ -664,7 +664,7 @@ public class ZMQ {
             return getLongSockopt(HWM);
         }
       
-        /**
+        /**
         * @see #setRouterHandover(long)
         *
         * @return the number of messages for handover.
@@ -1079,7 +1079,7 @@ public class ZMQ {
             setLongSockopt(HWM, hwm);
         }
       
-        /**
+        /**
         * For use ROUTER_HANDOVER
         * @param handover the number of handover
         */
@@ -1088,7 +1088,7 @@ public class ZMQ {
                 return;
             else
             {
-                setLongSockopt(56, handover);
+                setLongSockopt(56, handover);
                 return;
             }
         }
