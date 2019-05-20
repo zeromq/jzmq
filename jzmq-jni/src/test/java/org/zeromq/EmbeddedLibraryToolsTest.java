@@ -40,8 +40,8 @@ public class EmbeddedLibraryToolsTest {
 
     @Test
     public void rewriteMacOSX() {
-        setOsProperties("Mac OS X", "x86_64");
-        assertPlatformIdentifierEquals("x86_64/Darwin");
+        setOsProperties("mac os x", "x86_64");
+        assertPlatformIdentifierEquals("x86_64/Mac OS X");
     }
 
     @Test
