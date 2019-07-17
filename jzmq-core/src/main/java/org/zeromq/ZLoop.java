@@ -100,18 +100,20 @@ public class ZLoop {
     private void rebuild() {
         pollact = null;
 
-        pollSize = pollers.size();
-        pollset = new Poller(pollSize);
+        synchronized (pollers) {
+            pollSize = pollers.size();
+            pollset = new Poller(pollSize);
 
-        pollact = new SPoller[pollSize];
+            pollact = new SPoller[pollSize];
 
-        int itemNbr = 0;
-        for (SPoller poller : pollers) {
-            pollset.register(poller.item);
-            pollact[itemNbr] = poller;
-            itemNbr++;
+            int itemNbr = 0;
+            for (SPoller poller : pollers) {
+                pollset.register(poller.item);
+                pollact[itemNbr] = poller;
+                itemNbr++;
+            }
+            dirty = false;
         }
-        dirty = false;
     }
 
     private long ticklessTimer() {
@@ -144,9 +146,12 @@ public class ZLoop {
             return -1;
 
         SPoller poller = new SPoller(item_, handler, arg);
-        pollers.add(poller);
 
-        dirty = true;
+        synchronized (pollers) {
+            pollers.add(poller);
+            dirty = true;
+        }
+
         if (verbose)
             System.out.printf("I: zloop: register %s poller (%s, %s)\n", item.getSocket() != null ? item.getSocket()
                     .getType() : "RAW", item.getSocket(), item.getRawSocket());
@@ -161,12 +166,14 @@ public class ZLoop {
     public void removePoller(PollItem item_) {
         PollItem item = item_;
 
-        Iterator<SPoller> it = pollers.iterator();
-        while (it.hasNext()) {
-            SPoller p = it.next();
-            if (item.equals(p.item)) {
-                it.remove();
-                dirty = true;
+        synchronized (pollers) {
+            Iterator<SPoller> it = pollers.iterator();
+            while (it.hasNext()) {
+                SPoller p = it.next();
+                if (item.equals(p.item)) {
+                    it.remove();
+                    dirty = true;
+                }
             }
         }
         if (verbose)
