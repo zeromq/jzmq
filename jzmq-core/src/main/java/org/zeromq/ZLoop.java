@@ -77,7 +77,7 @@ public class ZLoop {
     private int pollSize; // Size of poll set
     private Poller pollset; // zmq_poll set
     private SPoller[] pollact; // Pollers for this poll set
-    private boolean dirty; // True if pollset needs rebuilding
+    private volatile boolean dirty; // True if pollset needs rebuilding
     private boolean verbose; // True if verbose tracing wanted
     private final List<Object> zombies; // List of timers to kill
     private final List<STimer> newTimers; // List of timers to add
