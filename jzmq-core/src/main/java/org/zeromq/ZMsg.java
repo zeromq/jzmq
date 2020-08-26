@@ -239,7 +239,7 @@ public class ZMsg implements Deque<ZFrame>
                     // Write byte size of frame
                     file.writeInt(f.size());
                     // Write frame byte data
-                    file.write(f.getData());
+                    file.write(f.hasData() ? f.getData() : new byte[0]);
                 }
             }
             return true;
@@ -342,7 +342,7 @@ public class ZMsg implements Deque<ZFrame>
             PrintWriter pw = new PrintWriter(sw);
             pw.printf("--------------------------------------\n");
             for (ZFrame frame : frames) {
-                pw.printf("[%03d] %s\n", frame.getData().length, frame.toString());
+                pw.printf("[%03d] %s\n", frame.hasData() ? frame.getData().length : 0, frame.toString());
             }
             out.append(sw.getBuffer());
             sw.close();
