@@ -81,6 +81,10 @@ zmq_msg_t *do_read(JNIEnv *env, jobject obj, zmq_msg_t *message, int flags)
 #endif
     int err = zmq_errno();
     if (rc < 0 && err == EAGAIN) {
+	//throw exception when recv(0) timeout
+	if (flag == 0) {
+	    raise_exception (env, err);
+	}
         rc = zmq_msg_close (message);
         err = zmq_errno();
         if (rc != 0) {
