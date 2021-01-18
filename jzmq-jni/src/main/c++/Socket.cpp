@@ -609,7 +609,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_join (JNIEnv *env,
                                                             jobject obj,
                                                             jstring group)
 {
-#ifdef ZMQ_BUILD_DRAFT_API
     void *s = get_socket (env, obj);
 
     if (group == NULL) {
@@ -631,7 +630,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_join (JNIEnv *env,
         raise_exception (env, err);
         return;
     }
-#endif
 }
 
 
@@ -642,7 +640,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_leave (JNIEnv *env,
                                                             jobject obj,
                                                             jstring group)
 {
-#ifdef ZMQ_BUILD_DRAFT_API
     void *s = get_socket (env, obj);
 
     if (group == NULL) {
@@ -664,7 +661,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_leave (JNIEnv *env,
         raise_exception (env, err);
         return;
     }
-#endif
 }
 
 
