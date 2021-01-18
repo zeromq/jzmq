@@ -602,6 +602,72 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_disconnect (JNIEnv *env,
 #endif
 }
 
+/**
+ * Called by Java's Socket::join(String group).
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_0024Socket_join (JNIEnv *env,
+                                                            jobject obj,
+                                                            jstring group)
+{
+#ifdef ZMQ_BUILD_DRAFT_API
+    void *s = get_socket (env, obj);
+
+    if (group == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    const char *c_group = env->GetStringUTFChars (group, NULL);
+    if (c_group == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    int rc = zmq_join (s, c_group);
+    int err = zmq_errno();
+    env->ReleaseStringUTFChars (addr, c_group);
+
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
+#endif
+}
+
+
+/**
+ * Called by Java's Socket::leave(String group).
+ */
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_0024Socket_leave (JNIEnv *env,
+                                                            jobject obj,
+                                                            jstring group)
+{
+#ifdef ZMQ_BUILD_DRAFT_API
+    void *s = get_socket (env, obj);
+
+    if (group == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    const char *c_group = env->GetStringUTFChars (group, NULL);
+    if (c_group == NULL) {
+        raise_exception (env, EINVAL);
+        return;
+    }
+
+    int rc = zmq_leave (s, c_group);
+    int err = zmq_errno();
+    env->ReleaseStringUTFChars (addr, c_group);
+
+    if (rc != 0) {
+        raise_exception (env, err);
+        return;
+    }
+#endif
+}
+
+
 typedef struct _jzmq_zerocopy_t {
     JNIEnv *env;
     jobject ref_buffer;
