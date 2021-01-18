@@ -82,3 +82,9 @@ javah_stamp
 .tags*
 *.sublime-project
 *.sublime-workspace
+jzmq-jni/src/.vs/src/v16/Browse.VC.opendb
+jzmq-jni/src/.vs/src/v16/Browse.VC.db-wal
+jzmq-jni/src/.vs/src/v16/Browse.VC.db-shm
+jzmq-jni/src/.vs/src/v16/Browse.VC.db
+jzmq-jni/src/.vs/slnx.sqlite
+jzmq-jni/src/.vs/ProjectSettings.json

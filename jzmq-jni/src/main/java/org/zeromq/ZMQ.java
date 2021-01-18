@@ -66,6 +66,14 @@ public class ZMQ {
      */
     public static final int SUB = 2;
     /**
+     * Flag to specify the receiving part of the RADIO socket.
+     */
+    public static final int DISH = 15;
+    /**
+     * Flag to specify a RADIO socket, receiving side must be a DISH.
+     */
+    public static final int RADIO = 14;
+     /**
      * Flag to specify a REQ socket, receiving side must be a REP.
      */
     public static final int REQ = 3;
