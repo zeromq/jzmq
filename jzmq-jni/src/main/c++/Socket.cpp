@@ -605,7 +605,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_disconnect (JNIEnv *env,
 /**
  * Called by Java's Socket::join(String group).
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_0024Socket_join (JNIEnv *env,
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_join (JNIEnv *env,
                                                             jobject obj,
                                                             jstring group)
 {
@@ -638,7 +638,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_0024Socket_join (JNIEnv *env,
 /**
  * Called by Java's Socket::leave(String group).
  */
-JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_0024Socket_leave (JNIEnv *env,
+JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_leave (JNIEnv *env,
                                                             jobject obj,
                                                             jstring group)
 {
