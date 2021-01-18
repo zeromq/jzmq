@@ -625,7 +625,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_join (JNIEnv *env,
 
     int rc = zmq_join (s, c_group);
     int err = zmq_errno();
-    env->ReleaseStringUTFChars (addr, c_group);
+    env->ReleaseStringUTFChars (group, c_group);
 
     if (rc != 0) {
         raise_exception (env, err);
@@ -658,7 +658,7 @@ JNIEXPORT void JNICALL Java_org_zeromq_ZMQ_00024Socket_leave (JNIEnv *env,
 
     int rc = zmq_leave (s, c_group);
     int err = zmq_errno();
-    env->ReleaseStringUTFChars (addr, c_group);
+    env->ReleaseStringUTFChars (group, c_group);
 
     if (rc != 0) {
         raise_exception (env, err);
