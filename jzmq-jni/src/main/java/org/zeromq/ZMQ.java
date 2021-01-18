@@ -1227,6 +1227,20 @@ public class ZMQ {
         }
 
         /**
+         * Joins a group.
+         *
+         * @param group the name of the group to join. Limited to 16 characters.
+         */
+        public native void join(String group);
+
+         /**
+         * Leaves a group.
+         *
+         * @param group the name of the group to leave. Limited to 16 characters.
+         */
+        public native void leave(String group);
+
+        /**
          * The 'ZMQ_RATE' option shall set the maximum send or receive data rate for multicast transports such as in the
          * man page of zmq_pgm[7] using the specified 'socket'.
          * 
