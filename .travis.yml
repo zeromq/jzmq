@@ -36,3 +36,7 @@ jdk:
  - openjdk6
  - openjdk7
  - oraclejdk8
+
+cache:
+  directories:
+  - $HOME/.m2
